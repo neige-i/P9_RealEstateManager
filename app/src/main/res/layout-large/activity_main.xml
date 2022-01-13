@@ -22,12 +22,32 @@
             />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/main_content"
-        android:name="com.openclassrooms.realestatemanager.list.ListFragment"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-        />
+        >
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/left_content"
+            android:name="com.openclassrooms.realestatemanager.list.ListFragment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toStartOf="@id/right_content"
+            app:layout_constraintHorizontal_weight="3"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/right_content"
+            android:name="com.openclassrooms.realestatemanager.detail.DetailFragment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="7"
+            app:layout_constraintStart_toEndOf="@id/left_content"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

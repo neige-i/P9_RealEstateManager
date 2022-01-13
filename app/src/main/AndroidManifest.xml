@@ -16,7 +16,7 @@
         android:theme="@style/AppTheme"
         >
         <activity
-            android:name="com.openclassrooms.realestatemanager.MainActivity"
+            android:name=".main.MainActivity"
             android:exported="true"
             >
             <intent-filter>
@@ -24,7 +24,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.openclassrooms.realestatemanager.SecondActivity" />
     </application>
 
 </manifest>
