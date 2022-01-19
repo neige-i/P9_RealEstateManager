@@ -5,13 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.openclassrooms.realestatemanager.databinding.FragmentDetailBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class DetailFragment : Fragment() {
-
-    companion object {
-        const val ITEM_ARG = "ITEM_ARG"
-    }
 
     private var mutableBinding: FragmentDetailBinding? = null
     private val binding get() = mutableBinding!!
@@ -26,11 +25,10 @@ class DetailFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.detailTv.text = "No item selected"
-
-        arguments?.let {
-            binding.detailTv.text = it.getString(ITEM_ARG)
-        }
+        ViewModelProvider(this)
+            .get(DetailViewModel::class.java)
+            .viewState
+            .observe(viewLifecycleOwner) { binding.detailTv.text = it }
     }
 
     override fun onDestroyView() {

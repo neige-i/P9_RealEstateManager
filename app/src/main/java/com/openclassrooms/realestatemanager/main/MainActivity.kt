@@ -1,16 +1,15 @@
 package com.openclassrooms.realestatemanager.main
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
-import androidx.fragment.app.commit
-import androidx.fragment.app.replace
-import com.openclassrooms.realestatemanager.ShowDetailCallback
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding
-import com.openclassrooms.realestatemanager.detail.DetailFragment
+import com.openclassrooms.realestatemanager.detail.DetailActivity
+import dagger.hilt.android.AndroidEntryPoint
 
-class MainActivity : AppCompatActivity(), ShowDetailCallback {
+@AndroidEntryPoint
+class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -22,40 +21,8 @@ class MainActivity : AppCompatActivity(), ShowDetailCallback {
         setContentView(binding.root)
         setSupportActionBar(binding.mainToolbar)
 
-        viewModel.onActivityCreated(binding.mainContent?.id, binding.rightContent?.id)
-
-        supportFragmentManager.addOnBackStackChangedListener {
-            viewModel.onBackStackChanged(supportFragmentManager.backStackEntryCount)
-        }
-
-        viewModel.viewState.observe(this) {
-            title = it.title
-            supportActionBar?.setDisplayHomeAsUpEnabled(it.isHomeAsUpEnabled)
-        }
-
-        viewModel.mainEvent.observe(this) {
-            when (it) {
-                is ShowDetailEvent -> {
-                    val bundle = bundleOf(DetailFragment.ITEM_ARG to it.arg)
-
-                    supportFragmentManager.commit {
-                        replace<DetailFragment>(it.containerId, args = bundle)
-                        setReorderingAllowed(true)
-                        addToBackStack(null)
-                    }
-                }
-                EndActivityEvent -> finish()
-                GoBackEvent -> super.onBackPressed()
-            }
+        viewModel.startDetailActivityEvent.observe(this) {
+            startActivity(Intent(this, DetailActivity::class.java))
         }
     }
-
-    override fun onSupportNavigateUp(): Boolean {
-        supportFragmentManager.popBackStack()
-        return super.onSupportNavigateUp()
-    }
-
-    override fun onBackPressed() = viewModel.onBackPressed()
-
-    override fun onShowDetail(item: String) = viewModel.onShowDetails(item)
 }

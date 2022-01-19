@@ -1,64 +1,29 @@
 package com.openclassrooms.realestatemanager.main
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.openclassrooms.realestatemanager.R
+import com.openclassrooms.realestatemanager.data.DetailRepository
 import com.openclassrooms.realestatemanager.util.SingleLiveEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    detailRepository: DetailRepository,
+    private val application: Application,
+) : ViewModel() {
 
-    private val mutableViewState = MutableLiveData<MainViewState>()
-    val viewState: LiveData<MainViewState> = mutableViewState
+    private val startDetailActivityMutableEvent = SingleLiveEvent<Unit>()
+    val startDetailActivityEvent: LiveData<Unit> = startDetailActivityMutableEvent
 
-    private val mainMutableEvent = SingleLiveEvent<MainEvent>()
-    val mainEvent: LiveData<MainEvent> = mainMutableEvent
+    init {
+        startDetailActivityMutableEvent.addSource(detailRepository.getItemLiveData()) {
 
-    private var detailContainerId: Int? = null
-    private var isTabletSize: Boolean? = null
-
-    fun onActivityCreated(mainContentId: Int?, rightContentId: Int?) {
-        detailContainerId = mainContentId ?: rightContentId
-        isTabletSize = rightContentId != null
-    }
-
-    /**
-     * Sets the fragment transaction info.
-     */
-    fun onShowDetails(item: String) {
-        mainMutableEvent.value = detailContainerId?.let {
-            ShowDetailEvent(
-                containerId = it,
-                arg = item
-            )
-        }
-    }
-
-    /**
-     * Updates the Toolbar title and up button.
-     */
-    fun onBackStackChanged(backStackEntryCount: Int) {
-        val showMainTitle = isTabletSize == true || backStackEntryCount == 0
-
-        mutableViewState.value = MainViewState(
-            title = if (showMainTitle) {
-                getApplication<Application>().getString(R.string.app_name)
-            } else {
-                "Detail"
-            },
-            isHomeAsUpEnabled = !showMainTitle
-        )
-    }
-
-    /**
-     * Decides whether to close the activity or to let the default behaviour happen.
-     */
-    fun onBackPressed() {
-        if (isTabletSize == true) {
-            mainMutableEvent.value = EndActivityEvent
-        } else {
-            mainMutableEvent.value = GoBackEvent
+            if (!application.resources.getBoolean(R.bool.is_tablet)) {
+                startDetailActivityMutableEvent.call()
+            }
         }
     }
 }

@@ -18,7 +18,7 @@ package com.openclassrooms.realestatemanager.util
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  *
  * Note that only one observer is going to be notified of changes.
  */
-class SingleLiveEvent<T> : MutableLiveData<T>() {
+class SingleLiveEvent<T> : MediatorLiveData<T>() {
 
     private val pending = AtomicBoolean(false)
 
