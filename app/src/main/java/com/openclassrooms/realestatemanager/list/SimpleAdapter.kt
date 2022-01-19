@@ -8,17 +8,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.openclassrooms.realestatemanager.databinding.ItemSimpleBinding
 
 class SimpleAdapter(
-    private val clickCallback: (String) -> Unit,
+    private val listener: (String) -> Unit,
 ) : ListAdapter<String, SimpleAdapter.SimpleViewHolder>(SimpleDiffUtil()) {
 
-    inner class SimpleViewHolder(private val binding: ItemSimpleBinding) :
+    class SimpleViewHolder(private val binding: ItemSimpleBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: String) {
-            binding.item.apply {
-                text = item
-                setOnClickListener { clickCallback(item) }
-            }
+        fun bind(item: String, listener: (String) -> Unit) {
+            binding.item.text = item
+            binding.item.setOnClickListener { listener(item) }
         }
     }
 
@@ -33,6 +31,6 @@ class SimpleAdapter(
     )
 
     override fun onBindViewHolder(holder: SimpleViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), listener)
     }
 }
