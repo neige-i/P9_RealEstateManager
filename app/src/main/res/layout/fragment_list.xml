@@ -8,6 +8,6 @@
     android:layout_height="match_parent"
     android:background="#DDD"
     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-    tools:context=".list.ListFragment"
+    tools:context=".ui.list.ListFragment"
     tools:listitem="@layout/item_simple"
     />

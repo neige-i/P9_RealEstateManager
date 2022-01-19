@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".detail.DetailActivity"
+    tools:context=".ui.detail.DetailActivity"
     >
 
     <com.google.android.material.appbar.AppBarLayout
@@ -23,7 +23,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/detail_content"
-        android:name="com.openclassrooms.realestatemanager.detail.DetailFragment"
+        android:name="com.openclassrooms.realestatemanager.ui.detail.DetailFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"

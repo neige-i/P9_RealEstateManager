@@ -1,4 +1,4 @@
-package com.openclassrooms.realestatemanager.detail
+package com.openclassrooms.realestatemanager.ui.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData

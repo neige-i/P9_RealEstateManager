@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.openclassrooms.realestatemanager.util
+package com.openclassrooms.realestatemanager.ui
 
 import android.util.Log
 import androidx.annotation.MainThread

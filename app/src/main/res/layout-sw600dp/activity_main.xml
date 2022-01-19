@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.MainActivity"
+    tools:context=".ui.main.MainActivity"
     >
 
     <com.google.android.material.appbar.AppBarLayout
@@ -29,22 +29,28 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/left_content"
-            android:name="com.openclassrooms.realestatemanager.list.ListFragment"
+            android:name="com.openclassrooms.realestatemanager.ui.list.ListFragment"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/right_content"
             app:layout_constraintHorizontal_weight="3"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout="@layout/fragment_list"
             />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/right_content"
-            android:name="com.openclassrooms.realestatemanager.detail.DetailFragment"
+            android:name="com.openclassrooms.realestatemanager.ui.detail.DetailFragment"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="7"
             app:layout_constraintStart_toEndOf="@id/left_content"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout="@layout/fragment_detail"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

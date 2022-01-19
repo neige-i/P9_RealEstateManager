@@ -1,18 +1,18 @@
-package com.openclassrooms.realestatemanager.detail
+package com.openclassrooms.realestatemanager.ui.list
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.openclassrooms.realestatemanager.databinding.FragmentDetailBinding
+import androidx.fragment.app.viewModels
+import com.openclassrooms.realestatemanager.databinding.FragmentListBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class DetailFragment : Fragment() {
+class ListFragment : Fragment() {
 
-    private var mutableBinding: FragmentDetailBinding? = null
+    private var mutableBinding: FragmentListBinding? = null
     private val binding get() = mutableBinding!!
 
     override fun onCreateView(
@@ -20,15 +20,15 @@ class DetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        mutableBinding = FragmentDetailBinding.inflate(inflater, container, false)
+        mutableBinding = FragmentListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        ViewModelProvider(this)
-            .get(DetailViewModel::class.java)
-            .viewState
-            .observe(viewLifecycleOwner) { binding.detailTv.text = it }
+        val viewModel: ListViewModel by viewModels()
+
+        binding.listRv.adapter = SimpleAdapter { viewModel.onItemClicked(it) }
+            .apply { submitList(listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")) }
     }
 
     override fun onDestroyView() {

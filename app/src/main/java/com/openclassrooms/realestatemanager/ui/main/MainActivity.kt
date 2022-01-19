@@ -1,11 +1,11 @@
-package com.openclassrooms.realestatemanager.main
+package com.openclassrooms.realestatemanager.ui.main
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding
-import com.openclassrooms.realestatemanager.detail.DetailActivity
+import com.openclassrooms.realestatemanager.ui.detail.DetailActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
