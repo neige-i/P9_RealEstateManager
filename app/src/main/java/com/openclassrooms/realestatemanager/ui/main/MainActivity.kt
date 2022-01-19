@@ -25,4 +25,9 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, DetailActivity::class.java))
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onActivityResumed()
+    }
 }
