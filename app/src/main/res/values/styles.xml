@@ -8,4 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppTheme.Chip">
+        <item name="android:checkable">true</item>
+        <item name="chipBackgroundColor">@color/chip_background</item>
+        <item name="checkedIconVisible">false</item>
+    </style>
 </resources>

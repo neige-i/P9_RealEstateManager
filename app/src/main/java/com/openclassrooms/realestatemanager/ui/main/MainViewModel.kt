@@ -15,14 +15,24 @@ class MainViewModel @Inject constructor(
     private val application: Application,
 ) : ViewModel() {
 
-    private val startDetailActivityMutableEvent = SingleLiveEvent<Unit>()
-    val startDetailActivityEvent: LiveData<Unit> = startDetailActivityMutableEvent
+    private val mainEventSingleLiveEvent = SingleLiveEvent<MainEvent>()
+    val mainEventLiveData: LiveData<MainEvent> = mainEventSingleLiveEvent
 
     init {
-        startDetailActivityMutableEvent.addSource(detailRepository.getItemLiveData()) {
+        mainEventSingleLiveEvent.addSource(detailRepository.getItemLiveData()) {
             if (!application.resources.getBoolean(R.bool.is_tablet)) {
-                startDetailActivityMutableEvent.call()
+                mainEventSingleLiveEvent.value = MainEvent.GoToDetailActivity
             }
+        }
+    }
+
+    fun onMenuItemClicked(itemId: Int): Boolean {
+        return when (itemId) {
+            R.id.toolbar_menu_add -> {
+                mainEventSingleLiveEvent.value = MainEvent.GoToAddActivity
+                true
+            }
+            else -> false
         }
     }
 }

@@ -1,3 +1,46 @@
 <resources>
     <string name="app_name">Real Estate Manager</string>
+
+    <string name="menu_item_add">Add</string>
+
+    <string name="toolbar_title_add">Add a real estate</string>
+    <string name="button_text_next">Next</string>
+    <string name="button_text_save">Save</string>
+    <string name="real_estate_type_flat">Flat</string>
+    <string name="real_estate_type_house">House</string>
+    <string name="real_estate_type_duplex">Duplex</string>
+    <string name="real_estate_type_penthouse">Penthouse</string>
+    <string name="hint_type">Type</string>
+    <string name="hint_price">Price</string>
+    <string name="hint_area">Area</string>
+    <string name="label_total_room">Number of rooms</string>
+    <string name="label_bathroom">Number of bathrooms</string>
+    <string name="label_bedroom">Number of bedrooms</string>
+    <string name="hint_description">Description</string>
+    <string name="hint_address_street">Street name &amp; house number</string>
+    <string name="hint_address_additional">Additional information</string>
+    <string name="hint_address_city">City</string>
+    <string name="hint_address_state">State</string>
+    <string name="hint_address_zipcode">Zipcode</string>
+    <string name="hint_address_country">Country</string>
+    <string name="label_points_of_interest">Points of interest</string>
+    <string name="label_poi_school">School</string>
+    <string name="label_poi_university">University</string>
+    <string name="label_poi_stadium">Stadium</string>
+    <string name="label_poi_movie_theater">Movie theater</string>
+    <string name="label_poi_restaurant">Restaurant</string>
+    <string name="label_poi_bar">Bar</string>
+    <string name="label_poi_cafe">Cafe</string>
+    <string name="label_poi_shopping_mall">Shopping_mall</string>
+    <string name="label_poi_park">Park</string>
+    <string name="label_poi_hospital">Hospital</string>
+    <string name="label_poi_train_station">Train station</string>
+    <string name="label_poi_subway_station">Subway station</string>
+    <string name="hint_status">Available for sale</string>
+    <string name="hint_market_entry_date">Market entry date</string>
+    <string name="hint_sold_date">Sold date</string>
+    <string name="hint_agent">Real estate agent</string>
+    <string name="description_button_add">Add button</string>
+    <string name="description_button_remove">Remove button</string>
+    <string name="description_button_add_photo">Add photo button</string>
 </resources>

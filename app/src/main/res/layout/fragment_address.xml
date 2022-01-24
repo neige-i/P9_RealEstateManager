@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context=".ui.add_edit.pages.AddressFragment"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingStart="@dimen/add_edit_form_padding_horizontal"
+        android:paddingTop="@dimen/add_edit_form_padding_vertical"
+        android:paddingEnd="@dimen/add_edit_form_padding_horizontal"
+        android:paddingBottom="@dimen/add_edit_form_padding_vertical"
+        >
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/address_street_input_layout"
+            android:layout_width="0dp"
+            app:layout_constraintVertical_chainStyle="packed"
+            android:layout_marginBottom="20dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_address_street"
+            android:labelFor="@id/address_street_input"
+            app:layout_constraintBottom_toTopOf="@id/address_additional_input_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/address_street_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="text"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/address_additional_input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:hint="@string/hint_address_additional"
+            android:labelFor="@id/address_additional_input"
+            app:layout_constraintBottom_toTopOf="@id/address_city_input_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/address_street_input_layout"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/address_additional_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="text"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/address_city_input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_address_city"
+            android:labelFor="@id/address_city_input"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintBottom_toTopOf="@id/address_state_input_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/address_additional_input_layout"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/address_city_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="text"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/address_state_input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_address_state"
+            android:layout_marginBottom="20dp"
+            android:labelFor="@id/address_state_input"
+            app:layout_constraintBottom_toTopOf="@id/address_country_input_layout"
+            app:layout_constraintEnd_toStartOf="@id/address_zipcode_input_layout"
+            app:layout_constraintHorizontal_weight="3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/address_city_input_layout"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/address_state_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textCapCharacters"
+                android:maxLength="2"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/address_zipcode_input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:hint="@string/hint_address_zipcode"
+            android:labelFor="@id/address_zipcode_input"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="7"
+            app:layout_constraintStart_toEndOf="@id/address_state_input_layout"
+            app:layout_constraintTop_toTopOf="@id/address_state_input_layout"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/address_zipcode_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="number"
+                android:maxLength="5"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/address_country_input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:hint="@string/hint_address_country"
+            android:labelFor="@id/address_country_input"
+            app:layout_constraintBottom_toTopOf="@id/address_poi_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/address_state_input_layout"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/address_country_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="text"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/address_poi_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_points_of_interest"
+            android:textColor="@android:color/black"
+            app:layout_constraintBottom_toTopOf="@id/address_poi_group"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/address_country_input_layout"
+            />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/address_poi_group"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/address_poi_label"
+            >
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/address_poi_bar"
+                style="@style/AppTheme.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_poi_bar"
+                />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/address_poi_cafe"
+                style="@style/AppTheme.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_poi_cafe"
+                />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/address_poi_restaurant"
+                style="@style/AppTheme.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_poi_restaurant"
+                />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/address_poi_hospital"
+                style="@style/AppTheme.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_poi_hospital"
+                />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/address_poi_movie_theater"
+                style="@style/AppTheme.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_poi_movie_theater"
+                />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/address_poi_park"
+                style="@style/AppTheme.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_poi_park"
+                />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/address_poi_stadium"
+                style="@style/AppTheme.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_poi_stadium"
+                />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/address_poi_shopping_mall"
+                style="@style/AppTheme.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_poi_shopping_mall"
+                />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/address_poi_school"
+                style="@style/AppTheme.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_poi_school"
+                />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/address_poi_university"
+                style="@style/AppTheme.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_poi_university"
+                />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/address_poi_subway_station"
+                style="@style/AppTheme.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_poi_subway_station"
+                />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/address_poi_train_station"
+                style="@style/AppTheme.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_poi_train_station"
+                />
+        </com.google.android.material.chip.ChipGroup>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
