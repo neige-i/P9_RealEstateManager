@@ -14,8 +14,10 @@ class DetailViewModel @Inject constructor(detailRepository: DetailRepository) : 
     val viewState: LiveData<String> = viewStateMediatorLiveData
 
     init {
+        viewStateMediatorLiveData.value = "No item selected"
+
         viewStateMediatorLiveData.addSource(detailRepository.getItemLiveData()) {
-            viewStateMediatorLiveData.value = it ?: "No item selected"
+            viewStateMediatorLiveData.value = it
         }
     }
 }

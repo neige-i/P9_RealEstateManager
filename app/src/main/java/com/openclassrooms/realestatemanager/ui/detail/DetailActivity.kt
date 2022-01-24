@@ -30,14 +30,4 @@ class DetailActivity : AppCompatActivity() {
         super.onResume()
         viewModel.onActivityResumed(resources.getBoolean(R.bool.is_tablet))
     }
-
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
-        return true
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        viewModel.onManuallyGoBack()
-    }
 }
