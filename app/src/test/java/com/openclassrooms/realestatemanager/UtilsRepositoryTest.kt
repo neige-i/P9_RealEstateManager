@@ -1,13 +1,15 @@
 package com.openclassrooms.realestatemanager
 
-import android.content.Context
 import android.net.ConnectivityManager
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.core.content.getSystemService
 import com.openclassrooms.realestatemanager.data.UtilsRepository
 import com.openclassrooms.realestatemanager.util.TestCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -40,22 +42,16 @@ class UtilsRepositoryTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
-
-    private val connectivityManagerShadow: ShadowConnectivityManager = shadowOf(
-        RuntimeEnvironment
-            .getApplication()
-            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val shadowConnectivityManager: ShadowConnectivityManager = shadowOf(
+        RuntimeEnvironment.getApplication().getSystemService<ConnectivityManager>()
     )
+
     private val utilsRepository = UtilsRepository(
         Clock.fixed(
             LocalDate.of(1977, 5, 4).atStartOfDay().toInstant(ZoneOffset.UTC),
             ZoneOffset.UTC
         ),
         RuntimeEnvironment.getApplication(),
-        testCoroutineRule.testCoroutineScope,
-        testCoroutineRule.testCoroutineDispatcher,
     )
 
     @Test
@@ -86,34 +82,52 @@ class UtilsRepositoryTest {
     }
 
     @Test
-    fun `return true when network is available`() {
+    fun `return true when network is available`() = runTest {
         // GIVEN
-        var isNetworkAvailable: Boolean? = null
+        var isAvailable: Boolean? = null
 
         // WHEN
-        utilsRepository.isInternetAvailable().observeForever {
-            isNetworkAvailable = it
-        }
+        // Launch the flow in a new coroutine
+        // Otherwise, the rest of the test is not executed and the test runs forever
+        launch { isAvailable = utilsRepository.isInternetAvailable().first() }
 
         // TRIGGER CALLBACK
-        connectivityManagerShadow.networkCallbacks.first().onAvailable(ShadowNetwork.newInstance(1))
+        // Wait for UtilsRepository.isInternetAvailable() to initialize the NetworkCallback
+        // Otherwise, ShadowConnectivityManager.networkCallbacks returns an empty set
+        advanceUntilIdle()
+        shadowConnectivityManager.networkCallbacks.onEach {
+            it.onAvailable(ShadowNetwork.newInstance(1))
+        }
 
         // THEN
-        assertTrue(isNetworkAvailable!!)
+        // Wait for the coroutine to complete when the flow is collected with Flow.first(),
+        // Otherwise, available is null
+        advanceUntilIdle()
+        assertTrue(isAvailable == true)
     }
 
     @Test
-    fun `return false when network is lost`() {
+    fun `return false when network is lost`() = runTest {
         // GIVEN
-        var isNetworkAvailable: Boolean? = null
+        var isAvailable: Boolean? = null
 
         // WHEN
-        utilsRepository.isInternetAvailable().observeForever { isNetworkAvailable = it }
+        // Launch the flow in a new coroutine
+        // Otherwise, the rest of the test is not executed and the test runs forever
+        launch { isAvailable = utilsRepository.isInternetAvailable().first() }
 
         // TRIGGER CALLBACK
-        connectivityManagerShadow.networkCallbacks.first().onLost(ShadowNetwork.newInstance(1))
+        // Wait for UtilsRepository.isInternetAvailable() to initialize the NetworkCallback
+        // Otherwise, ShadowConnectivityManager.networkCallbacks returns an empty set
+        advanceUntilIdle()
+        shadowConnectivityManager.networkCallbacks.onEach {
+            it.onLost(ShadowNetwork.newInstance(1))
+        }
 
         // THEN
-        assertFalse(isNetworkAvailable!!)
+        // Wait for the coroutine to complete by collecting the flow with first(),
+        // Otherwise, available is null
+        advanceUntilIdle()
+        assertTrue(isAvailable == false)
     }
 }

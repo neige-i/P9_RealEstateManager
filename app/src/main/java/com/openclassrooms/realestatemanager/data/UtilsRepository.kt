@@ -5,12 +5,11 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.core.content.getSystemService
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Clock
@@ -23,8 +22,6 @@ import javax.inject.Singleton
 class UtilsRepository @Inject constructor(
     private val clock: Clock,
     @ApplicationContext private val context: Context,
-    private val applicationScope: CoroutineScope,
-    private val mainDispatcher: CoroutineDispatcher,
 ) {
 
     companion object {
@@ -34,11 +31,13 @@ class UtilsRepository @Inject constructor(
 
     // CURRENCY
 
-    fun convertDollarToEuro(usd: Double): BigDecimal = (usd * USD_EUR).toCurrency()
+    fun convertDollarToEuro(usd: Double): BigDecimal = toCurrency(usd * USD_EUR)
 
-    fun convertEuroToDollar(eur: Double): BigDecimal = (eur / USD_EUR).toCurrency()
+    fun convertEuroToDollar(eur: Double): BigDecimal = toCurrency(eur / USD_EUR)
 
-    private fun Double.toCurrency(): BigDecimal = toBigDecimal().setScale(2, RoundingMode.HALF_EVEN)
+    private fun toCurrency(price: Double): BigDecimal {
+        return price.toBigDecimal().setScale(2, RoundingMode.HALF_EVEN)
+    }
 
     // DATE
 
@@ -46,9 +45,7 @@ class UtilsRepository @Inject constructor(
 
     // NETWORK CONNECTION
 
-    fun isInternetAvailable(): LiveData<Boolean> {
-        val isNetworkAvailableMutableLiveData = MutableLiveData<Boolean>()
-
+    fun isInternetAvailable(): Flow<Boolean> = callbackFlow {
         val networkRequest = NetworkRequest.Builder()
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
@@ -61,25 +58,19 @@ class UtilsRepository @Inject constructor(
         val networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                isNetworkAvailableMutableLiveData.setValueOnMainThread(true)
+                trySend(true)
             }
 
             override fun onLost(network: Network) {
                 super.onLost(network)
-                isNetworkAvailableMutableLiveData.setValueOnMainThread(false)
+                trySend(false)
             }
         }
 
-        (context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
-            .requestNetwork(networkRequest, networkCallback)
+        val connectivityManager = context.getSystemService<ConnectivityManager>()
 
-        return isNetworkAvailableMutableLiveData
-    }
+        connectivityManager?.requestNetwork(networkRequest, networkCallback)
 
-    private fun MutableLiveData<Boolean>.setValueOnMainThread(isAvailable: Boolean) {
-        applicationScope.launch(mainDispatcher) {
-            println("inside coroutine: isAvailable = $isAvailable")
-            this@setValueOnMainThread.value = isAvailable
-        }
+        awaitClose { connectivityManager?.unregisterNetworkCallback(networkCallback) }
     }
 }
