@@ -71,8 +71,11 @@ class EditAddressFragment : Fragment() {
             binding.addressZipcodeInput.setText(it.zipcode)
             binding.addressCountryInput.setText(it.country)
 
+            binding.addressStreetInputLayout.error = it.streetNumberError
+            binding.addressCityInputLayout.error = it.cityError
             binding.addressStateInputLayout.error = it.stateError
             binding.addressZipcodeInputLayout.error = it.zipcodeError
+            binding.addressCountryInputLayout.error = it.countryError
 
             chipAdapter.submitList(it.pointOfInterestList)
         }

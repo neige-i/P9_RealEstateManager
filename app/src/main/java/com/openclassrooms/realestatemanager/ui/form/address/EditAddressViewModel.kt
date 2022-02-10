@@ -17,14 +17,17 @@ class EditAddressViewModel @Inject constructor(
 
     val viewStateLiveData = Transformations.map(getFormUseCase.getUpdates()) {
         AddressViewState(
-            streetNumber = it.streetNameHouseNumber,
+            streetNumber = it.streetName,
+            streetNumberError = it.streetNameError,
             additionalInfo = it.additionalAddressInfo,
             city = it.city,
+            cityError = it.cityError,
             state = it.state,
             stateError = it.stateError,
             zipcode = it.zipcode,
             zipcodeError = it.zipcodeError,
             country = it.country,
+            countryError = it.countryError,
             pointOfInterestList = PointOfInterest.values().map { poi ->
                 AddressViewState.ChipViewState(
                     labelId = poi.labelId,
@@ -35,7 +38,7 @@ class EditAddressViewModel @Inject constructor(
     }
 
     fun onStreetNameChanged(streetName: String?) {
-        setFormUseCase.updateStreetNameHouseNumber(streetName ?: "")
+        setFormUseCase.updateStreetName(streetName ?: "")
     }
 
     fun onAdditionalAddressInfoChanged(additionalAddressInfo: String?) {

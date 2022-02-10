@@ -62,8 +62,8 @@ class SetFormUseCase @Inject constructor(
         formRepository.setForm(getForm().copy(description = description))
     }
 
-    fun updateStreetNameHouseNumber(streetNameHouseNumber: String) {
-        formRepository.setForm(getForm().copy(streetNameHouseNumber = streetNameHouseNumber))
+    fun updateStreetName(streetNameHouseNumber: String) {
+        formRepository.setForm(getForm().copy(streetName = streetNameHouseNumber))
     }
 
     fun updateAdditionalAddressInfo(additionalAddressInfo: String) {

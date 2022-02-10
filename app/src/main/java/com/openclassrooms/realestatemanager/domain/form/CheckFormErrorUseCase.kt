@@ -40,23 +40,43 @@ class CheckFormErrorUseCase @Inject constructor(
         val currentState = form.state
         val currentZipcode = form.zipcode
 
+        val streetNameError = when {
+            form.streetName.isBlank() -> appContext.getString(R.string.error_mandatory_field)
+            else -> null
+        }
+
+        val cityError = when {
+            form.city.isBlank() -> appContext.getString(R.string.error_mandatory_field)
+            else -> null
+        }
+
         val stateError = when {
-            currentState.isNotBlank() && !FormRepository.STATE_POSTAL_ABBR.contains(currentState) -> {
-                appContext.getString(R.string.error_unknown_state)
-            }
+            currentState.isBlank() -> appContext.getString(R.string.error_mandatory_field)
+            !FormRepository.STATE_POSTAL_ABBR.contains(currentState) -> appContext.getString(R.string.error_unknown_state)
             else -> null
         }
 
         val zipcodeError = when {
-            currentZipcode.isNotEmpty() && currentZipcode.length < 5 -> {
-                appContext.getString(R.string.error_incomplete_zipcode)
-            }
+            currentZipcode.isBlank() -> appContext.getString(R.string.error_mandatory_field)
+            currentZipcode.length < 5 -> appContext.getString(R.string.error_incomplete_zipcode)
             else -> null
         }
 
-        formRepository.setForm(form.copy(zipcodeError = zipcodeError, stateError = stateError))
+        val countryError = when {
+            form.country.isBlank() -> appContext.getString(R.string.error_mandatory_field)
+            else -> null
+        }
 
-        return stateError == null && zipcodeError == null
+        formRepository.setForm(form.copy(
+            streetNameError = streetNameError,
+            cityError = cityError,
+            stateError = stateError,
+            zipcodeError = zipcodeError,
+            countryError = countryError,
+        ))
+
+        return streetNameError == null && cityError == null && stateError == null &&
+                zipcodeError == null && countryError == null
     }
 
     private fun containsNoSaleError(form: FormEntity): Boolean {
