@@ -29,7 +29,7 @@ class MainViewModel @Inject constructor(
     fun onMenuItemClicked(itemId: Int): Boolean {
         return when (itemId) {
             R.id.toolbar_menu_add -> {
-                mainEventSingleLiveEvent.value = MainEvent.GoToAddActivity
+                mainEventSingleLiveEvent.value = MainEvent.GoToFormActivity
                 true
             }
             else -> false

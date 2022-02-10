@@ -1,4 +1,4 @@
-package com.openclassrooms.realestatemanager.ui.add_edit.pages
+package com.openclassrooms.realestatemanager.ui.form.main_info
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,13 +9,13 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.openclassrooms.realestatemanager.data.RealEstateType
-import com.openclassrooms.realestatemanager.databinding.FragmentMainInfoBinding
+import com.openclassrooms.realestatemanager.databinding.FragmentEditMainInfoBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainInfoFragment : Fragment() {
+class EditMainInfoFragment : Fragment() {
 
-    private var mutableBinding: FragmentMainInfoBinding? = null
+    private var mutableBinding: FragmentEditMainInfoBinding? = null
     private val binding get() = mutableBinding!!
 
     override fun onCreateView(
@@ -23,14 +23,14 @@ class MainInfoFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        mutableBinding = FragmentMainInfoBinding.inflate(inflater, container, false)
+        mutableBinding = FragmentEditMainInfoBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel = ViewModelProvider(this).get(MainInfoViewModel::class.java)
+        val viewModel = ViewModelProvider(this).get(EditMainInfoViewModel::class.java)
 
         val estateTypeArrayAdapter = ArrayAdapter(
             requireContext(),

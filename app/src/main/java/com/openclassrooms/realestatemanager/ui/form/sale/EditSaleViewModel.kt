@@ -1,28 +1,28 @@
-package com.openclassrooms.realestatemanager.ui.add_edit.pages
+package com.openclassrooms.realestatemanager.ui.form.sale
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import com.openclassrooms.realestatemanager.data.agent.AgentEntity
 import com.openclassrooms.realestatemanager.data.form.FormEntity
-import com.openclassrooms.realestatemanager.domain.EditFormUseCase
+import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.domain.GetAgentListUseCase
-import com.openclassrooms.realestatemanager.domain.GetFormInfoUseCase
+import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class SaleStatusViewModel @Inject constructor(
-    getFormInfoUseCase: GetFormInfoUseCase,
-    private val editFormUseCase: EditFormUseCase,
+class EditSaleViewModel @Inject constructor(
+    getFormUseCase: GetFormUseCase,
+    private val setFormUseCase: SetFormUseCase,
     getAgentListUseCase: GetAgentListUseCase,
 ) : ViewModel() {
 
-    private val viewStateMediatorLiveData = MediatorLiveData<SaleStatusViewState>()
-    val viewState: LiveData<SaleStatusViewState> = viewStateMediatorLiveData
+    private val viewStateMediatorLiveData = MediatorLiveData<SaleViewState>()
+    val viewStateLiveData: LiveData<SaleViewState> = viewStateMediatorLiveData
 
     init {
-        val tempRealEstateLiveData = getFormInfoUseCase()
+        val tempRealEstateLiveData = getFormUseCase.getUpdates()
         val agentListLiveData = getAgentListUseCase()
 
         viewStateMediatorLiveData.addSource(tempRealEstateLiveData) {
@@ -41,7 +41,7 @@ class SaleStatusViewModel @Inject constructor(
         val agentNameList = agentList.map { it.name }
         val selectedAgentName = agentNameList.firstOrNull { it == form.agentName } ?: ""
 
-        viewStateMediatorLiveData.value = SaleStatusViewState(
+        viewStateMediatorLiveData.value = SaleViewState(
             agentEntries = agentNameList,
             selectedAgentName = selectedAgentName,
             marketEntryDate = form.marketEntryDate,
@@ -51,22 +51,22 @@ class SaleStatusViewModel @Inject constructor(
     }
 
     fun onAgentSelected(agentName: String) {
-        editFormUseCase.updateAgent(agentName)
+        setFormUseCase.updateAgent(agentName)
     }
 
     fun onAvailabilitySwitched(isAvailable: Boolean) {
-        editFormUseCase.updateAvailability(isAvailable)
+        setFormUseCase.updateAvailability(isAvailable)
 
         if (!isAvailable) {
-            editFormUseCase.updateSaleDate("")
+            setFormUseCase.updateSaleDate("")
         }
     }
 
     fun onMarketEntryDateChanged(marketEntryDate: String?) {
-        editFormUseCase.updateMarketEntryDate(marketEntryDate ?: "")
+        setFormUseCase.updateMarketEntryDate(marketEntryDate ?: "")
     }
 
     fun onSaleDateChanged(saleDate: String?) {
-        editFormUseCase.updateSaleDate(saleDate ?: "")
+        setFormUseCase.updateSaleDate(saleDate ?: "")
     }
 }

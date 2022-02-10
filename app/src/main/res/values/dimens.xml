@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="photo_grid_column_count">2</integer>
-    <dimen name="add_edit_form_padding_vertical">20dp</dimen>
-    <dimen name="add_edit_form_padding_horizontal">20dp</dimen>
+    <dimen name="form_padding_vertical">20dp</dimen>
+    <dimen name="form_padding_horizontal">20dp</dimen>
 </resources>

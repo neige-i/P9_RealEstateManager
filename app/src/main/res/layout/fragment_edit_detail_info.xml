@@ -6,16 +6,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".ui.add_edit.pages.DetailInfoFragment"
+    tools:context=".ui.form.detail_info.EditDetailInfoFragment"
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingStart="@dimen/add_edit_form_padding_horizontal"
-        android:paddingTop="@dimen/add_edit_form_padding_vertical"
-        android:paddingEnd="@dimen/add_edit_form_padding_horizontal"
-        android:paddingBottom="@dimen/add_edit_form_padding_vertical"
+        android:paddingStart="@dimen/form_padding_horizontal"
+        android:paddingTop="@dimen/form_padding_vertical"
+        android:paddingEnd="@dimen/form_padding_horizontal"
+        android:paddingBottom="@dimen/form_padding_vertical"
         >
 
         <com.google.android.material.textfield.TextInputLayout

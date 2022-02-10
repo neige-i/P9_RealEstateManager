@@ -8,7 +8,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding
-import com.openclassrooms.realestatemanager.ui.add_edit.AddEditActivity
+import com.openclassrooms.realestatemanager.ui.form.FormActivity
 import com.openclassrooms.realestatemanager.ui.detail.DetailActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.mainEventLiveData.observe(this) {
             when (it) {
                 MainEvent.GoToDetailActivity -> redirectTo(DetailActivity::class.java)
-                MainEvent.GoToAddActivity -> redirectTo(AddEditActivity::class.java)
+                MainEvent.GoToFormActivity -> redirectTo(FormActivity::class.java)
             }
         }
     }

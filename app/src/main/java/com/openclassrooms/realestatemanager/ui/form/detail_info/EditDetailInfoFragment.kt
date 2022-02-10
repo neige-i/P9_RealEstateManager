@@ -1,4 +1,4 @@
-package com.openclassrooms.realestatemanager.ui.add_edit.pages
+package com.openclassrooms.realestatemanager.ui.form.detail_info
 
 import android.os.Bundle
 import android.util.Log
@@ -9,13 +9,13 @@ import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.openclassrooms.realestatemanager.databinding.FragmentDetailInfoBinding
+import com.openclassrooms.realestatemanager.databinding.FragmentEditDetailInfoBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class DetailInfoFragment : Fragment() {
+class EditDetailInfoFragment : Fragment() {
 
-    private var mutableBinding: FragmentDetailInfoBinding? = null
+    private var mutableBinding: FragmentEditDetailInfoBinding? = null
     private val binding get() = mutableBinding!!
 
     override fun onCreateView(
@@ -23,14 +23,14 @@ class DetailInfoFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        mutableBinding = FragmentDetailInfoBinding.inflate(inflater, container, false)
+        mutableBinding = FragmentEditDetailInfoBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel = ViewModelProvider(this).get(DetailInfoViewModel::class.java)
+        val viewModel = ViewModelProvider(this).get(EditDetailInfoViewModel::class.java)
 
         // noinspection ClickableViewAccessibility
         binding.detailInfoDescriptionInput.setOnTouchListener { v, event ->

@@ -1,6 +1,6 @@
-package com.openclassrooms.realestatemanager.ui.add_edit.pages
+package com.openclassrooms.realestatemanager.ui.form.sale
 
-data class SaleStatusViewState(
+data class SaleViewState(
     val agentEntries: List<String>,
     val selectedAgentName: String,
     val marketEntryDate: String,

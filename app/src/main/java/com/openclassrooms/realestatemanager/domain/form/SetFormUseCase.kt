@@ -1,10 +1,10 @@
-package com.openclassrooms.realestatemanager.domain
+package com.openclassrooms.realestatemanager.domain.form
 
 import androidx.annotation.StringRes
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import javax.inject.Inject
 
-class EditFormUseCase @Inject constructor(
+class SetFormUseCase @Inject constructor(
     private val formRepository: FormRepository,
 ) {
 

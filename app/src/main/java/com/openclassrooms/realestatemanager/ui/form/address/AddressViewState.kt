@@ -1,4 +1,4 @@
-package com.openclassrooms.realestatemanager.ui.add_edit.pages
+package com.openclassrooms.realestatemanager.ui.form.address
 
 import androidx.annotation.StringRes
 

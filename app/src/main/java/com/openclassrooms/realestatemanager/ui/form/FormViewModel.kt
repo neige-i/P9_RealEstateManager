@@ -1,4 +1,4 @@
-package com.openclassrooms.realestatemanager.ui.add_edit
+package com.openclassrooms.realestatemanager.ui.form
 
 import android.app.Application
 import androidx.lifecycle.LiveData
@@ -10,14 +10,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class AddEditViewModel @Inject constructor(
+class FormViewModel @Inject constructor(
     private val application: Application,
 ) : ViewModel() {
 
-    private val viewStateMutableLiveData = MutableLiveData<AddEditViewState>()
-    val viewStateLiveData: LiveData<AddEditViewState> = viewStateMutableLiveData
-    private val addEditEventSingleLiveEvent = SingleLiveEvent<AddEditEvent>()
-    val addEditEventLiveData: LiveData<AddEditEvent> = addEditEventSingleLiveEvent
+    private val viewStateMutableLiveData = MutableLiveData<FormViewState>()
+    val viewStateLiveData: LiveData<FormViewState> = viewStateMutableLiveData
+    private val formEventSingleLiveEvent = SingleLiveEvent<FormEvent>()
+    val formEventLiveData: LiveData<FormEvent> = formEventSingleLiveEvent
 
     private var pageCount = 0
     private var currentPage = 0
@@ -29,7 +29,7 @@ class AddEditViewModel @Inject constructor(
     fun onPageChanged(position: Int) {
         currentPage = position
 
-        viewStateMutableLiveData.value = AddEditViewState(
+        viewStateMutableLiveData.value = FormViewState(
             toolbarTitle = application.getString(R.string.toolbar_title_add) +
                     " (" + (currentPage + 1) +
                     "/" + pageCount +
@@ -43,10 +43,10 @@ class AddEditViewModel @Inject constructor(
     }
 
     fun onGoBack() {
-        addEditEventSingleLiveEvent.value = if (currentPage > 0) {
-            AddEditEvent.GoToPage(currentPage - 1)
+        formEventSingleLiveEvent.value = if (currentPage > 0) {
+            FormEvent.GoToPage(currentPage - 1)
         } else {
-            AddEditEvent.ExitActivity
+            FormEvent.ExitActivity
         }
     }
 
@@ -54,9 +54,9 @@ class AddEditViewModel @Inject constructor(
         // Save to repo
 
         if (isLastPageDisplayed()) {
-            addEditEventSingleLiveEvent.value = AddEditEvent.ExitActivity
+            formEventSingleLiveEvent.value = FormEvent.ExitActivity
         } else {
-            addEditEventSingleLiveEvent.value = AddEditEvent.GoToPage(currentPage + 1)
+            formEventSingleLiveEvent.value = FormEvent.GoToPage(currentPage + 1)
         }
     }
 

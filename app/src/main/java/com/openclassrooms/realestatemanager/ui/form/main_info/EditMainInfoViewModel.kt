@@ -1,19 +1,19 @@
-package com.openclassrooms.realestatemanager.ui.add_edit.pages
+package com.openclassrooms.realestatemanager.ui.form.main_info
 
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.openclassrooms.realestatemanager.domain.EditFormUseCase
-import com.openclassrooms.realestatemanager.domain.GetFormInfoUseCase
+import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
+import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class MainInfoViewModel @Inject constructor(
-    getFormInfoUseCase: GetFormInfoUseCase,
-    private val editFormUseCase: EditFormUseCase,
+class EditMainInfoViewModel @Inject constructor(
+    getFormUseCase: GetFormUseCase,
+    private val setFormUseCase: SetFormUseCase,
 ) : ViewModel() {
 
-    val viewStateLiveData = Transformations.map(getFormInfoUseCase()) {
+    val viewStateLiveData = Transformations.map(getFormUseCase.getUpdates()) {
         MainInfoViewState(
             selectedType = it.type,
             price = it.price,
@@ -25,38 +25,38 @@ class MainInfoViewModel @Inject constructor(
     }
 
     fun onTypeSelected(selectedType: String) {
-        editFormUseCase.updateType(selectedType)
+        setFormUseCase.updateType(selectedType)
     }
 
     fun onPriceChanged(price: String?) {
-        editFormUseCase.updatePrice(price ?: "")
+        setFormUseCase.updatePrice(price ?: "")
     }
 
     fun onAreaChanged(area: String?) {
-        editFormUseCase.updateArea(area ?: "")
+        setFormUseCase.updateArea(area ?: "")
     }
 
     fun onTotalRoomAdded() {
-        editFormUseCase.incTotalRoomCount()
+        setFormUseCase.incTotalRoomCount()
     }
 
     fun onTotalRoomRemoved() {
-        editFormUseCase.decTotalRoomCount()
+        setFormUseCase.decTotalRoomCount()
     }
 
     fun onBathRoomAdded() {
-        editFormUseCase.incBathroomCount()
+        setFormUseCase.incBathroomCount()
     }
 
     fun onBathRoomRemoved() {
-        editFormUseCase.decBathroomCount()
+        setFormUseCase.decBathroomCount()
     }
 
     fun onBedRoomAdded() {
-        editFormUseCase.incBedroomCount()
+        setFormUseCase.incBedroomCount()
     }
 
     fun onBedRoomRemoved() {
-        editFormUseCase.decBedroomCount()
+        setFormUseCase.decBedroomCount()
     }
 }

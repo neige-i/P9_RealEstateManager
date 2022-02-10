@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.detail.DetailActivity" />
-        <activity android:name=".ui.add_edit.AddEditActivity" />
+        <activity android:name=".ui.form.FormActivity" />
     </application>
 
 </manifest>

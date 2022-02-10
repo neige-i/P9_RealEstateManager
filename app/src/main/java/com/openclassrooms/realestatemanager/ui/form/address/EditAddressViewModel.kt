@@ -1,21 +1,21 @@
-package com.openclassrooms.realestatemanager.ui.add_edit.pages
+package com.openclassrooms.realestatemanager.ui.form.address
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.openclassrooms.realestatemanager.data.PointOfInterest
-import com.openclassrooms.realestatemanager.domain.EditFormUseCase
-import com.openclassrooms.realestatemanager.domain.GetFormInfoUseCase
+import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
+import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class AddressViewModel @Inject constructor(
-    getFormInfoUseCase: GetFormInfoUseCase,
-    private val editFormUseCase: EditFormUseCase,
+class EditAddressViewModel @Inject constructor(
+    getFormUseCase: GetFormUseCase,
+    private val setFormUseCase: SetFormUseCase,
 ) : ViewModel() {
 
-    val viewStateLiveData = Transformations.map(getFormInfoUseCase()) {
+    val viewStateLiveData = Transformations.map(getFormUseCase.getUpdates()) {
         AddressViewState(
             streetNumber = it.streetNameHouseNumber,
             additionalInfo = it.additionalAddressInfo,
@@ -33,30 +33,30 @@ class AddressViewModel @Inject constructor(
     }
 
     fun onStreetNameChanged(streetName: String?) {
-        editFormUseCase.updateStreetNameHouseNumber(streetName ?: "")
+        setFormUseCase.updateStreetNameHouseNumber(streetName ?: "")
     }
 
     fun onAdditionalAddressInfoChanged(additionalAddressInfo: String?) {
-        editFormUseCase.updateAdditionalAddressInfo(additionalAddressInfo ?: "")
+        setFormUseCase.updateAdditionalAddressInfo(additionalAddressInfo ?: "")
     }
 
     fun onCityChanged(city: String?) {
-        editFormUseCase.updateCity(city ?: "")
+        setFormUseCase.updateCity(city ?: "")
     }
 
     fun onStateNameChanged(state: String?) {
-        editFormUseCase.updateState(state ?: "")
+        setFormUseCase.updateState(state ?: "")
     }
 
     fun onZipcodeChanged(zipcode: String?) {
-        editFormUseCase.updateZipcode(zipcode ?: "")
+        setFormUseCase.updateZipcode(zipcode ?: "")
     }
 
     fun onCountryChanged(country: String?) {
-        editFormUseCase.updateCountry(country ?: "")
+        setFormUseCase.updateCountry(country ?: "")
     }
 
     fun onPoiChecked(@StringRes labelId: Int, isChecked: Boolean) {
-        editFormUseCase.updatePoi(labelId, isChecked)
+        setFormUseCase.updatePoi(labelId, isChecked)
     }
 }

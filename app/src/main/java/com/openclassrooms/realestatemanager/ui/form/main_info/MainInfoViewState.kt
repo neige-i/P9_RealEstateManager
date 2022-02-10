@@ -1,4 +1,4 @@
-package com.openclassrooms.realestatemanager.ui.add_edit.pages
+package com.openclassrooms.realestatemanager.ui.form.main_info
 
 data class MainInfoViewState(
     val selectedType: String,

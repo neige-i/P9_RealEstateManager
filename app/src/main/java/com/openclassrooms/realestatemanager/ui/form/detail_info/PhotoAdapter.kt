@@ -1,4 +1,4 @@
-package com.openclassrooms.realestatemanager.ui.add_edit.pages
+package com.openclassrooms.realestatemanager.ui.form.detail_info
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
