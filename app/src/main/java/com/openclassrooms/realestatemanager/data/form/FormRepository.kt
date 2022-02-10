@@ -3,6 +3,7 @@ package com.openclassrooms.realestatemanager.data.form
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,6 +17,8 @@ class FormRepository @Inject constructor() {
             "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "PR", "RI", "SC",
             "SD", "TN", "TX", "UT", "VT", "VA", "VI", "WA", "WV", "WI", "WY",
         )
+
+        val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     }
 
     private val defaultRealEstateEntity = FormEntity(
@@ -38,6 +41,7 @@ class FormRepository @Inject constructor() {
         pointsOfInterests = emptyList(),
         agentName = "",
         marketEntryDate = "",
+        marketEntryDateError = null,
         saleDate = "",
         saleDateError = null,
         isAvailableForSale = true

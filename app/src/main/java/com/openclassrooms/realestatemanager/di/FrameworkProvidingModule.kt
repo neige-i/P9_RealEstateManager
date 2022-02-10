@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import java.time.Clock
+import java.time.ZoneId
 import javax.inject.Singleton
 
 @Module
@@ -14,4 +15,8 @@ object FrameworkProvidingModule {
     @Singleton
     @Provides
     fun provideDefaultClock(): Clock = Clock.systemDefaultZone()
+
+    @Singleton
+    @Provides
+    fun provideDefaultZoneId(): ZoneId = ZoneId.systemDefault()
 }

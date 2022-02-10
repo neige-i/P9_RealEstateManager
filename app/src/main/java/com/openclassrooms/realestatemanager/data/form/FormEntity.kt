@@ -20,6 +20,7 @@ data class FormEntity(
     val pointsOfInterests: List<Int>,
     val agentName: String,
     val marketEntryDate: String,
+    val marketEntryDateError: String?,
     val saleDate: String,
     val saleDateError: String?,
     val isAvailableForSale: Boolean,

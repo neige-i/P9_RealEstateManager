@@ -5,6 +5,7 @@ import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.LocalDate
 import javax.inject.Inject
 
 class CheckFormErrorUseCase @Inject constructor(
@@ -59,15 +60,34 @@ class CheckFormErrorUseCase @Inject constructor(
     }
 
     private fun containsNoSaleError(form: FormEntity): Boolean {
-        val saleDateError = when {
-            !form.isAvailableForSale && form.saleDate.isEmpty() -> {
-                appContext.getString(R.string.error_mandatory_field)
-            }
+        val marketEntryDateString = form.marketEntryDate
+        val saleDateString = form.saleDate
+
+        val isDateOrderInconsistent = marketEntryDateString.isNotEmpty() &&
+                saleDateString.isNotEmpty() &&
+                toLocalDate(marketEntryDateString).isAfter(toLocalDate(saleDateString))
+
+        val marketEntryDateError = when {
+            marketEntryDateString.isEmpty() -> appContext.getString(R.string.error_mandatory_field)
+            isDateOrderInconsistent -> appContext.getString(R.string.error_inconsistent_date_order)
             else -> null
         }
 
-        formRepository.setForm(form.copy(saleDateError = saleDateError))
+        val saleDateError = when {
+            !form.isAvailableForSale && saleDateString.isEmpty() -> appContext.getString(R.string.error_mandatory_field)
+            isDateOrderInconsistent -> appContext.getString(R.string.error_inconsistent_date_order)
+            else -> null
+        }
 
-        return saleDateError == null
+        formRepository.setForm(form.copy(
+            marketEntryDateError = marketEntryDateError,
+            saleDateError = saleDateError
+        ))
+
+        return marketEntryDateError == null && saleDateError == null
+    }
+
+    private fun toLocalDate(dateString: String): LocalDate {
+        return LocalDate.parse(dateString, FormRepository.DATE_FORMATTER)
     }
 }

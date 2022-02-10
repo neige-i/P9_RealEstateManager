@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.openclassrooms.realestatemanager.databinding.FragmentEditSaleBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -39,12 +39,8 @@ class EditSaleFragment : Fragment() {
             viewModel.onAvailabilitySwitched(isChecked)
         }
 
-        binding.saleMarketEntryDateInput.doAfterTextChanged {
-            viewModel.onMarketEntryDateChanged(it?.toString())
-        }
-        binding.saleDateInput.doAfterTextChanged {
-            viewModel.onSaleDateChanged(it?.toString())
-        }
+        binding.saleMarketEntryDateInput.setOnClickListener { viewModel.onMarketEntryDateClicked() }
+        binding.saleDateInput.setOnClickListener { viewModel.onSaleDateClicked() }
 
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
             binding.saleAgentInput.setAdapter(ArrayAdapter(
@@ -60,7 +56,21 @@ class EditSaleFragment : Fragment() {
             binding.saleSwitch.isChecked = it.isAvailableForSale
             binding.saleDateInputLayout.isVisible = !it.isAvailableForSale
 
+            binding.saleMarketEntryDateInputLayout.error = it.marketEntryDateError
             binding.saleDateInputLayout.error = it.saleDateError
+        }
+
+        viewModel.showDatePickerEventLiveData.observe(viewLifecycleOwner) {
+            val datePicker = MaterialDatePicker.Builder
+                .datePicker()
+                .setTitleText(it.title)
+                .setSelection(it.dateMillis)
+                .build()
+
+            datePicker.addOnPositiveButtonClickListener { dateMillis ->
+                viewModel.onDateSelected(dateMillis)
+            }
+            datePicker.show(parentFragmentManager, null)
         }
     }
 
