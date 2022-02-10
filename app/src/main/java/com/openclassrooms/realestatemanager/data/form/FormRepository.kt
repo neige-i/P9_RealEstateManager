@@ -20,6 +20,7 @@ class FormRepository @Inject constructor() {
 
     private val defaultRealEstateEntity = FormEntity(
         type = "",
+        typeError = null,
         price = "",
         area = "",
         totalRoomCount = 0,
@@ -38,6 +39,7 @@ class FormRepository @Inject constructor() {
         agentName = "",
         marketEntryDate = "",
         saleDate = "",
+        saleDateError = null,
         isAvailableForSale = true
     )
 

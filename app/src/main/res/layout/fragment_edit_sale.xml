@@ -75,7 +75,7 @@
             android:id="@+id/sale_date_input_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_sold_date"
+            android:hint="@string/hint_sale_date"
             android:labelFor="@id/sale_date_input"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

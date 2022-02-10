@@ -16,6 +16,7 @@ class EditMainInfoViewModel @Inject constructor(
     val viewStateLiveData = Transformations.map(getFormUseCase.getUpdates()) {
         MainInfoViewState(
             selectedType = it.type,
+            typeError = it.typeError,
             price = it.price,
             area = it.area,
             totalRoomCount = it.totalRoomCount.toString(),

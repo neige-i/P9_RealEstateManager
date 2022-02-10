@@ -5,5 +5,6 @@ data class SaleViewState(
     val selectedAgentName: String,
     val marketEntryDate: String,
     val saleDate: String,
+    val saleDateError: String?,
     val isAvailableForSale: Boolean,
 )

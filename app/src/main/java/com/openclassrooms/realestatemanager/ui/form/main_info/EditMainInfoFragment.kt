@@ -59,6 +59,8 @@ class EditMainInfoFragment : Fragment() {
             binding.mainInfoTotalRoomCount.text = it.totalRoomCount
             binding.mainInfoBathroomCount.text = it.bathroomCount
             binding.mainInfoBedroomCount.text = it.bedroomCount
+
+            binding.mainInfoTypeInputLayout.error = it.typeError
         }
     }
 

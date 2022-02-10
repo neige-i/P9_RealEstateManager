@@ -59,6 +59,8 @@ class EditSaleFragment : Fragment() {
 
             binding.saleSwitch.isChecked = it.isAvailableForSale
             binding.saleDateInputLayout.isVisible = !it.isAvailableForSale
+
+            binding.saleDateInputLayout.error = it.saleDateError
         }
     }
 

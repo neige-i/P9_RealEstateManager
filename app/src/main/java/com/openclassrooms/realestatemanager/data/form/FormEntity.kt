@@ -2,6 +2,7 @@ package com.openclassrooms.realestatemanager.data.form
 
 data class FormEntity(
     val type: String,
+    val typeError: String?,
     val price: String,
     val area: String,
     val totalRoomCount: Int,
@@ -20,5 +21,6 @@ data class FormEntity(
     val agentName: String,
     val marketEntryDate: String,
     val saleDate: String,
+    val saleDateError: String?,
     val isAvailableForSale: Boolean,
 )

@@ -16,9 +16,23 @@ class CheckFormErrorUseCase @Inject constructor(
         val form = formRepository.getCurrentForm()
 
         return when (pageToCheck) {
+            0 -> containsNoMainError(form)
             2 -> containsNoAddressError(form)
+            3 -> containsNoSaleError(form)
             else -> true
         }
+    }
+
+    private fun containsNoMainError(form: FormEntity): Boolean {
+        val typeError = if (form.type.isEmpty()) {
+            appContext.getString(R.string.error_mandatory_field)
+        } else {
+            null
+        }
+
+        formRepository.setForm(form.copy(typeError = typeError))
+
+        return typeError == null
     }
 
     private fun containsNoAddressError(form: FormEntity): Boolean {
@@ -42,5 +56,18 @@ class CheckFormErrorUseCase @Inject constructor(
         formRepository.setForm(form.copy(zipcodeError = zipcodeError, stateError = stateError))
 
         return stateError == null && zipcodeError == null
+    }
+
+    private fun containsNoSaleError(form: FormEntity): Boolean {
+        val saleDateError = when {
+            !form.isAvailableForSale && form.saleDate.isEmpty() -> {
+                appContext.getString(R.string.error_mandatory_field)
+            }
+            else -> null
+        }
+
+        formRepository.setForm(form.copy(saleDateError = saleDateError))
+
+        return saleDateError == null
     }
 }

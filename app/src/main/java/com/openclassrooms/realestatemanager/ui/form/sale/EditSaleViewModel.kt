@@ -46,6 +46,7 @@ class EditSaleViewModel @Inject constructor(
             selectedAgentName = selectedAgentName,
             marketEntryDate = form.marketEntryDate,
             saleDate = form.saleDate,
+            saleDateError = form.saleDateError,
             isAvailableForSale = form.isAvailableForSale
         )
     }
