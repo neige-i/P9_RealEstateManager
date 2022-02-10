@@ -21,7 +21,9 @@ class EditAddressViewModel @Inject constructor(
             additionalInfo = it.additionalAddressInfo,
             city = it.city,
             state = it.state,
+            stateError = it.stateError,
             zipcode = it.zipcode,
+            zipcodeError = it.zipcodeError,
             country = it.country,
             pointOfInterestList = PointOfInterest.values().map { poi ->
                 AddressViewState.ChipViewState(

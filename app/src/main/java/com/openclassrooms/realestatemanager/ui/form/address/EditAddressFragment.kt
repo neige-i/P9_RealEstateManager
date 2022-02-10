@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.flexbox.FlexboxLayoutManager
+import com.openclassrooms.realestatemanager.data.form.FormRepository
 import com.openclassrooms.realestatemanager.databinding.FragmentEditAddressBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -36,6 +38,12 @@ class EditAddressFragment : Fragment() {
         binding.poiList.adapter = chipAdapter
         binding.poiList.layoutManager = FlexboxLayoutManager(requireContext())
 
+        binding.addressStateInput.setAdapter(ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_list_item_1,
+            FormRepository.STATE_POSTAL_ABBR
+        ))
+
         binding.addressStreetInput.doAfterTextChanged {
             viewModel.onStreetNameChanged(it?.toString())
         }
@@ -59,9 +67,12 @@ class EditAddressFragment : Fragment() {
             binding.addressStreetInput.setText(it.streetNumber)
             binding.addressAdditionalInput.setText(it.additionalInfo)
             binding.addressCityInput.setText(it.city)
-            binding.addressStateInput.setText(it.state)
+            binding.addressStateInput.setText(it.state, false)
             binding.addressZipcodeInput.setText(it.zipcode)
             binding.addressCountryInput.setText(it.country)
+
+            binding.addressStateInputLayout.error = it.stateError
+            binding.addressZipcodeInputLayout.error = it.zipcodeError
 
             chipAdapter.submitList(it.pointOfInterestList)
         }

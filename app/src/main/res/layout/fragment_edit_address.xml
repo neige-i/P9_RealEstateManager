@@ -83,6 +83,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/address_state_input_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
@@ -90,12 +91,12 @@
             android:labelFor="@id/address_state_input"
             app:layout_constraintBottom_toTopOf="@id/address_country_input_layout"
             app:layout_constraintEnd_toStartOf="@id/address_zipcode_input_layout"
-            app:layout_constraintHorizontal_weight="3"
+            app:layout_constraintHorizontal_weight="4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/address_city_input_layout"
             >
 
-            <com.google.android.material.textfield.TextInputEditText
+            <AutoCompleteTextView
                 android:id="@+id/address_state_input"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -112,7 +113,7 @@
             android:hint="@string/hint_address_zipcode"
             android:labelFor="@id/address_zipcode_input"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_weight="7"
+            app:layout_constraintHorizontal_weight="6"
             app:layout_constraintStart_toEndOf="@id/address_state_input_layout"
             app:layout_constraintTop_toTopOf="@id/address_state_input_layout"
             >

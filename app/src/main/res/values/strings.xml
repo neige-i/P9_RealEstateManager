@@ -6,6 +6,7 @@
     <string name="toolbar_title_add">Add a real estate</string>
     <string name="button_text_next">Next</string>
     <string name="button_text_save">Save</string>
+
     <string name="real_estate_type_flat">Flat</string>
     <string name="real_estate_type_house">House</string>
     <string name="real_estate_type_duplex">Duplex</string>
@@ -40,7 +41,11 @@
     <string name="hint_market_entry_date">Market entry date</string>
     <string name="hint_sold_date">Sold date</string>
     <string name="hint_agent">Real estate agent</string>
+
     <string name="description_button_add">Add button</string>
     <string name="description_button_remove">Remove button</string>
     <string name="description_button_add_photo">Add photo button</string>
+
+    <string name="error_unknown_state">Unknown state</string>
+    <string name="error_incomplete_zipcode">Incomplete zipcode</string>
 </resources>

@@ -7,7 +7,9 @@ data class AddressViewState(
     val additionalInfo: String,
     val city: String,
     val state: String,
+    val stateError: String?,
     val zipcode: String,
+    val zipcodeError: String?,
     val country: String,
     val pointOfInterestList: List<ChipViewState>,
 ) {

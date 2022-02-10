@@ -5,12 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.openclassrooms.realestatemanager.R
+import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
 import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class FormViewModel @Inject constructor(
+    private val checkFormErrorUseCase: CheckFormErrorUseCase,
     private val application: Application,
 ) : ViewModel() {
 
@@ -51,12 +53,13 @@ class FormViewModel @Inject constructor(
     }
 
     fun onSubmitButtonClicked() {
-        // Save to repo
+        if (checkFormErrorUseCase.containsNoError(currentPage)) {
 
-        if (isLastPageDisplayed()) {
-            formEventSingleLiveEvent.value = FormEvent.ExitActivity
-        } else {
-            formEventSingleLiveEvent.value = FormEvent.GoToPage(currentPage + 1)
+            if (isLastPageDisplayed()) {
+                formEventSingleLiveEvent.value = FormEvent.ExitActivity
+            } else {
+                formEventSingleLiveEvent.value = FormEvent.GoToPage(currentPage + 1)
+            }
         }
     }
 
