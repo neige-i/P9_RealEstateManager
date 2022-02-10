@@ -1,79 +1,62 @@
 package com.openclassrooms.realestatemanager.ui.add_edit.pages
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import com.openclassrooms.realestatemanager.domain.EditFormUseCase
+import com.openclassrooms.realestatemanager.domain.GetFormInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class MainInfoViewModel @Inject constructor() : ViewModel() {
+class MainInfoViewModel @Inject constructor(
+    getFormInfoUseCase: GetFormInfoUseCase,
+    private val editFormUseCase: EditFormUseCase,
+) : ViewModel() {
 
-    private val viewStateMutableLiveData = MutableLiveData<MainInfoViewState>()
-    val viewStateLiveData: LiveData<MainInfoViewState> = viewStateMutableLiveData
+    val viewStateLiveData = Transformations.map(getFormInfoUseCase()) {
+        MainInfoViewState(
+            selectedType = it.type,
+            price = it.price,
+            area = it.area,
+            totalRoomCount = it.totalRoomCount.toString(),
+            bathroomCount = it.bathroomCount.toString(),
+            bedroomCount = it.bedroomCount.toString()
+        )
+    }
 
-    private var currentState = MainInfoViewState(
-        totalRoomCount = 0,
-        bathroomCount = 0,
-        bedroomCount = 0
-    )
+    fun onTypeSelected(selectedType: String) {
+        editFormUseCase.updateType(selectedType)
+    }
 
-    init {
-        viewStateMutableLiveData.value = currentState
+    fun onPriceChanged(price: String?) {
+        editFormUseCase.updatePrice(price ?: "")
+    }
+
+    fun onAreaChanged(area: String?) {
+        editFormUseCase.updateArea(area ?: "")
     }
 
     fun onTotalRoomAdded() {
-        updateRoom(
-            newState = currentState.copy(totalRoomCount = currentState.totalRoomCount.inc()),
-            conditionToUpdate = true
-        )
-    }
-
-    fun onBathRoomAdded() {
-        updateRoom(
-            newState = currentState.copy(bathroomCount = currentState.bathroomCount.inc()),
-            conditionToUpdate = areAnyRoomsLeft()
-        )
-    }
-
-    fun onBedRoomAdded() {
-        updateRoom(
-            newState = currentState.copy(bedroomCount = currentState.bedroomCount.inc()),
-            conditionToUpdate = areAnyRoomsLeft()
-        )
+        editFormUseCase.incTotalRoomCount()
     }
 
     fun onTotalRoomRemoved() {
-        updateRoom(
-            newState = currentState.copy(totalRoomCount = currentState.totalRoomCount.dec()),
-            conditionToUpdate = areAnyRoomsLeft()
-        )
+        editFormUseCase.decTotalRoomCount()
+    }
+
+    fun onBathRoomAdded() {
+        editFormUseCase.incBathroomCount()
     }
 
     fun onBathRoomRemoved() {
-        val currentBathRoomCount = currentState.bathroomCount
-        updateRoom(
-            newState = currentState.copy(bathroomCount = currentBathRoomCount.dec()),
-            conditionToUpdate = currentBathRoomCount > 0
-        )
+        editFormUseCase.decBathroomCount()
+    }
+
+    fun onBedRoomAdded() {
+        editFormUseCase.incBedroomCount()
     }
 
     fun onBedRoomRemoved() {
-        val currentBedRoomCount = currentState.bedroomCount
-        updateRoom(
-            newState = currentState.copy(bedroomCount = currentBedRoomCount.dec()),
-            conditionToUpdate = currentBedRoomCount > 0
-        )
-    }
-
-    private fun updateRoom(newState: MainInfoViewState, conditionToUpdate: Boolean) {
-        if (conditionToUpdate) {
-            currentState = newState
-            viewStateMutableLiveData.value = currentState
-        }
-    }
-
-    private fun areAnyRoomsLeft(): Boolean = currentState.run {
-        totalRoomCount - bathroomCount - bedroomCount > 0
+        editFormUseCase.decBedroomCount()
     }
 }

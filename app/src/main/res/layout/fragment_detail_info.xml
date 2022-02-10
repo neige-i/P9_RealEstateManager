@@ -19,31 +19,29 @@
         >
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/main_info_description_input_layout"
+            android:id="@+id/detail_info_description_input_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="@string/hint_description"
-            android:labelFor="@id/main_info_description_input"
-            app:layout_constraintBottom_toTopOf="@id/main_info_photo_list"
+            android:labelFor="@id/detail_info_description_input"
+            app:layout_constraintBottom_toTopOf="@id/detail_info_photo_list"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             >
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/main_info_description_input"
+                android:id="@+id/detail_info_description_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
                 android:maxLines="4"
-                android:overScrollMode="always"
-                android:scrollbarStyle="insideInset"
                 android:scrollbars="vertical"
                 />
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/main_info_photo_list"
+            android:id="@+id/detail_info_photo_list"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -51,7 +49,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/main_info_description_input_layout"
+            app:layout_constraintTop_toBottomOf="@id/detail_info_description_input_layout"
             app:spanCount="@integer/photo_grid_column_count"
             tools:listitem="@layout/item_add_photo"
             />

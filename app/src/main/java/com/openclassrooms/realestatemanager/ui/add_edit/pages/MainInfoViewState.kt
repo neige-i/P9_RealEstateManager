@@ -1,7 +1,10 @@
 package com.openclassrooms.realestatemanager.ui.add_edit.pages
 
 data class MainInfoViewState(
-    val totalRoomCount: Int,
-    val bathroomCount: Int,
-    val bedroomCount: Int,
+    val selectedType: String,
+    val price: String,
+    val area: String,
+    val totalRoomCount: String,
+    val bathroomCount: String,
+    val bedroomCount: String,
 )
