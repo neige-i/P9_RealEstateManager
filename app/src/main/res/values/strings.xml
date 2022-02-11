@@ -2,6 +2,7 @@
     <string name="app_name">Real Estate Manager</string>
 
     <string name="menu_item_add">Add</string>
+    <string name="menu_item_close">Close</string>
 
     <string name="toolbar_title_add">Add a real estate</string>
     <string name="button_text_next">Next</string>

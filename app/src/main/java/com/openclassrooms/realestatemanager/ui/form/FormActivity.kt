@@ -1,9 +1,12 @@
 package com.openclassrooms.realestatemanager.ui.form
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
+import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ActivityFormBinding
 import com.openclassrooms.realestatemanager.ui.form.address.EditAddressFragment
 import com.openclassrooms.realestatemanager.ui.form.detail_info.EditDetailInfoFragment
@@ -60,6 +63,21 @@ class FormActivity : AppCompatActivity() {
                     binding.formPager.currentItem = it.pageToGo
                 }
             }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_form, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.close_form -> {
+                viewModel.onCloseMenuItemClicked()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

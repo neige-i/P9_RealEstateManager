@@ -52,6 +52,10 @@ class FormViewModel @Inject constructor(
         }
     }
 
+    fun onCloseMenuItemClicked() {
+        formEventSingleLiveEvent.value = FormEvent.ExitActivity
+    }
+
     fun onSubmitButtonClicked() {
         if (checkFormErrorUseCase.containsNoError(currentPage)) {
 
