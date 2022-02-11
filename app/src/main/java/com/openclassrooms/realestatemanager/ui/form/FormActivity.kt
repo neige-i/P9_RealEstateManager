@@ -6,6 +6,7 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ActivityFormBinding
 import com.openclassrooms.realestatemanager.ui.form.address.EditAddressFragment
@@ -62,6 +63,18 @@ class FormActivity : AppCompatActivity() {
                 is FormEvent.GoToPage -> {
                     binding.formPager.currentItem = it.pageToGo
                 }
+                is FormEvent.ShowExitDialog -> MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.exit_form_dialog_title)
+                    .setMessage(it.dialogMessage)
+                    .setPositiveButton(R.string.exit_form_dialog_positive_button) { _, _ ->
+                        viewModel.onDialogPositiveButtonClicked()
+                    }
+                    .setNegativeButton(R.string.exit_form_dialog_negative_button) { _, _ ->
+                        viewModel.onDialogNegativeButtonClicked()
+                    }
+                    .setNeutralButton(R.string.exit_form_dialog_neutral_button, null)
+                    .setCancelable(false)
+                    .show()
             }
         }
     }

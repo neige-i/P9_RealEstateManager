@@ -19,46 +19,70 @@ class FormRepository @Inject constructor() {
         )
 
         val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+        private val DEFAULT_FORM = FormEntity(
+            type = "",
+            typeError = null,
+            price = "",
+            area = "",
+            totalRoomCount = 0,
+            bathroomCount = 0,
+            bedroomCount = 0,
+            description = "",
+            streetName = "",
+            streetNameError = null,
+            additionalAddressInfo = "",
+            city = "",
+            cityError = null,
+            state = "",
+            stateError = null,
+            zipcode = "",
+            zipcodeError = null,
+            country = "",
+            countryError = null,
+            pointsOfInterests = emptyList(),
+            agentName = "",
+            marketEntryDate = "",
+            marketEntryDateError = null,
+            saleDate = "",
+            saleDateError = null,
+            isAvailableForSale = true
+        )
     }
 
-    private val defaultRealEstateEntity = FormEntity(
-        type = "",
-        typeError = null,
-        price = "",
-        area = "",
-        totalRoomCount = 0,
-        bathroomCount = 0,
-        bedroomCount = 0,
-        description = "",
-        streetName = "",
-        streetNameError = null,
-        additionalAddressInfo = "",
-        city = "",
-        cityError = null,
-        state = "",
-        stateError = null,
-        zipcode = "",
-        zipcodeError = null,
-        country = "",
-        countryError = null,
-        pointsOfInterests = emptyList(),
-        agentName = "",
-        marketEntryDate = "",
-        marketEntryDateError = null,
-        saleDate = "",
-        saleDateError = null,
-        isAvailableForSale = true
+    private val formMutableLiveData = MutableLiveData<FormEntity>()
+    private var initialState: FormEntity? = null
+    private var currentState: FormEntity? = null
+
+    fun getFormLiveData(): LiveData<FormEntity> {
+        return Transformations.distinctUntilChanged(formMutableLiveData)
+    }
+
+    fun getCurrentForm(): FormEntity = currentState ?: throw NullPointerException(
+        "The form has not been initialized. Please call initForm() before accessing it"
     )
 
-    private var currentForm = defaultRealEstateEntity
-    private val formMutableLiveData = MutableLiveData(currentForm)
+    fun getFormType(): FormType = if (initialState == DEFAULT_FORM) FormType.ADD else FormType.EDIT
 
-    fun getCurrentForm() = currentForm
+    fun containsModifications(): Boolean = currentState != initialState
 
-    fun getForm(): LiveData<FormEntity> = Transformations.distinctUntilChanged(formMutableLiveData)
+    fun initForm(form: FormEntity? = null) {
+        initialState = form ?: DEFAULT_FORM
+        setForm(form ?: currentState ?: DEFAULT_FORM)
+    }
 
     fun setForm(form: FormEntity) {
-        currentForm = form
+        currentState = form
         formMutableLiveData.value = form
+    }
+
+    fun resetForm() {
+        initialState = null
+        currentState = null
+    }
+
+    enum class FormType {
+        ADD,
+        EDIT,
     }
 }

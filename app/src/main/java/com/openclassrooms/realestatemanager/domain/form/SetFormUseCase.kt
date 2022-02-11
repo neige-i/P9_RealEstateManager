@@ -8,6 +8,14 @@ class SetFormUseCase @Inject constructor(
     private val formRepository: FormRepository,
 ) {
 
+    fun initAddForm() {
+        formRepository.initForm()
+    }
+
+    fun reset() {
+        formRepository.resetForm()
+    }
+
     fun updateType(type: String) {
         formRepository.setForm(getForm().copy(type = type))
     }

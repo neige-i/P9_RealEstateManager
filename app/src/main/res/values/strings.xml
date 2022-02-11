@@ -8,6 +8,13 @@
     <string name="button_text_next">Next</string>
     <string name="button_text_save">Save</string>
 
+    <string name="exit_form_dialog_title">Exit form</string>
+    <string name="exit_add_form_dialog_message">Keep modifications in memory?</string>
+    <string name="exit_edit_form_dialog_message">Save modifications?</string>
+    <string name="exit_form_dialog_positive_button">Yes, save modifications</string>
+    <string name="exit_form_dialog_negative_button">No, discard modifications</string>
+    <string name="exit_form_dialog_neutral_button">Cancel</string>
+
     <string name="real_estate_type_flat">Flat</string>
     <string name="real_estate_type_house">House</string>
     <string name="real_estate_type_duplex">Duplex</string>

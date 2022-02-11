@@ -9,5 +9,9 @@ class GetFormUseCase @Inject constructor(
     private val formRepository: FormRepository,
 ) {
 
-    fun getUpdates(): LiveData<FormEntity> = formRepository.getForm()
+    fun getUpdates(): LiveData<FormEntity> = formRepository.getFormLiveData()
+
+    fun getType(): FormRepository.FormType = formRepository.getFormType()
+
+    fun isModified(): Boolean = formRepository.containsModifications()
 }

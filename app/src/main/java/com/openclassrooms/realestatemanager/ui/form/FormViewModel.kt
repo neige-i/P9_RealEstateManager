@@ -5,14 +5,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.openclassrooms.realestatemanager.R
+import com.openclassrooms.realestatemanager.data.form.FormRepository
 import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
+import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
+import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class FormViewModel @Inject constructor(
+    private val getFormInfoUseCase: GetFormUseCase,
     private val checkFormErrorUseCase: CheckFormErrorUseCase,
+    private val editFormUseCase: SetFormUseCase,
     private val application: Application,
 ) : ViewModel() {
 
@@ -45,26 +50,54 @@ class FormViewModel @Inject constructor(
     }
 
     fun onGoBack() {
-        formEventSingleLiveEvent.value = if (currentPage > 0) {
-            FormEvent.GoToPage(currentPage - 1)
+        if (currentPage > 0) {
+            formEventSingleLiveEvent.value = FormEvent.GoToPage(currentPage - 1)
         } else {
-            FormEvent.ExitActivity
+            confirmExit()
         }
     }
 
     fun onCloseMenuItemClicked() {
-        formEventSingleLiveEvent.value = FormEvent.ExitActivity
+        confirmExit()
+    }
+
+    private fun confirmExit() {
+        if (getFormInfoUseCase.isModified()) {
+
+            formEventSingleLiveEvent.value = FormEvent.ShowExitDialog(
+                dialogMessage = when (getFormInfoUseCase.getType()) {
+                    FormRepository.FormType.ADD -> application.getString(R.string.exit_add_form_dialog_message)
+                    FormRepository.FormType.EDIT -> application.getString(R.string.exit_edit_form_dialog_message)
+                }
+            )
+        } else {
+            formEventSingleLiveEvent.value = FormEvent.ExitActivity
+        }
     }
 
     fun onSubmitButtonClicked() {
-        if (checkFormErrorUseCase.containsNoError(currentPage)) {
-
+        if (checkFormErrorUseCase.containsNoError(pageToCheck = currentPage)) {
             if (isLastPageDisplayed()) {
-                formEventSingleLiveEvent.value = FormEvent.ExitActivity
+                resetFormAndExit()
             } else {
                 formEventSingleLiveEvent.value = FormEvent.GoToPage(currentPage + 1)
             }
         }
+    }
+
+    fun onDialogPositiveButtonClicked() {
+        if (checkFormErrorUseCase.containsNoError(pageToCheck = 0)) {
+            formEventSingleLiveEvent.value = FormEvent.ExitActivity
+        }
+    }
+
+    fun onDialogNegativeButtonClicked() {
+        resetFormAndExit()
+    }
+
+    private fun resetFormAndExit() {
+        editFormUseCase.reset()
+        formEventSingleLiveEvent.value = FormEvent.ExitActivity
     }
 
     private fun isLastPageDisplayed(): Boolean = currentPage == pageCount - 1

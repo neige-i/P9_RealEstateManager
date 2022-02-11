@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.DetailRepository
+import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -12,6 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     detailRepository: DetailRepository,
+    private val editFormUseCase: SetFormUseCase,
     private val application: Application,
 ) : ViewModel() {
 
@@ -29,6 +31,7 @@ class MainViewModel @Inject constructor(
     fun onMenuItemClicked(itemId: Int): Boolean {
         return when (itemId) {
             R.id.toolbar_menu_add -> {
+                editFormUseCase.initAddForm()
                 mainEventSingleLiveEvent.value = MainEvent.GoToFormActivity
                 true
             }
