@@ -63,17 +63,15 @@ class FormActivity : AppCompatActivity() {
                 is FormEvent.GoToPage -> {
                     binding.formPager.currentItem = it.pageToGo
                 }
-                is FormEvent.ShowExitDialog -> MaterialAlertDialogBuilder(this)
-                    .setTitle(R.string.exit_form_dialog_title)
-                    .setMessage(it.dialogMessage)
-                    .setPositiveButton(R.string.exit_form_dialog_positive_button) { _, _ ->
+                is FormEvent.ShowDialog -> MaterialAlertDialogBuilder(this)
+                    .setTitle(it.title)
+                    .setMessage(it.message)
+                    .setPositiveButton(it.positiveButtonText) { _, _ ->
                         viewModel.onDialogPositiveButtonClicked()
                     }
-                    .setNegativeButton(R.string.exit_form_dialog_negative_button) { _, _ ->
+                    .setNegativeButton(it.negativeButtonText) { _, _ ->
                         viewModel.onDialogNegativeButtonClicked()
                     }
-                    .setNeutralButton(R.string.exit_form_dialog_neutral_button, null)
-                    .setCancelable(false)
                     .show()
             }
         }

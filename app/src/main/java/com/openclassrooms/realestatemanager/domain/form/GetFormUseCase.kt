@@ -11,6 +11,8 @@ class GetFormUseCase @Inject constructor(
 
     fun getUpdates(): LiveData<FormEntity> = formRepository.getFormLiveData()
 
+    fun getCurrent(): FormEntity = formRepository.getCurrentForm()
+
     fun getType(): FormRepository.FormType = formRepository.getFormType()
 
     fun isModified(): Boolean = formRepository.containsModifications()

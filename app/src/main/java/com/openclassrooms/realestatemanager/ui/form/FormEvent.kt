@@ -6,5 +6,10 @@ sealed class FormEvent {
 
     object ExitActivity : FormEvent()
 
-    data class ShowExitDialog(val dialogMessage: String) : FormEvent()
+    data class ShowDialog(
+        val title: String,
+        val message: String,
+        val positiveButtonText: String,
+        val negativeButtonText: String,
+    ) : FormEvent()
 }

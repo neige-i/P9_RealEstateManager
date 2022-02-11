@@ -13,7 +13,11 @@
     <string name="exit_edit_form_dialog_message">Save modifications?</string>
     <string name="exit_form_dialog_positive_button">Yes, save modifications</string>
     <string name="exit_form_dialog_negative_button">No, discard modifications</string>
-    <string name="exit_form_dialog_neutral_button">Cancel</string>
+
+    <string name="draft_form_dialog_title">There is a real estate saved in memory</string>
+    <string name="draft_form_dialog_message">You have partially added a \'%s\'. Do you want to resume it?</string>
+    <string name="draft_form_dialog_positive_button">Yes, resume it</string>
+    <string name="draft_form_dialog_negative_button">No, start a new one</string>
 
     <string name="real_estate_type_flat">Flat</string>
     <string name="real_estate_type_house">House</string>

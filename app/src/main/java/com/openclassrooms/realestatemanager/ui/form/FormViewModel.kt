@@ -21,13 +21,37 @@ class FormViewModel @Inject constructor(
     private val application: Application,
 ) : ViewModel() {
 
+    companion object {
+        private const val EXIT_DIALOG = 0
+        private const val DRAFT_DIALOG = 1
+    }
+
     private val viewStateMutableLiveData = MutableLiveData<FormViewState>()
     val viewStateLiveData: LiveData<FormViewState> = viewStateMutableLiveData
-    private val formEventSingleLiveEvent = SingleLiveEvent<FormEvent>()
-    val formEventLiveData: LiveData<FormEvent> = formEventSingleLiveEvent
+    private val formSingleLiveEvent = SingleLiveEvent<FormEvent>()
+    val formEventLiveData: LiveData<FormEvent> = formSingleLiveEvent
 
     private var pageCount = 0
     private var currentPage = 0
+    private var whichDialog = -1
+
+    init {
+        if (getFormInfoUseCase.getType() == FormRepository.FormType.ADD &&
+            getFormInfoUseCase.isModified()
+        ) {
+            whichDialog = DRAFT_DIALOG
+
+            formSingleLiveEvent.value = FormEvent.ShowDialog(
+                title = application.getString(R.string.draft_form_dialog_title),
+                message = application.getString(
+                    R.string.draft_form_dialog_message,
+                    getFormInfoUseCase.getCurrent().type
+                ),
+                positiveButtonText = application.getString(R.string.draft_form_dialog_positive_button),
+                negativeButtonText = application.getString(R.string.draft_form_dialog_negative_button)
+            )
+        }
+    }
 
     fun onInitPagerAdapter(pageCount: Int) {
         this.pageCount = pageCount
@@ -51,7 +75,7 @@ class FormViewModel @Inject constructor(
 
     fun onGoBack() {
         if (currentPage > 0) {
-            formEventSingleLiveEvent.value = FormEvent.GoToPage(currentPage - 1)
+            formSingleLiveEvent.value = FormEvent.GoToPage(currentPage - 1)
         } else {
             confirmExit()
         }
@@ -63,15 +87,19 @@ class FormViewModel @Inject constructor(
 
     private fun confirmExit() {
         if (getFormInfoUseCase.isModified()) {
+            whichDialog = EXIT_DIALOG
 
-            formEventSingleLiveEvent.value = FormEvent.ShowExitDialog(
-                dialogMessage = when (getFormInfoUseCase.getType()) {
+            formSingleLiveEvent.value = FormEvent.ShowDialog(
+                title = application.getString(R.string.exit_form_dialog_title),
+                message = when (getFormInfoUseCase.getType()) {
                     FormRepository.FormType.ADD -> application.getString(R.string.exit_add_form_dialog_message)
                     FormRepository.FormType.EDIT -> application.getString(R.string.exit_edit_form_dialog_message)
-                }
+                },
+                positiveButtonText = application.getString(R.string.exit_form_dialog_positive_button),
+                negativeButtonText = application.getString(R.string.exit_form_dialog_negative_button)
             )
         } else {
-            formEventSingleLiveEvent.value = FormEvent.ExitActivity
+            formSingleLiveEvent.value = FormEvent.ExitActivity
         }
     }
 
@@ -80,24 +108,35 @@ class FormViewModel @Inject constructor(
             if (isLastPageDisplayed()) {
                 resetFormAndExit()
             } else {
-                formEventSingleLiveEvent.value = FormEvent.GoToPage(currentPage + 1)
+                formSingleLiveEvent.value = FormEvent.GoToPage(currentPage + 1)
             }
         }
     }
 
     fun onDialogPositiveButtonClicked() {
-        if (checkFormErrorUseCase.containsNoError(pageToCheck = 0)) {
-            formEventSingleLiveEvent.value = FormEvent.ExitActivity
+        when (whichDialog) {
+            EXIT_DIALOG -> {
+                if (checkFormErrorUseCase.containsNoError(pageToCheck = 0)) {
+                    formSingleLiveEvent.value = FormEvent.ExitActivity
+                }
+            }
+            DRAFT_DIALOG -> {}
         }
     }
 
     fun onDialogNegativeButtonClicked() {
-        resetFormAndExit()
+        when (whichDialog) {
+            EXIT_DIALOG -> resetFormAndExit()
+            DRAFT_DIALOG -> {
+                editFormUseCase.reset()
+                editFormUseCase.initAddForm()
+            }
+        }
     }
 
     private fun resetFormAndExit() {
         editFormUseCase.reset()
-        formEventSingleLiveEvent.value = FormEvent.ExitActivity
+        formSingleLiveEvent.value = FormEvent.ExitActivity
     }
 
     private fun isLastPageDisplayed(): Boolean = currentPage == pageCount - 1
