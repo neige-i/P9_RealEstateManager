@@ -19,6 +19,10 @@
     <string name="draft_form_dialog_positive_button">Yes, resume it</string>
     <string name="draft_form_dialog_negative_button">No, start a new one</string>
 
+    <string name="image_picker_dialog_title">Pick an image</string>
+    <string name="image_picker_dialog_gallery_item">From gallery</string>
+    <string name="image_picker_dialog_camera_item">From camera</string>
+
     <string name="real_estate_type_flat">Flat</string>
     <string name="real_estate_type_house">House</string>
     <string name="real_estate_type_duplex">Duplex</string>

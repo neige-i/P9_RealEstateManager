@@ -1,5 +1,6 @@
 package com.openclassrooms.realestatemanager.ui.form.detail_info
 
+import android.net.Uri
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
@@ -15,11 +16,25 @@ class EditDetailInfoViewModel @Inject constructor(
 
     val viewStateLiveData = Transformations.map(getFormUseCase.getUpdates()) {
         DetailInfoViewState(
-            description = it.description
+            description = it.description,
+            photoList = it.pictureUriList.map { uri -> DetailInfoViewState.PhotoViewState.Add(uri) }
         )
     }
 
+    private var whichPhotoPosition = -1
+
     fun onDescriptionChanged(description: String?) {
         setFormUseCase.updateDescription(description ?: "")
+    }
+
+    fun onPhotoClicked(position: Int) {
+        whichPhotoPosition = position
+    }
+
+    fun onPictureTaken(pictureUri: Uri?) {
+        if (pictureUri != null) {
+            setFormUseCase.updatePictureUri(whichPhotoPosition, pictureUri)
+            whichPhotoPosition = -1
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.openclassrooms.realestatemanager.data.form
 
+import android.net.Uri
+
 data class FormEntity(
     val type: String,
     val typeError: String?,
@@ -9,6 +11,7 @@ data class FormEntity(
     val bathroomCount: Int,
     val bedroomCount: Int,
     val description: String,
+    val pictureUriList: List<Uri?>,
     val streetName: String,
     val streetNameError: String?,
     val additionalAddressInfo: String,

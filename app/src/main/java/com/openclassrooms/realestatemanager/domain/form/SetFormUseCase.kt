@@ -1,5 +1,6 @@
 package com.openclassrooms.realestatemanager.domain.form
 
+import android.net.Uri
 import androidx.annotation.StringRes
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import javax.inject.Inject
@@ -68,6 +69,12 @@ class SetFormUseCase @Inject constructor(
 
     fun updateDescription(description: String) {
         formRepository.setForm(getForm().copy(description = description))
+    }
+
+    fun updatePictureUri(position: Int, pictureUri: Uri) {
+        val pictureList = getForm().pictureUriList.toMutableList()
+        pictureList[position] = pictureUri
+        formRepository.setForm(getForm().copy(pictureUriList = pictureList))
     }
 
     fun updateStreetName(streetNameHouseNumber: String) {
