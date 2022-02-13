@@ -17,9 +17,19 @@ class EditDetailInfoViewModel @Inject constructor(
 ) : ViewModel() {
 
     val viewStateLiveData = Transformations.map(getFormUseCase.getUpdates()) {
+
+        val photoList = mutableListOf<DetailInfoViewState.PhotoViewState>()
+        it.pictureList.forEach { picture ->
+            photoList.add(DetailInfoViewState.PhotoViewState.Picture(
+                uri = picture.uri,
+                description = picture.description
+            ))
+        }
+        photoList.add(DetailInfoViewState.PhotoViewState.Add)
+
         DetailInfoViewState(
             description = it.description,
-            photoList = it.pictureUriList.map { uri -> DetailInfoViewState.PhotoViewState.Add(uri) }
+            photoList = photoList
         )
     }
 
@@ -27,13 +37,22 @@ class EditDetailInfoViewModel @Inject constructor(
         setFormUseCase.updateDescription(description ?: "")
     }
 
-    fun onPhotoClicked(position: Int) {
+    fun onPhotoAdded(position: Int) {
         setFormUseCase.setPicturePosition(position)
     }
 
-    fun onPictureTaken(pictureUri: Uri?) {
+    fun onPhotoPicked(pictureUri: Uri?) {
         if (pictureUri != null) {
             setDisplayedPictureUseCase.init(pictureUri)
         }
+    }
+
+    fun onPhotoOpened(position: Int, picture: DetailInfoViewState.PhotoViewState.Picture) {
+        setFormUseCase.setPicturePosition(position)
+        setDisplayedPictureUseCase.init(picture.uri, picture.description)
+    }
+
+    fun onPhotoRemoved(position: Int) {
+        setFormUseCase.removePhoto(position)
     }
 }

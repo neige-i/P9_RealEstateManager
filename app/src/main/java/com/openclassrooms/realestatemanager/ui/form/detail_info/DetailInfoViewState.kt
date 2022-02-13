@@ -9,8 +9,11 @@ data class DetailInfoViewState(
 
     sealed class PhotoViewState {
 
-        data class Add(
-            val pictureUri: Uri?,
+        object Add : PhotoViewState()
+
+        data class Picture(
+            val uri: Uri,
+            val description: String,
         ) : PhotoViewState()
     }
 }

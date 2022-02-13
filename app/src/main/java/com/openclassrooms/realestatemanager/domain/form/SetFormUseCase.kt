@@ -74,6 +74,12 @@ class SetFormUseCase @Inject constructor(
         formRepository.setPositionOfPictureToUpdate(position)
     }
 
+    fun removePhoto(position: Int) {
+        val pictureList = getForm().pictureList.toMutableList()
+        pictureList.removeAt(position)
+        formRepository.setForm(getForm().copy(pictureList = pictureList))
+    }
+
     fun updateStreetName(streetNameHouseNumber: String) {
         formRepository.setForm(getForm().copy(streetName = streetNameHouseNumber))
     }

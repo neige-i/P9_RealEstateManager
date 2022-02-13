@@ -29,7 +29,7 @@ class FormRepository @Inject constructor() {
             bathroomCount = 0,
             bedroomCount = 0,
             description = "",
-            pictureUriList = List(9) { null },
+            pictureList = emptyList(),
             streetName = "",
             streetNameError = null,
             additionalAddressInfo = "",

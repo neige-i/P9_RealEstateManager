@@ -70,10 +70,10 @@ class EditDetailInfoFragment : Fragment() {
         var cameraPictureUri: Uri? = null
 
         val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) {
-            viewModel.onPictureTaken(it)
+            viewModel.onPhotoPicked(it)
         }
         val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) {
-            viewModel.onPictureTaken(cameraPictureUri)
+            viewModel.onPhotoPicked(cameraPictureUri)
         }
 
         val imagePickerDialogItems = arrayOf(
@@ -81,22 +81,33 @@ class EditDetailInfoFragment : Fragment() {
             getString(R.string.image_picker_dialog_camera_item)
         )
 
-        return PhotoAdapter {
-            viewModel.onPhotoClicked(position = it)
+        return PhotoAdapter(object : PhotoAdapter.PhotoListener {
+            override fun add(position: Int) {
+                viewModel.onPhotoAdded(position)
 
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.image_picker_dialog_title)
-                .setItems(imagePickerDialogItems) { _, which ->
-                    when (which) {
-                        0 -> galleryLauncher.launch("image/*")
-                        1 -> {
-                            cameraPictureUri = getCameraPictureUri()
-                            cameraLauncher.launch(cameraPictureUri)
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.image_picker_dialog_title)
+                    .setItems(imagePickerDialogItems) { _, which ->
+                        when (which) {
+                            0 -> galleryLauncher.launch("image/*")
+                            1 -> {
+                                cameraPictureUri = getCameraPictureUri()
+                                cameraLauncher.launch(cameraPictureUri)
+                            }
                         }
                     }
-                }
-                .show()
-        }
+                    .show()
+            }
+
+            override fun open(position: Int, picture: DetailInfoViewState.PhotoViewState.Picture) {
+                viewModel.onPhotoOpened(position, picture)
+            }
+
+            override fun remove(position: Int) {
+                viewModel.onPhotoRemoved(position)
+            }
+
+        })
     }
 
     private fun getCameraPictureUri(): Uri = FileProvider.getUriForFile(
