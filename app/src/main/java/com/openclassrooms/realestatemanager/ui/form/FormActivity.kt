@@ -1,5 +1,6 @@
 package com.openclassrooms.realestatemanager.ui.form
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -13,6 +14,7 @@ import com.openclassrooms.realestatemanager.ui.form.address.EditAddressFragment
 import com.openclassrooms.realestatemanager.ui.form.detail_info.EditDetailInfoFragment
 import com.openclassrooms.realestatemanager.ui.form.main_info.EditMainInfoFragment
 import com.openclassrooms.realestatemanager.ui.form.sale.EditSaleFragment
+import com.openclassrooms.realestatemanager.ui.form.picture.PictureActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -73,6 +75,7 @@ class FormActivity : AppCompatActivity() {
                         viewModel.onDialogNegativeButtonClicked()
                     }
                     .show()
+                FormEvent.ShowPicture -> startActivity(Intent(this, PictureActivity::class.java))
             }
         }
     }

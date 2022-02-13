@@ -2,6 +2,7 @@ package com.openclassrooms.realestatemanager.domain.form
 
 import android.content.Context
 import com.openclassrooms.realestatemanager.R
+import com.openclassrooms.realestatemanager.data.form.DisplayedPictureRepository
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -10,17 +11,21 @@ import javax.inject.Inject
 
 class CheckFormErrorUseCase @Inject constructor(
     private val formRepository: FormRepository,
+    private val displayedPictureRepository: DisplayedPictureRepository,
     @ApplicationContext private val appContext: Context,
 ) {
+
+    fun containsNoError(pageToCheck: PageToCheck): Boolean = containsNoError(pageToCheck.ordinal)
 
     fun containsNoError(pageToCheck: Int): Boolean {
         val form = formRepository.getCurrentForm()
 
-        return when (pageToCheck) {
-            0 -> containsNoMainError(form)
-            2 -> containsNoAddressError(form)
-            3 -> containsNoSaleError(form)
-            else -> true
+        return when (PageToCheck.values()[pageToCheck]) {
+            PageToCheck.MAIN -> containsNoMainError(form)
+            PageToCheck.DETAIL -> true
+            PageToCheck.ADDRESS -> containsNoAddressError(form)
+            PageToCheck.SALE -> containsNoSaleError(form)
+            PageToCheck.PICTURE -> containsNoPictureError()
         }
     }
 
@@ -34,6 +39,21 @@ class CheckFormErrorUseCase @Inject constructor(
         formRepository.setForm(form.copy(typeError = typeError))
 
         return typeError == null
+    }
+
+    private fun containsNoPictureError(): Boolean {
+        val displayedPicture = displayedPictureRepository.get()
+
+        val descriptionError =
+            if (displayedPicture.description.isBlank()) {
+                appContext.getString(R.string.error_mandatory_field)
+            } else {
+                null
+            }
+
+        displayedPictureRepository.set(displayedPicture.copy(descriptionError = descriptionError))
+
+        return descriptionError == null
     }
 
     private fun containsNoAddressError(form: FormEntity): Boolean {
@@ -109,5 +129,13 @@ class CheckFormErrorUseCase @Inject constructor(
 
     private fun toLocalDate(dateString: String): LocalDate {
         return LocalDate.parse(dateString, FormRepository.DATE_FORMATTER)
+    }
+
+    enum class PageToCheck {
+        MAIN,
+        DETAIL,
+        ADDRESS,
+        SALE,
+        PICTURE
     }
 }

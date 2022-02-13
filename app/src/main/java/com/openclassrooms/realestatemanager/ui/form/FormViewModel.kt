@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.form.FormRepository
+import com.openclassrooms.realestatemanager.domain.displayed_picture.GetDisplayedPictureUseCase
 import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
@@ -18,6 +19,7 @@ class FormViewModel @Inject constructor(
     private val getFormInfoUseCase: GetFormUseCase,
     private val checkFormErrorUseCase: CheckFormErrorUseCase,
     private val editFormUseCase: SetFormUseCase,
+    getDisplayedPictureUseCase: GetDisplayedPictureUseCase,
     private val application: Application,
 ) : ViewModel() {
 
@@ -50,6 +52,12 @@ class FormViewModel @Inject constructor(
                 positiveButtonText = application.getString(R.string.draft_form_dialog_positive_button),
                 negativeButtonText = application.getString(R.string.draft_form_dialog_negative_button)
             )
+        }
+
+        formSingleLiveEvent.addSource(getDisplayedPictureUseCase()) {
+            if (it != null) {
+                formSingleLiveEvent.value = FormEvent.ShowPicture
+            }
         }
     }
 

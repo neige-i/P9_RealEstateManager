@@ -12,4 +12,6 @@ sealed class FormEvent {
         val positiveButtonText: String,
         val negativeButtonText: String,
     ) : FormEvent()
+
+    object ShowPicture : FormEvent()
 }

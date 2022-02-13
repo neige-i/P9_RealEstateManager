@@ -54,6 +54,7 @@ class FormRepository @Inject constructor() {
     private val formMutableLiveData = MutableLiveData<FormEntity>()
     private var initialState: FormEntity? = null
     private var currentState: FormEntity? = null
+    private var positionOfPictureToUpdate = -1
 
     fun getFormLiveData(): LiveData<FormEntity> {
         return Transformations.distinctUntilChanged(formMutableLiveData)
@@ -80,6 +81,12 @@ class FormRepository @Inject constructor() {
     fun resetForm() {
         initialState = null
         currentState = null
+    }
+
+    fun getPositionOfPictureToUpdate(): Int = positionOfPictureToUpdate
+
+    fun setPositionOfPictureToUpdate(position: Int) {
+        positionOfPictureToUpdate = position
     }
 
     enum class FormType {
