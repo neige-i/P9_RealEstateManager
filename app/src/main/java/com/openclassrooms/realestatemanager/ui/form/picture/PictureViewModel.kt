@@ -1,5 +1,6 @@
 package com.openclassrooms.realestatemanager.ui.form.picture
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
@@ -41,6 +42,12 @@ class PictureViewModel @Inject constructor(
         if (checkFormErrorUseCase.containsNoError(CheckFormErrorUseCase.PageToCheck.PICTURE)) {
             savePictureUseCase()
             exitSingleLiveEvent.call()
+        }
+    }
+
+    fun onPhotoPicked(uri: Uri?) {
+        if (uri != null) {
+            setDisplayedPictureUseCase.updateUri(uri)
         }
     }
 

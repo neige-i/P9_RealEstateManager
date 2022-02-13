@@ -17,6 +17,11 @@ class SetDisplayedPictureUseCase @Inject constructor(
         ))
     }
 
+    fun updateUri(uri: Uri) {
+        val picture = displayedPictureRepository.get()
+        displayedPictureRepository.set(picture.copy(uri = uri))
+    }
+
     fun updateDescription(description: String) {
         val picture = displayedPictureRepository.get()
         displayedPictureRepository.set(picture.copy(description = description))

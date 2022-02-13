@@ -4,6 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
     <item
+        android:id="@+id/edit_picture"
+        android:icon="@drawable/ic_edit"
+        android:title="@string/menu_item_edit"
+        app:showAsAction="ifRoom"
+        />
+    <item
         android:id="@+id/save_picture"
         android:icon="@drawable/ic_save"
         android:title="@string/menu_item_save"

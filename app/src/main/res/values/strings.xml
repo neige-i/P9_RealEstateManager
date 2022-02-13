@@ -4,6 +4,7 @@
     <string name="menu_item_add">Add</string>
     <string name="menu_item_close">Close</string>
     <string name="menu_item_save">Save</string>
+    <string name="menu_item_edit">Edit</string>
 
     <string name="toolbar_title_add">Add a real estate</string>
     <string name="toolbar_title_edit_picture">Edit picture</string>

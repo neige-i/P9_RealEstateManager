@@ -9,15 +9,24 @@ import androidx.core.widget.doAfterTextChanged
 import com.bumptech.glide.Glide
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ActivityPictureBinding
+import com.openclassrooms.realestatemanager.ui.form.picker_dialog.ImagePickerLifecycleObserver
+import com.openclassrooms.realestatemanager.ui.form.picker_dialog.ImagePickerDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class PictureActivity : AppCompatActivity() {
 
     private val viewModel: PictureViewModel by viewModels()
+    private lateinit var imagePickerLifecycleObserver: ImagePickerLifecycleObserver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        imagePickerLifecycleObserver = ImagePickerLifecycleObserver(
+            registry = activityResultRegistry,
+            context = this
+        ) { viewModel.onPhotoPicked(it) }
+        lifecycle.addObserver(imagePickerLifecycleObserver)
 
         val binding = ActivityPictureBinding.inflate(layoutInflater)
 
@@ -54,6 +63,10 @@ class PictureActivity : AppCompatActivity() {
             }
             R.id.save_picture -> {
                 viewModel.onSaveMenuItemClicked()
+                true
+            }
+            R.id.edit_picture -> {
+                ImagePickerDialog(imagePickerLifecycleObserver).show(supportFragmentManager, null)
                 true
             }
             else -> super.onOptionsItemSelected(item)
