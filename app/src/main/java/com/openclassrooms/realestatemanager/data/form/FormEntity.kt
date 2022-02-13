@@ -12,6 +12,7 @@ data class FormEntity(
     val bedroomCount: Int,
     val description: String,
     val pictureList: List<PictureEntity>,
+    val pictureListError: String?,
     val streetName: String,
     val streetNameError: String?,
     val additionalAddressInfo: String,

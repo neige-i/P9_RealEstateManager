@@ -70,6 +70,7 @@
     <string name="description_picture">Picture</string>
 
     <string name="error_mandatory_field">Mandatory field</string>
+    <string name="error_empty_photo_list">Please select at least one photo</string>
     <string name="error_unknown_state">Unknown state</string>
     <string name="error_incomplete_zipcode">Incomplete zipcode</string>
     <string name="error_inconsistent_date_order">Inconsistent date order</string>

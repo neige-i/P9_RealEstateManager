@@ -6,12 +6,14 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.snackbar.Snackbar
 import com.openclassrooms.realestatemanager.databinding.FragmentEditDetailInfoBinding
-import com.openclassrooms.realestatemanager.ui.form.picker_dialog.ImagePickerLifecycleObserver
 import com.openclassrooms.realestatemanager.ui.form.picker_dialog.ImagePickerDialog
+import com.openclassrooms.realestatemanager.ui.form.picker_dialog.ImagePickerLifecycleObserver
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -65,6 +67,14 @@ class EditDetailInfoFragment : Fragment() {
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
             binding.detailInfoDescriptionInput.setText(it.description)
             photoAdapter.submitList(it.photoList)
+        }
+
+        viewModel.showErrorEventLiveData.observe(viewLifecycleOwner) {
+            val redColor = ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark)
+            Snackbar
+                .make(binding.root, it, Snackbar.LENGTH_SHORT)
+                .setBackgroundTint(redColor)
+                .show()
         }
     }
 

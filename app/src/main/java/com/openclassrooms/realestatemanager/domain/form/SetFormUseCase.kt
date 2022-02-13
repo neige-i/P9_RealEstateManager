@@ -80,6 +80,10 @@ class SetFormUseCase @Inject constructor(
         formRepository.setForm(getForm().copy(pictureList = pictureList))
     }
 
+    fun resetPictureError() {
+        formRepository.setForm(getForm().copy(pictureListError = null))
+    }
+
     fun updateStreetName(streetNameHouseNumber: String) {
         formRepository.setForm(getForm().copy(streetName = streetNameHouseNumber))
     }

@@ -22,7 +22,7 @@ class CheckFormErrorUseCase @Inject constructor(
 
         return when (PageToCheck.values()[pageToCheck]) {
             PageToCheck.MAIN -> containsNoMainError(form)
-            PageToCheck.DETAIL -> true
+            PageToCheck.DETAIL -> containsNoDetailError(form)
             PageToCheck.ADDRESS -> containsNoAddressError(form)
             PageToCheck.SALE -> containsNoSaleError(form)
             PageToCheck.PICTURE -> containsNoPictureError()
@@ -41,15 +41,27 @@ class CheckFormErrorUseCase @Inject constructor(
         return typeError == null
     }
 
+    private fun containsNoDetailError(form: FormEntity): Boolean {
+        val pictureList = form.pictureList
+        val pictureListError = if (pictureList.isEmpty()) {
+            appContext.getString(R.string.error_empty_photo_list)
+        } else {
+            null
+        }
+
+        formRepository.setForm(form.copy(pictureListError = pictureListError))
+
+        return pictureListError == null
+    }
+
     private fun containsNoPictureError(): Boolean {
         val displayedPicture = displayedPictureRepository.get()
 
-        val descriptionError =
-            if (displayedPicture.description.isBlank()) {
-                appContext.getString(R.string.error_mandatory_field)
-            } else {
-                null
-            }
+        val descriptionError = if (displayedPicture.description.isBlank()) {
+            appContext.getString(R.string.error_mandatory_field)
+        } else {
+            null
+        }
 
         displayedPictureRepository.set(displayedPicture.copy(descriptionError = descriptionError))
 

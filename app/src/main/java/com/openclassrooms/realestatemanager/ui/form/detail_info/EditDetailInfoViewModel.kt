@@ -1,11 +1,13 @@
 package com.openclassrooms.realestatemanager.ui.form.detail_info
 
 import android.net.Uri
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.openclassrooms.realestatemanager.domain.displayed_picture.SetDisplayedPictureUseCase
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
+import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -17,6 +19,11 @@ class EditDetailInfoViewModel @Inject constructor(
 ) : ViewModel() {
 
     val viewStateLiveData = Transformations.map(getFormUseCase.getUpdates()) {
+
+        it.pictureListError?.let { errorMessage ->
+            showErrorSingleLiveEvent.value = errorMessage
+            setFormUseCase.resetPictureError()
+        }
 
         val photoList = mutableListOf<DetailInfoViewState.PhotoViewState>()
         it.pictureList.forEach { picture ->
@@ -32,6 +39,8 @@ class EditDetailInfoViewModel @Inject constructor(
             photoList = photoList
         )
     }
+    private val showErrorSingleLiveEvent = SingleLiveEvent<String>()
+    val showErrorEventLiveData: LiveData<String> = showErrorSingleLiveEvent
 
     fun onDescriptionChanged(description: String?) {
         setFormUseCase.updateDescription(description ?: "")
