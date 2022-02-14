@@ -16,4 +16,11 @@ enum class PointOfInterest(@StringRes val labelId: Int) {
     UNIVERSITY(R.string.label_poi_university),
     SUBWAY(R.string.label_poi_subway_station),
     TRAIN(R.string.label_poi_train_station),
+    ;
+
+    companion object {
+        fun fromLabelId(@StringRes labelId: Int): PointOfInterest {
+            return values().first { it.labelId == labelId }
+        }
+    }
 }

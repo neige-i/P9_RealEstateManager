@@ -38,7 +38,8 @@ android {
 }
 
 dependencies {
-    ext.glide_version = '4.13.0'
+    def glide_version = "4.13.0"
+    def room_version = "2.4.1"
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
@@ -60,6 +61,9 @@ dependencies {
 
     implementation "com.github.bumptech.glide:glide:$glide_version"
     annotationProcessor "com.github.bumptech.glide:compiler:$glide_version"
+
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation "androidx.arch.core:core-testing:2.1.0"

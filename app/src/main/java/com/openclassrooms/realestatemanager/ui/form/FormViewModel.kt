@@ -4,14 +4,19 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import com.openclassrooms.realestatemanager.domain.displayed_picture.GetDisplayedPictureUseCase
 import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
+import com.openclassrooms.realestatemanager.domain.real_estate.CreateRealEstateUseCase
+import com.openclassrooms.realestatemanager.ui.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,6 +25,8 @@ class FormViewModel @Inject constructor(
     private val checkFormErrorUseCase: CheckFormErrorUseCase,
     private val editFormUseCase: SetFormUseCase,
     getDisplayedPictureUseCase: GetDisplayedPictureUseCase,
+    private val createRealEstateUseCase: CreateRealEstateUseCase,
+    private val coroutineProvider: CoroutineProvider,
     private val application: Application,
 ) : ViewModel() {
 
@@ -114,9 +121,19 @@ class FormViewModel @Inject constructor(
     fun onSubmitButtonClicked() {
         if (checkFormErrorUseCase.containsNoError(pageToCheck = currentPage)) {
             if (isLastPageDisplayed()) {
-                resetFormAndExit()
+                onFormCompleted()
             } else {
                 formSingleLiveEvent.value = FormEvent.GoToPage(currentPage + 1)
+            }
+        }
+    }
+
+    private fun onFormCompleted() {
+        viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
+            createRealEstateUseCase()
+
+            withContext(coroutineProvider.getMainDispatcher()) {
+                resetFormAndExit()
             }
         }
     }
