@@ -9,7 +9,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.flexbox.FlexboxLayoutManager
-import com.openclassrooms.realestatemanager.data.form.FormRepository
+import com.openclassrooms.realestatemanager.data.UtilsRepository
 import com.openclassrooms.realestatemanager.databinding.FragmentEditAddressBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -41,7 +41,7 @@ class EditAddressFragment : Fragment() {
         binding.addressStateInput.setAdapter(ArrayAdapter(
             requireContext(),
             android.R.layout.simple_list_item_1,
-            FormRepository.STATE_POSTAL_ABBR
+            UtilsRepository.STATE_POSTAL_ABBR
         ))
 
         binding.addressStreetInput.doAfterTextChanged {

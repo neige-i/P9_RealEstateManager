@@ -8,8 +8,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding
-import com.openclassrooms.realestatemanager.ui.form.FormActivity
 import com.openclassrooms.realestatemanager.ui.detail.DetailActivity
+import com.openclassrooms.realestatemanager.ui.form.FormActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -42,7 +42,11 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return viewModel.onMenuItemClicked(item.itemId)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.toolbar_menu_add -> {
+            viewModel.onAddMenuItemClicked()
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
     }
 }

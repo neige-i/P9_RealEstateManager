@@ -6,9 +6,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import com.openclassrooms.realestatemanager.R
+import com.openclassrooms.realestatemanager.data.UtilsRepository
 import com.openclassrooms.realestatemanager.data.agent.AgentEntity
 import com.openclassrooms.realestatemanager.data.form.FormEntity
-import com.openclassrooms.realestatemanager.data.form.FormRepository
 import com.openclassrooms.realestatemanager.domain.GetAgentListUseCase
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
@@ -92,7 +92,7 @@ class EditSaleViewModel @Inject constructor(
 
     private fun setDatePickerInfo(dateString: String?, @StringRes titleId: Int) {
         val pickerDate = if (dateString?.isNotEmpty() == true) {
-            LocalDate.parse(dateString, FormRepository.DATE_FORMATTER)
+            UtilsRepository.stringToDate(dateString)
         } else {
             LocalDate.now(defaultClock)
         }
@@ -107,7 +107,7 @@ class EditSaleViewModel @Inject constructor(
         val selectedDateString = Instant.ofEpochMilli(dateMillis)
             .atZone(defaultZoneId)
             .toLocalDate()
-            .format(FormRepository.DATE_FORMATTER)
+            .format(UtilsRepository.DATE_FORMATTER)
 
         when (whichDatePicker) {
             MARKET_ENTRY_DATE -> setFormUseCase.updateMarketEntryDate(selectedDateString)

@@ -73,12 +73,21 @@ class UtilsRepositoryTest {
     }
 
     @Test
-    fun `return May, 4th 1977 in the correct format`() {
+    fun `return May, 4th 1977 in the correct String format`() {
         // WHEN
         val todayDate = utilsRepository.todayDate()
 
         // THEN
         Assert.assertEquals("04/05/1977", todayDate)
+    }
+
+    @Test
+    fun `return August, 6th 1991 from the String`() {
+        // WHEN
+        val parsedDate = UtilsRepository.stringToDate("06/08/1991")
+
+        // THEN
+        Assert.assertEquals(LocalDate.of(1991, 8, 6), parsedDate)
     }
 
     @Test

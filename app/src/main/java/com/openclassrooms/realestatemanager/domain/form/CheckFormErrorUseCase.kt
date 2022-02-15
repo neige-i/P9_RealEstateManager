@@ -2,11 +2,11 @@ package com.openclassrooms.realestatemanager.domain.form
 
 import android.content.Context
 import com.openclassrooms.realestatemanager.R
+import com.openclassrooms.realestatemanager.data.UtilsRepository
 import com.openclassrooms.realestatemanager.data.form.DisplayedPictureRepository
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.time.LocalDate
 import javax.inject.Inject
 
 class CheckFormErrorUseCase @Inject constructor(
@@ -84,7 +84,7 @@ class CheckFormErrorUseCase @Inject constructor(
 
         val stateError = when {
             currentState.isBlank() -> appContext.getString(R.string.error_mandatory_field)
-            !FormRepository.STATE_POSTAL_ABBR.contains(currentState) -> appContext.getString(R.string.error_unknown_state)
+            !UtilsRepository.STATE_POSTAL_ABBR.contains(currentState) -> appContext.getString(R.string.error_unknown_state)
             else -> null
         }
 
@@ -117,7 +117,8 @@ class CheckFormErrorUseCase @Inject constructor(
 
         val isDateOrderInconsistent = marketEntryDateString.isNotEmpty() &&
                 saleDateString.isNotEmpty() &&
-                toLocalDate(marketEntryDateString).isAfter(toLocalDate(saleDateString))
+                UtilsRepository.stringToDate(marketEntryDateString)
+                    .isAfter(UtilsRepository.stringToDate(saleDateString))
 
         val marketEntryDateError = when {
             marketEntryDateString.isEmpty() -> appContext.getString(R.string.error_mandatory_field)
@@ -137,10 +138,6 @@ class CheckFormErrorUseCase @Inject constructor(
         ))
 
         return marketEntryDateError == null && saleDateError == null
-    }
-
-    private fun toLocalDate(dateString: String): LocalDate {
-        return LocalDate.parse(dateString, FormRepository.DATE_FORMATTER)
     }
 
     enum class PageToCheck {

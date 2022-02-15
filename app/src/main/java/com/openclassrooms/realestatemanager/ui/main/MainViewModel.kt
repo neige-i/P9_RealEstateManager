@@ -28,14 +28,8 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun onMenuItemClicked(itemId: Int): Boolean {
-        return when (itemId) {
-            R.id.toolbar_menu_add -> {
-                editFormUseCase.initAddForm()
-                mainEventSingleLiveEvent.value = MainEvent.GoToFormActivity
-                true
-            }
-            else -> false
-        }
+    fun onAddMenuItemClicked() {
+        editFormUseCase.initAddForm()
+        mainEventSingleLiveEvent.value = MainEvent.GoToFormActivity
     }
 }

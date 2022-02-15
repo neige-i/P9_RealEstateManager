@@ -3,7 +3,6 @@ package com.openclassrooms.realestatemanager.ui.form.detail_info
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -80,12 +79,8 @@ class EditDetailInfoFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun enableEditTextScrolling() {
-        binding.detailInfoDescriptionInput.setOnTouchListener { v, event ->
+        binding.detailInfoDescriptionInput.setOnTouchListener { v, _ ->
             v.parent.requestDisallowInterceptTouchEvent(true)
-            if (event.action and MotionEvent.ACTION_MASK == MotionEvent.ACTION_UP) {
-                v.parent.requestDisallowInterceptTouchEvent(false)
-            }
-
             false
         }
     }
