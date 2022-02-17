@@ -2,9 +2,9 @@ package com.openclassrooms.realestatemanager.ui.form
 
 sealed class FormEvent {
 
-    data class GoToPage(val pageToGo: Int) : FormEvent()
-
     object ExitActivity : FormEvent()
+
+    object ExitFragment : FormEvent()
 
     data class ShowDialog(
         val title: String,

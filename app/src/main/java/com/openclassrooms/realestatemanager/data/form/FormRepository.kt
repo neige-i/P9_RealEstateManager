@@ -1,6 +1,7 @@
 package com.openclassrooms.realestatemanager.data.form
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import javax.inject.Inject
@@ -11,6 +12,7 @@ class FormRepository @Inject constructor() {
 
     companion object {
         private val DEFAULT_FORM = FormEntity(
+            displayedPage = 0,
             type = "",
             typeError = null,
             price = "",
@@ -42,22 +44,51 @@ class FormRepository @Inject constructor() {
         )
     }
 
+    private val formInfoMediatorLiveData = MediatorLiveData<FormInfoEntity>()
     private val formMutableLiveData = MutableLiveData<FormEntity>()
+    private val formPageCountMutableLiveData = MutableLiveData<Int>()
+    private val exitRequestMutableLiveData = MutableLiveData<Boolean>()
     private var initialState: FormEntity? = null
     private var currentState: FormEntity? = null
     private var positionOfPictureToUpdate = -1
+
+    init {
+        formInfoMediatorLiveData.addSource(formMutableLiveData) {
+            combineFormInfo(it, formPageCountMutableLiveData.value)
+        }
+        formInfoMediatorLiveData.addSource(formPageCountMutableLiveData) {
+            combineFormInfo(formMutableLiveData.value, it)
+        }
+    }
+
+    private fun combineFormInfo(form: FormEntity?, pageCount: Int?) {
+        val capturedInitialState = initialState
+
+        if (form == null || pageCount == null || capturedInitialState == null) {
+            return
+        }
+
+        formInfoMediatorLiveData.value = FormInfoEntity(
+            form = form,
+            pageCount = pageCount,
+            type = if (initialState == DEFAULT_FORM) {
+                FormInfoEntity.FormType.ADD
+            } else {
+                FormInfoEntity.FormType.EDIT
+            },
+            hasModifications = form != capturedInitialState
+        )
+    }
 
     fun getFormLiveData(): LiveData<FormEntity> {
         return Transformations.distinctUntilChanged(formMutableLiveData)
     }
 
+    fun getFormInfoLiveData(): LiveData<FormInfoEntity> = formInfoMediatorLiveData
+
     fun getCurrentForm(): FormEntity = currentState ?: throw NullPointerException(
         "The form has not been initialized. Please call initForm() before accessing it"
     )
-
-    fun getFormType(): FormType = if (initialState == DEFAULT_FORM) FormType.ADD else FormType.EDIT
-
-    fun containsModifications(): Boolean = currentState != initialState
 
     fun initForm(form: FormEntity? = null) {
         initialState = form ?: DEFAULT_FORM
@@ -80,8 +111,13 @@ class FormRepository @Inject constructor() {
         positionOfPictureToUpdate = position
     }
 
-    enum class FormType {
-        ADD,
-        EDIT,
+    fun setPageCount(pageCount: Int) {
+        formPageCountMutableLiveData.value = pageCount
+    }
+
+    fun getExitFormLiveData(): LiveData<Boolean> = exitRequestMutableLiveData
+
+    fun setExitRequest(exit: Boolean) {
+        exitRequestMutableLiveData.value = exit
     }
 }

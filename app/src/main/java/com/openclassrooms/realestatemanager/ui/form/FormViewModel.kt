@@ -2,31 +2,25 @@ package com.openclassrooms.realestatemanager.ui.form
 
 import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.openclassrooms.realestatemanager.R
-import com.openclassrooms.realestatemanager.data.form.FormRepository
+import com.openclassrooms.realestatemanager.data.form.FormInfoEntity
 import com.openclassrooms.realestatemanager.domain.displayed_picture.GetDisplayedPictureUseCase
 import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
-import com.openclassrooms.realestatemanager.domain.real_estate.CreateRealEstateUseCase
-import com.openclassrooms.realestatemanager.ui.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class FormViewModel @Inject constructor(
-    private val getFormInfoUseCase: GetFormUseCase,
+    getFormUseCase: GetFormUseCase,
     private val checkFormErrorUseCase: CheckFormErrorUseCase,
-    private val editFormUseCase: SetFormUseCase,
+    private val setFormUseCase: SetFormUseCase,
     getDisplayedPictureUseCase: GetDisplayedPictureUseCase,
-    private val createRealEstateUseCase: CreateRealEstateUseCase,
-    private val coroutineProvider: CoroutineProvider,
     private val application: Application,
 ) : ViewModel() {
 
@@ -35,30 +29,24 @@ class FormViewModel @Inject constructor(
         private const val DRAFT_DIALOG = 1
     }
 
-    private val viewStateMutableLiveData = MutableLiveData<FormViewState>()
-    val viewStateLiveData: LiveData<FormViewState> = viewStateMutableLiveData
+    private val viewStateMediatorLiveData = MediatorLiveData<String>()
+    val viewStateLiveData: LiveData<String> = viewStateMediatorLiveData
     private val formSingleLiveEvent = SingleLiveEvent<FormEvent>()
     val formEventLiveData: LiveData<FormEvent> = formSingleLiveEvent
 
-    private var pageCount = 0
-    private var currentPage = 0
+    private val backStackEntryCountMutableLiveData = MutableLiveData<Int>()
+
+    private lateinit var currentFormInfo: FormInfoEntity
+    private var checkDraft = true
     private var whichDialog = -1
 
     init {
-        if (getFormInfoUseCase.getType() == FormRepository.FormType.ADD &&
-            getFormInfoUseCase.isModified()
-        ) {
-            whichDialog = DRAFT_DIALOG
-
-            formSingleLiveEvent.value = FormEvent.ShowDialog(
-                title = application.getString(R.string.draft_form_dialog_title),
-                message = application.getString(
-                    R.string.draft_form_dialog_message,
-                    getFormInfoUseCase.getCurrent().type
-                ),
-                positiveButtonText = application.getString(R.string.draft_form_dialog_positive_button),
-                negativeButtonText = application.getString(R.string.draft_form_dialog_negative_button)
-            )
+        val formInfoLiveData = getFormUseCase.getWithInfo()
+        viewStateMediatorLiveData.addSource(formInfoLiveData) {
+            combineViewState(it, backStackEntryCountMutableLiveData.value)
+        }
+        viewStateMediatorLiveData.addSource(backStackEntryCountMutableLiveData) {
+            combineViewState(formInfoLiveData.value, it)
         }
 
         formSingleLiveEvent.addSource(getDisplayedPictureUseCase()) {
@@ -66,33 +54,68 @@ class FormViewModel @Inject constructor(
                 formSingleLiveEvent.value = FormEvent.ShowPicture
             }
         }
-    }
 
-    fun onInitPagerAdapter(pageCount: Int) {
-        this.pageCount = pageCount
-    }
-
-    fun onPageChanged(position: Int) {
-        currentPage = position
-
-        viewStateMutableLiveData.value = FormViewState(
-            toolbarTitle = application.getString(R.string.toolbar_title_add) +
-                    " (" + (currentPage + 1) +
-                    "/" + pageCount +
-                    ")",
-            submitButtonText = if (isLastPageDisplayed()) {
-                application.getString(R.string.button_text_save)
-            } else {
-                application.getString(R.string.button_text_next)
+        formSingleLiveEvent.addSource(getFormUseCase.getExitFormRequest()) {
+            if (it) {
+                setFormUseCase.setExitRequest(false) // Reset flag
+                formSingleLiveEvent.value = FormEvent.ExitActivity
             }
-        )
+        }
     }
 
-    fun onGoBack() {
-        if (currentPage > 0) {
-            formSingleLiveEvent.value = FormEvent.GoToPage(currentPage - 1)
+    private fun combineViewState(formInfo: FormInfoEntity?, backStackEntryCount: Int?) {
+        if (formInfo == null) {
+            return
+        }
+
+        currentFormInfo = formInfo
+
+        checkExistingDraft(formInfo)
+
+        viewStateMediatorLiveData.value =
+            if (backStackEntryCount == null || backStackEntryCount == 0) {
+                application.getString(R.string.toolbar_title_add) +
+                        " (" + (formInfo.form.displayedPage + 1) +
+                        "/" + formInfo.pageCount +
+                        ")"
+            } else {
+                application.getString(R.string.toolbar_title_edit_picture)
+            }
+    }
+
+    private fun checkExistingDraft(formInfo: FormInfoEntity) {
+        if (checkDraft && formInfo.type == FormInfoEntity.FormType.ADD && formInfo.hasModifications) {
+            whichDialog = DRAFT_DIALOG
+
+            formSingleLiveEvent.value = FormEvent.ShowDialog(
+                title = application.getString(R.string.draft_form_dialog_title),
+                message = application.getString(
+                    R.string.draft_form_dialog_message,
+                    formInfo.form.type
+                ),
+                positiveButtonText = application.getString(R.string.draft_form_dialog_positive_button),
+                negativeButtonText = application.getString(R.string.draft_form_dialog_negative_button)
+            )
+        }
+
+        // Reset flag to display draft dialog only once (when the ViewModel is initialized)
+        checkDraft = false
+    }
+
+    fun onBackStackChanged(backStackEntryCount: Int) {
+        backStackEntryCountMutableLiveData.value = backStackEntryCount
+    }
+
+    fun onGoBack(backStackEntryCount: Int) {
+        if (backStackEntryCount == 0) {
+            val currentFormPage = currentFormInfo.form.displayedPage
+            if (currentFormPage > 0) {
+                setFormUseCase.setPagePosition(currentFormPage.dec())
+            } else {
+                confirmExit()
+            }
         } else {
-            confirmExit()
+            formSingleLiveEvent.value = FormEvent.ExitFragment
         }
     }
 
@@ -101,40 +124,20 @@ class FormViewModel @Inject constructor(
     }
 
     private fun confirmExit() {
-        if (getFormInfoUseCase.isModified()) {
+        if (currentFormInfo.hasModifications) {
             whichDialog = EXIT_DIALOG
 
             formSingleLiveEvent.value = FormEvent.ShowDialog(
                 title = application.getString(R.string.exit_form_dialog_title),
-                message = when (getFormInfoUseCase.getType()) {
-                    FormRepository.FormType.ADD -> application.getString(R.string.exit_add_form_dialog_message)
-                    FormRepository.FormType.EDIT -> application.getString(R.string.exit_edit_form_dialog_message)
+                message = when (currentFormInfo.type) {
+                    FormInfoEntity.FormType.ADD -> application.getString(R.string.exit_add_form_dialog_message)
+                    FormInfoEntity.FormType.EDIT -> application.getString(R.string.exit_edit_form_dialog_message)
                 },
                 positiveButtonText = application.getString(R.string.exit_form_dialog_positive_button),
                 negativeButtonText = application.getString(R.string.exit_form_dialog_negative_button)
             )
         } else {
             formSingleLiveEvent.value = FormEvent.ExitActivity
-        }
-    }
-
-    fun onSubmitButtonClicked() {
-        if (checkFormErrorUseCase.containsNoError(pageToCheck = currentPage)) {
-            if (isLastPageDisplayed()) {
-                onFormCompleted()
-            } else {
-                formSingleLiveEvent.value = FormEvent.GoToPage(currentPage + 1)
-            }
-        }
-    }
-
-    private fun onFormCompleted() {
-        viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            createRealEstateUseCase()
-
-            withContext(coroutineProvider.getMainDispatcher()) {
-                resetFormAndExit()
-            }
         }
     }
 
@@ -150,19 +153,11 @@ class FormViewModel @Inject constructor(
     }
 
     fun onDialogNegativeButtonClicked() {
+        setFormUseCase.reset()
+
         when (whichDialog) {
-            EXIT_DIALOG -> resetFormAndExit()
-            DRAFT_DIALOG -> {
-                editFormUseCase.reset()
-                editFormUseCase.initAddForm()
-            }
+            EXIT_DIALOG -> formSingleLiveEvent.value = FormEvent.ExitActivity
+            DRAFT_DIALOG -> setFormUseCase.initAddForm()
         }
     }
-
-    private fun resetFormAndExit() {
-        editFormUseCase.reset()
-        formSingleLiveEvent.value = FormEvent.ExitActivity
-    }
-
-    private fun isLastPageDisplayed(): Boolean = currentPage == pageCount - 1
 }

@@ -2,6 +2,7 @@ package com.openclassrooms.realestatemanager.domain.form
 
 import androidx.lifecycle.LiveData
 import com.openclassrooms.realestatemanager.data.form.FormEntity
+import com.openclassrooms.realestatemanager.data.form.FormInfoEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import javax.inject.Inject
 
@@ -11,9 +12,7 @@ class GetFormUseCase @Inject constructor(
 
     fun getUpdates(): LiveData<FormEntity> = formRepository.getFormLiveData()
 
-    fun getCurrent(): FormEntity = formRepository.getCurrentForm()
+    fun getWithInfo(): LiveData<FormInfoEntity> = formRepository.getFormInfoLiveData()
 
-    fun getType(): FormRepository.FormType = formRepository.getFormType()
-
-    fun isModified(): Boolean = formRepository.containsModifications()
+    fun getExitFormRequest(): LiveData<Boolean> = formRepository.getExitFormLiveData()
 }

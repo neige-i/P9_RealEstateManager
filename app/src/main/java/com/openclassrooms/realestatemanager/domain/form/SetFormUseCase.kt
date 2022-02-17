@@ -136,5 +136,17 @@ class SetFormUseCase @Inject constructor(
         formRepository.setForm(getForm().copy(isAvailableForSale = isAvailable))
     }
 
+    fun setPagePosition(position: Int) {
+        formRepository.setForm(getForm().copy(displayedPage = position))
+    }
+
+    fun setPageCount(pageCount: Int) {
+        formRepository.setPageCount(pageCount)
+    }
+
+    fun setExitRequest(exit: Boolean) {
+        formRepository.setExitRequest(exit)
+    }
+
     private fun getForm() = formRepository.getCurrentForm()
 }

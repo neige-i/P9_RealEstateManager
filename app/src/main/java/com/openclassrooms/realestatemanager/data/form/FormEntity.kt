@@ -3,6 +3,7 @@ package com.openclassrooms.realestatemanager.data.form
 import android.net.Uri
 
 data class FormEntity(
+    val displayedPage: Int,
     val type: String,
     val typeError: String?,
     val price: String,

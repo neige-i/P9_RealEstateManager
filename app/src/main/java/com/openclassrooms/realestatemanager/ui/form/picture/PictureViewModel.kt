@@ -24,7 +24,7 @@ class PictureViewModel @Inject constructor(
     private val viewStateMediatorLiveData = MediatorLiveData<DisplayedPictureEntity>()
     val viewStateLiveData: LiveData<DisplayedPictureEntity> = viewStateMediatorLiveData
     private val exitSingleLiveEvent = SingleLiveEvent<Unit>()
-    val exitEvent: LiveData<Unit> = exitSingleLiveEvent
+    val exitEventLiveData: LiveData<Unit> = exitSingleLiveEvent
 
     init {
         viewStateMediatorLiveData.addSource(getDisplayedPictureUseCase()) {
@@ -51,7 +51,7 @@ class PictureViewModel @Inject constructor(
         }
     }
 
-    fun onActivityFinished() {
+    fun onFragmentViewDestroyed() {
         setDisplayedPictureUseCase.reset()
     }
 }

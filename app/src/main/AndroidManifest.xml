@@ -24,10 +24,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.detail.DetailActivity" />
-        <activity android:name=".ui.form.FormActivity" />
         <activity
-            android:name="com.openclassrooms.realestatemanager.ui.form.picture.PictureActivity"
-            android:label="@string/toolbar_title_edit_picture"
+            android:name=".ui.form.FormActivity"
             android:windowSoftInputMode="adjustResize"
             />
 

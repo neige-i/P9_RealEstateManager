@@ -1,20 +1,18 @@
 package com.openclassrooms.realestatemanager.ui.form
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.viewpager2.widget.ViewPager2
+import androidx.fragment.app.add
+import androidx.fragment.app.commit
+import androidx.fragment.app.replace
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ActivityFormBinding
-import com.openclassrooms.realestatemanager.ui.form.address.EditAddressFragment
-import com.openclassrooms.realestatemanager.ui.form.detail_info.EditDetailInfoFragment
-import com.openclassrooms.realestatemanager.ui.form.main_info.EditMainInfoFragment
-import com.openclassrooms.realestatemanager.ui.form.sale.EditSaleFragment
-import com.openclassrooms.realestatemanager.ui.form.picture.PictureActivity
+import com.openclassrooms.realestatemanager.ui.form.pager.FormPagerFragment
+import com.openclassrooms.realestatemanager.ui.form.picture.PictureFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -31,40 +29,20 @@ class FormActivity : AppCompatActivity() {
         setSupportActionBar(binding.formToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val addEditPagerAdapter = FormPagerAdapter(
-            fragmentActivity = this,
-            fragmentList = listOf(
-                EditMainInfoFragment(),
-                EditDetailInfoFragment(),
-                EditAddressFragment(),
-                EditSaleFragment()
-            ),
-        )
-        viewModel.onInitPagerAdapter(addEditPagerAdapter.itemCount)
-
-        binding.formPager.isUserInputEnabled = false
-        binding.formPager.adapter = addEditPagerAdapter
-        binding.formPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                viewModel.onPageChanged(position)
-            }
-        })
-
-        binding.formToolbar.setNavigationOnClickListener { onBackPressed() }
-
-        binding.formSubmitButton.setOnClickListener { viewModel.onSubmitButtonClicked() }
-
-        viewModel.viewStateLiveData.observe(this) {
-            binding.formToolbar.title = it.toolbarTitle
-            binding.formSubmitButton.text = it.submitButtonText
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            add<FormPagerFragment>(binding.formContainer.id)
         }
+        supportFragmentManager.addOnBackStackChangedListener {
+            viewModel.onBackStackChanged(supportFragmentManager.backStackEntryCount)
+        }
+
+        viewModel.viewStateLiveData.observe(this) { binding.formToolbar.title = it }
 
         viewModel.formEventLiveData.observe(this) {
             when (it) {
                 FormEvent.ExitActivity -> finish()
-                is FormEvent.GoToPage -> {
-                    binding.formPager.currentItem = it.pageToGo
-                }
+                FormEvent.ExitFragment -> supportFragmentManager.popBackStack()
                 is FormEvent.ShowDialog -> MaterialAlertDialogBuilder(this)
                     .setTitle(it.title)
                     .setMessage(it.message)
@@ -75,7 +53,11 @@ class FormActivity : AppCompatActivity() {
                         viewModel.onDialogNegativeButtonClicked()
                     }
                     .show()
-                FormEvent.ShowPicture -> startActivity(Intent(this, PictureActivity::class.java))
+                FormEvent.ShowPicture -> supportFragmentManager.commit {
+                    replace<PictureFragment>(binding.formContainer.id)
+                    setReorderingAllowed(true)
+                    addToBackStack(null)
+                }
             }
         }
     }
@@ -85,17 +67,24 @@ class FormActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.close_form -> {
-                viewModel.onCloseMenuItemClicked()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        menu?.findItem(R.id.close_form)?.isVisible = supportFragmentManager.backStackEntryCount == 0
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        android.R.id.home -> {
+            onBackPressed()
+            true
         }
+        R.id.close_form -> {
+            viewModel.onCloseMenuItemClicked()
+            true
+        }
+        else -> false
     }
 
     override fun onBackPressed() {
-        viewModel.onGoBack()
+        viewModel.onGoBack(supportFragmentManager.backStackEntryCount)
     }
 }
