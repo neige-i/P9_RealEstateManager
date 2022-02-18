@@ -29,11 +29,6 @@ class FormViewModel @Inject constructor(
     private val application: Application,
 ) : ViewModel() {
 
-    companion object {
-        private const val EXIT_DIALOG = 0
-        private const val DRAFT_DIALOG = 1
-    }
-
     private val viewStateMediatorLiveData = MediatorLiveData<String>()
     val viewStateLiveData: LiveData<String> = viewStateMediatorLiveData
     private val formSingleLiveEvent = SingleLiveEvent<FormEvent>()
@@ -43,7 +38,6 @@ class FormViewModel @Inject constructor(
 
     private lateinit var currentFormInfo: FormInfoEntity
     private var checkDraft = true
-    private var whichDialog = -1
 
     init {
         val formInfoLiveData = getFormUseCase.getWithInfo()
@@ -109,9 +103,8 @@ class FormViewModel @Inject constructor(
 
     private fun checkExistingDraft(formInfo: FormInfoEntity) {
         if (checkDraft && formInfo.type == FormInfoEntity.FormType.ADD && formInfo.hasModifications) {
-            whichDialog = DRAFT_DIALOG
-
             formSingleLiveEvent.value = FormEvent.ShowDialog(
+                type = DialogType.DRAFT,
                 title = application.getString(R.string.draft_form_dialog_title),
                 message = application.getString(
                     R.string.draft_form_dialog_message,
@@ -149,9 +142,8 @@ class FormViewModel @Inject constructor(
 
     private fun confirmExit() {
         if (currentFormInfo.hasModifications) {
-            whichDialog = EXIT_DIALOG
-
             formSingleLiveEvent.value = FormEvent.ShowDialog(
+                type = DialogType.EXIT,
                 title = application.getString(R.string.exit_form_dialog_title),
                 message = when (currentFormInfo.type) {
                     FormInfoEntity.FormType.ADD -> application.getString(R.string.exit_add_form_dialog_message)
@@ -165,23 +157,21 @@ class FormViewModel @Inject constructor(
         }
     }
 
-    fun onDialogPositiveButtonClicked() {
-        when (whichDialog) {
-            EXIT_DIALOG -> {
-                if (checkFormErrorUseCase.containsNoError(pageToCheck = 0)) {
-                    formSingleLiveEvent.value = FormEvent.ExitActivity
-                }
+    fun onDialogPositiveButtonClicked(type: DialogType) {
+        when (type) {
+            DialogType.EXIT -> if (checkFormErrorUseCase.containsNoError(pageToCheck = 0)) {
+                formSingleLiveEvent.value = FormEvent.ExitActivity
             }
-            DRAFT_DIALOG -> {}
+            DialogType.DRAFT -> {}
         }
     }
 
-    fun onDialogNegativeButtonClicked() {
+    fun onDialogNegativeButtonClicked(type: DialogType) {
         setFormUseCase.reset()
 
-        when (whichDialog) {
-            EXIT_DIALOG -> formSingleLiveEvent.value = FormEvent.ExitActivity
-            DRAFT_DIALOG -> setFormUseCase.initAddForm()
+        when (type) {
+            DialogType.EXIT -> formSingleLiveEvent.value = FormEvent.ExitActivity
+            DialogType.DRAFT -> setFormUseCase.initAddForm()
         }
     }
 
@@ -189,5 +179,10 @@ class FormViewModel @Inject constructor(
         if (uri != null && success) {
             setDisplayedPictureUseCase.setUri(uri)
         }
+    }
+
+    enum class DialogType {
+        EXIT,
+        DRAFT,
     }
 }

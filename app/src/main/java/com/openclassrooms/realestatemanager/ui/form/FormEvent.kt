@@ -7,6 +7,7 @@ sealed class FormEvent {
     object ExitFragment : FormEvent()
 
     data class ShowDialog(
+        val type: FormViewModel.DialogType,
         val title: String,
         val message: String,
         val positiveButtonText: String,

@@ -61,10 +61,10 @@ class FormActivity : AppCompatActivity() {
                     .setTitle(it.title)
                     .setMessage(it.message)
                     .setPositiveButton(it.positiveButtonText) { _, _ ->
-                        viewModel.onDialogPositiveButtonClicked()
+                        viewModel.onDialogPositiveButtonClicked(it.type)
                     }
                     .setNegativeButton(it.negativeButtonText) { _, _ ->
-                        viewModel.onDialogNegativeButtonClicked()
+                        viewModel.onDialogNegativeButtonClicked(it.type)
                     }
                     .show()
                 FormEvent.ShowPicture -> supportFragmentManager.commit {
