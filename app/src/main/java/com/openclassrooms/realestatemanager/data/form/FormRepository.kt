@@ -58,7 +58,7 @@ class FormRepository @Inject constructor() {
     private val formMutableLiveData = MutableLiveData<FormEntity>()
     private val formPageCountMutableLiveData = MutableLiveData<Int>()
     private val exitRequestMutableLiveData = MutableLiveData<Boolean>()
-    private val showPictureDialogMutableLiveData = MutableLiveData<PicturePicker>()
+    private val showPictureDialogMutableLiveData = MutableLiveData<PicturePicker?>()
     private var initialState: FormEntity? = null
     private var currentState: FormEntity? = null
     private var positionOfPictureToUpdate = -1
@@ -130,9 +130,9 @@ class FormRepository @Inject constructor() {
         exitRequestMutableLiveData.value = exit
     }
 
-    fun getPicturePickerLiveData(): LiveData<PicturePicker> = showPictureDialogMutableLiveData
+    fun getPicturePickerLiveData(): LiveData<PicturePicker?> = showPictureDialogMutableLiveData
 
-    fun setPicturePicker(picturePicker: PicturePicker) {
+    fun setPicturePicker(picturePicker: PicturePicker?) {
         showPictureDialogMutableLiveData.value = picturePicker
     }
 

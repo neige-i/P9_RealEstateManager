@@ -64,9 +64,13 @@ class FormViewModel @Inject constructor(
         }
 
         formSingleLiveEvent.addSource(getFormUseCase.getPicturePicker()) {
-            formSingleLiveEvent.value = when (it) {
-                FormRepository.PicturePicker.GALLERY -> FormEvent.OpenGallery
-                FormRepository.PicturePicker.CAMERA -> FormEvent.OpenCamera
+            it?.let {
+                setFormUseCase.setPicturePicker(null) // Reset flag
+
+                formSingleLiveEvent.value = when (it) {
+                    FormRepository.PicturePicker.GALLERY -> FormEvent.OpenGallery
+                    FormRepository.PicturePicker.CAMERA -> FormEvent.OpenCamera
+                }
             }
         }
     }
