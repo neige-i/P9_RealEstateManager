@@ -4,6 +4,7 @@ import android.net.Uri
 
 data class DetailInfoViewState(
     val description: String,
+    val descriptionSelection: Int,
     val photoList: List<PhotoViewState>,
 ) {
 

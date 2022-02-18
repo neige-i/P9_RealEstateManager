@@ -6,12 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.openclassrooms.realestatemanager.databinding.FragmentEditDetailInfoBinding
 import com.openclassrooms.realestatemanager.ui.form.picker_dialog.PicturePickerDialog
+import com.openclassrooms.realestatemanager.ui.onAfterTextChanged
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -35,8 +35,8 @@ class EditDetailInfoFragment : Fragment() {
         val viewModel = ViewModelProvider(this).get(EditDetailInfoViewModel::class.java)
 
         enableEditTextScrolling()
-        binding.detailInfoDescriptionInput.doAfterTextChanged {
-            viewModel.onDescriptionChanged(it?.toString())
+        binding.detailInfoDescriptionInput.onAfterTextChanged { text, cursorPosition ->
+            viewModel.onDescriptionChanged(text?.toString(), cursorPosition)
         }
 
         val photoAdapter = PhotoAdapter(object : PhotoAdapter.PhotoListener {
@@ -58,6 +58,7 @@ class EditDetailInfoFragment : Fragment() {
 
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
             binding.detailInfoDescriptionInput.setText(it.description)
+            binding.detailInfoDescriptionInput.setSelection(it.descriptionSelection)
             photoAdapter.submitList(it.photoList)
         }
 

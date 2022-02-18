@@ -2,13 +2,13 @@ package com.openclassrooms.realestatemanager.ui.form.picture
 
 import android.os.Bundle
 import android.view.*
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.FragmentPictureBinding
 import com.openclassrooms.realestatemanager.ui.form.picker_dialog.PicturePickerDialog
+import com.openclassrooms.realestatemanager.ui.onAfterTextChanged
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -36,8 +36,8 @@ class PictureFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.pictureDescriptionInput.doAfterTextChanged {
-            viewModel.onDescriptionChanged(it?.toString())
+        binding.pictureDescriptionInput.onAfterTextChanged { text, cursorPosition ->
+            viewModel.onDescriptionChanged(text?.toString(), cursorPosition)
         }
 
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
@@ -46,6 +46,7 @@ class PictureFragment : Fragment() {
                 .into(binding.pictureImage)
 
             binding.pictureDescriptionInput.setText(it.description)
+            binding.pictureDescriptionInput.setSelection(it.descriptionCursor)
             binding.pictureDescriptionInputLayout.error = it.descriptionError
         }
 

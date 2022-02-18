@@ -8,6 +8,11 @@ class SetFormUseCase @Inject constructor(
     private val formRepository: FormRepository,
 ) {
 
+    /*
+        For EditText related fields, set the new value only if it is different from the current one.
+        Otherwise, the cursor will automatically be placed at the end of the text.
+     */
+
     fun initAddForm() {
         formRepository.initForm()
     }
@@ -20,12 +25,16 @@ class SetFormUseCase @Inject constructor(
         formRepository.setForm(getForm().copy(type = type))
     }
 
-    fun updatePrice(price: String) {
-        formRepository.setForm(getForm().copy(price = price))
+    fun updatePrice(price: String, cursorPosition: Int) {
+        if (price != getForm().price) {
+            formRepository.setForm(getForm().copy(price = price, priceCursor = cursorPosition))
+        }
     }
 
-    fun updateArea(area: String) {
-        formRepository.setForm(getForm().copy(area = area))
+    fun updateArea(area: String, cursorPosition: Int) {
+        if (area != getForm().area) {
+            formRepository.setForm(getForm().copy(area = area, areaCursor = cursorPosition))
+        }
     }
 
     fun incTotalRoomCount() {
@@ -66,8 +75,15 @@ class SetFormUseCase @Inject constructor(
         totalRoomCount - bathroomCount - bedroomCount > 0
     }
 
-    fun updateDescription(description: String) {
-        formRepository.setForm(getForm().copy(description = description))
+    fun updateDescription(description: String, cursorPosition: Int) {
+        if (description != getForm().description) {
+            formRepository.setForm(
+                getForm().copy(
+                    description = description,
+                    descriptionCursor = cursorPosition
+                )
+            )
+        }
     }
 
     fun setPicturePosition(position: Int) {
@@ -84,28 +100,65 @@ class SetFormUseCase @Inject constructor(
         formRepository.setForm(getForm().copy(pictureListError = null))
     }
 
-    fun updateStreetName(streetNameHouseNumber: String) {
-        formRepository.setForm(getForm().copy(streetName = streetNameHouseNumber))
+    fun updateStreetName(streetNameHouseNumber: String, cursorPosition: Int) {
+        if (streetNameHouseNumber != getForm().streetName) {
+            formRepository.setForm(
+                getForm().copy(
+                    streetName = streetNameHouseNumber,
+                    streetNameCursor = cursorPosition
+                )
+            )
+        }
     }
 
-    fun updateAdditionalAddressInfo(additionalAddressInfo: String) {
-        formRepository.setForm(getForm().copy(additionalAddressInfo = additionalAddressInfo))
+    fun updateAdditionalAddressInfo(additionalAddressInfo: String, cursorPosition: Int) {
+        if (additionalAddressInfo != getForm().additionalAddressInfo) {
+            formRepository.setForm(
+                getForm().copy(
+                    additionalAddressInfo = additionalAddressInfo,
+                    additionalAddressInfoCursor = cursorPosition
+                )
+            )
+        }
     }
 
-    fun updateCity(city: String) {
-        formRepository.setForm(getForm().copy(city = city))
+    fun updateCity(city: String, cursorPosition: Int) {
+        if (city != getForm().city) {
+            formRepository.setForm(getForm().copy(city = city, cityCursor = cursorPosition))
+        }
     }
 
-    fun updateState(state: String) {
-        formRepository.setForm(getForm().copy(state = state.uppercase()))
+    fun updateState(state: String, cursorPosition: Int) {
+        if (state != getForm().state) {
+            formRepository.setForm(
+                getForm().copy(
+                    state = state.uppercase(),
+                    stateCursor = cursorPosition
+                )
+            )
+        }
     }
 
-    fun updateZipcode(zipcode: String) {
-        formRepository.setForm(getForm().copy(zipcode = zipcode))
+    fun updateZipcode(zipcode: String, cursorPosition: Int) {
+        if (zipcode != getForm().zipcode) {
+            formRepository.setForm(
+                getForm().copy(
+                    zipcode = zipcode,
+                    zipcodeCursor = cursorPosition
+                )
+            )
+        }
     }
 
-    fun updateCountry(country: String) {
-        formRepository.setForm(getForm().copy(country = country))
+    fun updateCountry(country: String, cursorPosition: Int) {
+        if (country != getForm().country) {
+            formRepository.setForm(
+                getForm().copy(
+                    country = country,
+                    countryCursor = cursorPosition
+                )
+            )
+        }
     }
 
     fun updatePoi(@StringRes labelId: Int, isChecked: Boolean) {

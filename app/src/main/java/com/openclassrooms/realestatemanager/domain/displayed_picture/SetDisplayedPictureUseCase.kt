@@ -10,16 +10,26 @@ class SetDisplayedPictureUseCase @Inject constructor(
 ) {
 
     fun init(pictureUri: Uri, pictureDescription: String) {
-        displayedPictureRepository.set(DisplayedPictureEntity(
-            uri = pictureUri,
-            description = pictureDescription,
-            descriptionError = null
-        ))
+        displayedPictureRepository.set(
+            DisplayedPictureEntity(
+                uri = pictureUri,
+                description = pictureDescription,
+                descriptionError = null,
+                descriptionCursor = 0,
+            )
+        )
     }
 
-    fun updateDescription(description: String) {
+    fun updateDescription(description: String, cursorPosition: Int) {
         val picture = displayedPictureRepository.get()
-        displayedPictureRepository.set(picture.copy(description = description))
+        if (description != picture.description) {
+            displayedPictureRepository.set(
+                picture.copy(
+                    description = description,
+                    descriptionCursor = cursorPosition
+                )
+            )
+        }
     }
 
     fun reset() {

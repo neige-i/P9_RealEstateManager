@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import com.openclassrooms.realestatemanager.R
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -18,24 +17,33 @@ class FormRepository @Inject constructor() {
             type = "",
             typeError = null,
             price = "",
+            priceCursor = 0,
             area = "",
+            areaCursor = 0,
             totalRoomCount = 0,
             bathroomCount = 0,
             bedroomCount = 0,
             description = "",
+            descriptionCursor = 0,
             pictureList = emptyList(),
             pictureListError = null,
             streetName = "",
             streetNameError = null,
+            streetNameCursor = 0,
             additionalAddressInfo = "",
+            additionalAddressInfoCursor = 0,
             city = "",
             cityError = null,
+            cityCursor = 0,
             state = "",
             stateError = null,
+            stateCursor = 0,
             zipcode = "",
             zipcodeError = null,
+            zipcodeCursor = 0,
             country = "",
             countryError = null,
+            countryCursor = 0,
             pointsOfInterests = emptyList(),
             agentName = "",
             marketEntryDate = "",
@@ -83,9 +91,7 @@ class FormRepository @Inject constructor() {
         )
     }
 
-    fun getFormLiveData(): LiveData<FormEntity> {
-        return Transformations.distinctUntilChanged(formMutableLiveData)
-    }
+    fun getFormLiveData(): LiveData<FormEntity> = formMutableLiveData
 
     fun getFormInfoLiveData(): LiveData<FormInfoEntity> = formInfoMediatorLiveData
 

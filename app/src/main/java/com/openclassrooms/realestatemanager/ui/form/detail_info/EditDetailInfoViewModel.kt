@@ -26,23 +26,26 @@ class EditDetailInfoViewModel @Inject constructor(
 
         val photoList = mutableListOf<DetailInfoViewState.PhotoViewState>()
         it.pictureList.forEach { picture ->
-            photoList.add(DetailInfoViewState.PhotoViewState.Picture(
-                uri = picture.uri,
-                description = picture.description
-            ))
+            photoList.add(
+                DetailInfoViewState.PhotoViewState.Picture(
+                    uri = picture.uri,
+                    description = picture.description
+                )
+            )
         }
         photoList.add(DetailInfoViewState.PhotoViewState.Add)
 
         DetailInfoViewState(
             description = it.description,
+            descriptionSelection = it.descriptionCursor,
             photoList = photoList
         )
     }
     private val showErrorSingleLiveEvent = SingleLiveEvent<String>()
     val showErrorEventLiveData: LiveData<String> = showErrorSingleLiveEvent
 
-    fun onDescriptionChanged(description: String?) {
-        setFormUseCase.updateDescription(description ?: "")
+    fun onDescriptionChanged(description: String?, cursorPosition: Int) {
+        setFormUseCase.updateDescription(description ?: "", cursorPosition)
     }
 
     fun onPhotoAdded(position: Int) {

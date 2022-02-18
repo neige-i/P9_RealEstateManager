@@ -6,4 +6,5 @@ data class DisplayedPictureEntity(
     val uri: Uri,
     val description: String,
     val descriptionError: String?,
+    val descriptionCursor: Int,
 )

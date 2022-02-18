@@ -33,8 +33,8 @@ class PictureViewModel @Inject constructor(
         }
     }
 
-    fun onDescriptionChanged(description: String?) {
-        setDisplayedPictureUseCase.updateDescription(description ?: "")
+    fun onDescriptionChanged(description: String?, cursorPosition: Int) {
+        setDisplayedPictureUseCase.updateDescription(description ?: "", cursorPosition)
     }
 
     fun onSaveMenuItemClicked() {
