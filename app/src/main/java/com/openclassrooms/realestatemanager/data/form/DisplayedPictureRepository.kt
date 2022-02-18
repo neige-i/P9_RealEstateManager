@@ -19,6 +19,8 @@ class DisplayedPictureRepository @Inject constructor() {
     fun get(): DisplayedPictureEntity =
         displayedPicture ?: throw NullPointerException("Picture is not initialized!")
 
+    fun isInitialized(): Boolean = displayedPicture != null
+
     fun set(displayedPicture: DisplayedPictureEntity?) {
         this.displayedPicture = displayedPicture
         displayedPictureMutableLiveData.value = displayedPicture

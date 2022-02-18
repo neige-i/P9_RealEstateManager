@@ -1,9 +1,11 @@
 package com.openclassrooms.realestatemanager.data.form
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import com.openclassrooms.realestatemanager.R
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -48,6 +50,7 @@ class FormRepository @Inject constructor() {
     private val formMutableLiveData = MutableLiveData<FormEntity>()
     private val formPageCountMutableLiveData = MutableLiveData<Int>()
     private val exitRequestMutableLiveData = MutableLiveData<Boolean>()
+    private val showPictureDialogMutableLiveData = MutableLiveData<PicturePicker>()
     private var initialState: FormEntity? = null
     private var currentState: FormEntity? = null
     private var positionOfPictureToUpdate = -1
@@ -119,5 +122,16 @@ class FormRepository @Inject constructor() {
 
     fun setExitRequest(exit: Boolean) {
         exitRequestMutableLiveData.value = exit
+    }
+
+    fun getPicturePickerLiveData(): LiveData<PicturePicker> = showPictureDialogMutableLiveData
+
+    fun setPicturePicker(picturePicker: PicturePicker) {
+        showPictureDialogMutableLiveData.value = picturePicker
+    }
+
+    enum class PicturePicker(@StringRes val labelId: Int) {
+        GALLERY(R.string.image_picker_dialog_gallery_item),
+        CAMERA(R.string.image_picker_dialog_camera_item),
     }
 }

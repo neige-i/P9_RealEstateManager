@@ -9,17 +9,12 @@ class SetDisplayedPictureUseCase @Inject constructor(
     private val displayedPictureRepository: DisplayedPictureRepository,
 ) {
 
-    fun init(pictureUri: Uri, pictureDescription: String = "") {
+    fun init(pictureUri: Uri, pictureDescription: String) {
         displayedPictureRepository.set(DisplayedPictureEntity(
             uri = pictureUri,
             description = pictureDescription,
             descriptionError = null
         ))
-    }
-
-    fun updateUri(uri: Uri) {
-        val picture = displayedPictureRepository.get()
-        displayedPictureRepository.set(picture.copy(uri = uri))
     }
 
     fun updateDescription(description: String) {
@@ -29,5 +24,14 @@ class SetDisplayedPictureUseCase @Inject constructor(
 
     fun reset() {
         displayedPictureRepository.set(null)
+    }
+
+    fun setUri(uri: Uri) {
+        if (displayedPictureRepository.isInitialized()) {
+            val picture = displayedPictureRepository.get()
+            displayedPictureRepository.set(picture.copy(uri = uri))
+        } else {
+            init(uri, "")
+        }
     }
 }

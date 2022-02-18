@@ -11,8 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.openclassrooms.realestatemanager.databinding.FragmentEditDetailInfoBinding
-import com.openclassrooms.realestatemanager.ui.form.picker_dialog.ImagePickerDialog
-import com.openclassrooms.realestatemanager.ui.form.picker_dialog.ImagePickerLifecycleObserver
+import com.openclassrooms.realestatemanager.ui.form.picker_dialog.PicturePickerDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -35,12 +34,6 @@ class EditDetailInfoFragment : Fragment() {
 
         val viewModel = ViewModelProvider(this).get(EditDetailInfoViewModel::class.java)
 
-        val imagePickerLifecycleObserver = ImagePickerLifecycleObserver(
-            registry = requireActivity().activityResultRegistry,
-            context = requireContext()
-        ) { viewModel.onPhotoPicked(it) }
-        lifecycle.addObserver(imagePickerLifecycleObserver)
-
         enableEditTextScrolling()
         binding.detailInfoDescriptionInput.doAfterTextChanged {
             viewModel.onDescriptionChanged(it?.toString())
@@ -49,7 +42,7 @@ class EditDetailInfoFragment : Fragment() {
         val photoAdapter = PhotoAdapter(object : PhotoAdapter.PhotoListener {
             override fun add(position: Int) {
                 viewModel.onPhotoAdded(position)
-                ImagePickerDialog(imagePickerLifecycleObserver).show(childFragmentManager, null)
+                PicturePickerDialog().show(childFragmentManager, null)
             }
 
             override fun open(position: Int, picture: DetailInfoViewState.PhotoViewState.Picture) {

@@ -148,5 +148,9 @@ class SetFormUseCase @Inject constructor(
         formRepository.setExitRequest(exit)
     }
 
+    fun setPicturePicker(position: Int) {
+        formRepository.setPicturePicker(FormRepository.PicturePicker.values()[position])
+    }
+
     private fun getForm() = formRepository.getCurrentForm()
 }

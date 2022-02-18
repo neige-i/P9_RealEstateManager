@@ -8,8 +8,7 @@ import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.FragmentPictureBinding
-import com.openclassrooms.realestatemanager.ui.form.picker_dialog.ImagePickerDialog
-import com.openclassrooms.realestatemanager.ui.form.picker_dialog.ImagePickerLifecycleObserver
+import com.openclassrooms.realestatemanager.ui.form.picker_dialog.PicturePickerDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -18,7 +17,6 @@ class PictureFragment : Fragment() {
     private var mutableBinding: FragmentPictureBinding? = null
     private val binding: FragmentPictureBinding get() = mutableBinding!!
     private val viewModel: PictureViewModel by viewModels()
-    private lateinit var imagePickerLifecycleObserver: ImagePickerLifecycleObserver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,12 +35,6 @@ class PictureFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        imagePickerLifecycleObserver = ImagePickerLifecycleObserver(
-            registry = requireActivity().activityResultRegistry,
-            context = requireContext()
-        ) { viewModel.onPhotoPicked(it) }
-        lifecycle.addObserver(imagePickerLifecycleObserver)
 
         binding.pictureDescriptionInput.doAfterTextChanged {
             viewModel.onDescriptionChanged(it?.toString())
@@ -72,7 +64,7 @@ class PictureFragment : Fragment() {
             true
         }
         R.id.edit_picture -> {
-            ImagePickerDialog(imagePickerLifecycleObserver).show(parentFragmentManager, null)
+            PicturePickerDialog().show(childFragmentManager, null)
             true
         }
         else -> false

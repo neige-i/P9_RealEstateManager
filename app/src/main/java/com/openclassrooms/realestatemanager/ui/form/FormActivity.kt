@@ -1,19 +1,24 @@
 package com.openclassrooms.realestatemanager.ui.form
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.openclassrooms.realestatemanager.BuildConfig
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ActivityFormBinding
 import com.openclassrooms.realestatemanager.ui.form.pager.FormPagerFragment
 import com.openclassrooms.realestatemanager.ui.form.picture.PictureFragment
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 
 @AndroidEntryPoint
 class FormActivity : AppCompatActivity() {
@@ -37,6 +42,15 @@ class FormActivity : AppCompatActivity() {
             viewModel.onBackStackChanged(supportFragmentManager.backStackEntryCount)
         }
 
+        var cameraPictureUri: Uri? = null
+
+        val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) {
+            viewModel.onPhotoPicked(uri = it)
+        }
+        val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) {
+            viewModel.onPhotoPicked(uri = cameraPictureUri, success = it)
+        }
+
         viewModel.viewStateLiveData.observe(this) { binding.formToolbar.title = it }
 
         viewModel.formEventLiveData.observe(this) {
@@ -58,9 +72,20 @@ class FormActivity : AppCompatActivity() {
                     setReorderingAllowed(true)
                     addToBackStack(null)
                 }
+                FormEvent.OpenGallery -> galleryLauncher.launch("image/*")
+                FormEvent.OpenCamera -> {
+                    cameraPictureUri = getCameraPictureUri()
+                    cameraLauncher.launch(cameraPictureUri)
+                }
             }
         }
     }
+
+    private fun getCameraPictureUri(): Uri = FileProvider.getUriForFile(
+        this,
+        BuildConfig.APPLICATION_ID + ".provider",
+        File.createTempFile("tmp_camera_pic_", ".jpg")
+    )
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_form, menu)

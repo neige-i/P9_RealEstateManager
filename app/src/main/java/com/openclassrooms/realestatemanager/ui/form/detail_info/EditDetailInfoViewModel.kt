@@ -1,6 +1,5 @@
 package com.openclassrooms.realestatemanager.ui.form.detail_info
 
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
@@ -48,12 +47,6 @@ class EditDetailInfoViewModel @Inject constructor(
 
     fun onPhotoAdded(position: Int) {
         setFormUseCase.setPicturePosition(position)
-    }
-
-    fun onPhotoPicked(pictureUri: Uri?) {
-        if (pictureUri != null) {
-            setDisplayedPictureUseCase.init(pictureUri)
-        }
     }
 
     fun onPhotoOpened(position: Int, picture: DetailInfoViewState.PhotoViewState.Picture) {

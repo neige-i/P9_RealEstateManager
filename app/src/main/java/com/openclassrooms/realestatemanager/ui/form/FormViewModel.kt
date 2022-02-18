@@ -1,13 +1,17 @@
 package com.openclassrooms.realestatemanager.ui.form
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.openclassrooms.realestatemanager.R
+import com.openclassrooms.realestatemanager.data.form.DisplayedPictureEntity
 import com.openclassrooms.realestatemanager.data.form.FormInfoEntity
+import com.openclassrooms.realestatemanager.data.form.FormRepository
 import com.openclassrooms.realestatemanager.domain.displayed_picture.GetDisplayedPictureUseCase
+import com.openclassrooms.realestatemanager.domain.displayed_picture.SetDisplayedPictureUseCase
 import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
@@ -21,6 +25,7 @@ class FormViewModel @Inject constructor(
     private val checkFormErrorUseCase: CheckFormErrorUseCase,
     private val setFormUseCase: SetFormUseCase,
     getDisplayedPictureUseCase: GetDisplayedPictureUseCase,
+    private val setDisplayedPictureUseCase: SetDisplayedPictureUseCase,
     private val application: Application,
 ) : ViewModel() {
 
@@ -49,16 +54,25 @@ class FormViewModel @Inject constructor(
             combineViewState(formInfoLiveData.value, it)
         }
 
-        formSingleLiveEvent.addSource(getDisplayedPictureUseCase()) {
-            if (it != null) {
-                formSingleLiveEvent.value = FormEvent.ShowPicture
-            }
+        val displayedPictureLiveData = getDisplayedPictureUseCase()
+        formSingleLiveEvent.addSource(displayedPictureLiveData) {
+            combineDisplayedPicture(it, backStackEntryCountMutableLiveData.value)
+        }
+        formSingleLiveEvent.addSource(backStackEntryCountMutableLiveData) {
+            combineDisplayedPicture(displayedPictureLiveData.value, it)
         }
 
         formSingleLiveEvent.addSource(getFormUseCase.getExitFormRequest()) {
             if (it) {
                 setFormUseCase.setExitRequest(false) // Reset flag
                 formSingleLiveEvent.value = FormEvent.ExitActivity
+            }
+        }
+
+        formSingleLiveEvent.addSource(getFormUseCase.getPicturePicker()) {
+            formSingleLiveEvent.value = when (it) {
+                FormRepository.PicturePicker.GALLERY -> FormEvent.OpenGallery
+                FormRepository.PicturePicker.CAMERA -> FormEvent.OpenCamera
             }
         }
     }
@@ -81,6 +95,16 @@ class FormViewModel @Inject constructor(
             } else {
                 application.getString(R.string.toolbar_title_edit_picture)
             }
+    }
+
+    private fun combineDisplayedPicture(
+        displayedPicture: DisplayedPictureEntity?,
+        backStackEntryCount: Int?,
+    ) {
+        val isPagerDisplayed = backStackEntryCount == null || backStackEntryCount == 0
+        if (displayedPicture != null && isPagerDisplayed) {
+            formSingleLiveEvent.value = FormEvent.ShowPicture
+        }
     }
 
     private fun checkExistingDraft(formInfo: FormInfoEntity) {
@@ -158,6 +182,12 @@ class FormViewModel @Inject constructor(
         when (whichDialog) {
             EXIT_DIALOG -> formSingleLiveEvent.value = FormEvent.ExitActivity
             DRAFT_DIALOG -> setFormUseCase.initAddForm()
+        }
+    }
+
+    fun onPhotoPicked(uri: Uri?, success: Boolean = true) {
+        if (uri != null && success) {
+            setDisplayedPictureUseCase.setUri(uri)
         }
     }
 }

@@ -14,4 +14,8 @@ sealed class FormEvent {
     ) : FormEvent()
 
     object ShowPicture : FormEvent()
+
+    object OpenGallery : FormEvent()
+
+    object OpenCamera : FormEvent()
 }
