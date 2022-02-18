@@ -3,7 +3,6 @@ package com.openclassrooms.realestatemanager.ui.form.detail_info
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.openclassrooms.realestatemanager.domain.displayed_picture.SetDisplayedPictureUseCase
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
@@ -14,7 +13,6 @@ import javax.inject.Inject
 class EditDetailInfoViewModel @Inject constructor(
     getFormUseCase: GetFormUseCase,
     private val setFormUseCase: SetFormUseCase,
-    private val setDisplayedPictureUseCase: SetDisplayedPictureUseCase,
 ) : ViewModel() {
 
     val viewStateLiveData = Transformations.map(getFormUseCase.getUpdates()) {
@@ -54,7 +52,7 @@ class EditDetailInfoViewModel @Inject constructor(
 
     fun onPhotoOpened(position: Int, picture: DetailInfoViewState.PhotoViewState.Picture) {
         setFormUseCase.setPicturePosition(position)
-        setDisplayedPictureUseCase.init(picture.uri, picture.description)
+        setFormUseCase.initPicture(picture.uri, picture.description)
     }
 
     fun onPhotoRemoved(position: Int) {

@@ -3,7 +3,6 @@ package com.openclassrooms.realestatemanager.domain.form
 import android.content.Context
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.UtilsRepository
-import com.openclassrooms.realestatemanager.data.form.DisplayedPictureRepository
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -11,7 +10,6 @@ import javax.inject.Inject
 
 class CheckFormErrorUseCase @Inject constructor(
     private val formRepository: FormRepository,
-    private val displayedPictureRepository: DisplayedPictureRepository,
     @ApplicationContext private val appContext: Context,
 ) {
 
@@ -55,7 +53,7 @@ class CheckFormErrorUseCase @Inject constructor(
     }
 
     private fun containsNoPictureError(): Boolean {
-        val displayedPicture = displayedPictureRepository.get()
+        val displayedPicture = formRepository.getCurrentDisplayedPicture()
 
         val descriptionError = if (displayedPicture.description.isBlank()) {
             appContext.getString(R.string.error_mandatory_field)
@@ -63,7 +61,7 @@ class CheckFormErrorUseCase @Inject constructor(
             null
         }
 
-        displayedPictureRepository.set(displayedPicture.copy(descriptionError = descriptionError))
+        formRepository.setDisplayedPicture(displayedPicture.copy(descriptionError = descriptionError))
 
         return descriptionError == null
     }
@@ -99,13 +97,15 @@ class CheckFormErrorUseCase @Inject constructor(
             else -> null
         }
 
-        formRepository.setForm(form.copy(
-            streetNameError = streetNameError,
-            cityError = cityError,
-            stateError = stateError,
-            zipcodeError = zipcodeError,
-            countryError = countryError,
-        ))
+        formRepository.setForm(
+            form.copy(
+                streetNameError = streetNameError,
+                cityError = cityError,
+                stateError = stateError,
+                zipcodeError = zipcodeError,
+                countryError = countryError,
+            )
+        )
 
         return streetNameError == null && cityError == null && stateError == null &&
                 zipcodeError == null && countryError == null
@@ -132,10 +132,12 @@ class CheckFormErrorUseCase @Inject constructor(
             else -> null
         }
 
-        formRepository.setForm(form.copy(
-            marketEntryDateError = marketEntryDateError,
-            saleDateError = saleDateError
-        ))
+        formRepository.setForm(
+            form.copy(
+                marketEntryDateError = marketEntryDateError,
+                saleDateError = saleDateError
+            )
+        )
 
         return marketEntryDateError == null && saleDateError == null
     }

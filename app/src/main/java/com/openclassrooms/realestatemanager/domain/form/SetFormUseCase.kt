@@ -1,6 +1,9 @@
 package com.openclassrooms.realestatemanager.domain.form
 
+import android.net.Uri
 import androidx.annotation.StringRes
+import com.openclassrooms.realestatemanager.data.form.DisplayedPictureEntity
+import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import javax.inject.Inject
 
@@ -88,6 +91,59 @@ class SetFormUseCase @Inject constructor(
 
     fun setPicturePosition(position: Int) {
         formRepository.setPositionOfPictureToUpdate(position)
+    }
+
+    fun initPicture(pictureUri: Uri, pictureDescription: String) {
+        formRepository.setDisplayedPicture(
+            DisplayedPictureEntity(
+                uri = pictureUri,
+                description = pictureDescription,
+                descriptionError = null,
+                descriptionCursor = 0,
+            )
+        )
+    }
+
+    fun updatePictureDescription(description: String, cursorPosition: Int) {
+        val picture = formRepository.getCurrentDisplayedPicture()
+        if (description != picture.description) {
+            formRepository.setDisplayedPicture(
+                picture.copy(
+                    description = description,
+                    descriptionCursor = cursorPosition
+                )
+            )
+        }
+    }
+
+    fun resetPicture() {
+        formRepository.setDisplayedPicture(null)
+    }
+
+    fun setPictureUri(uri: Uri) {
+        if (formRepository.isPictureInitialized()) {
+            val picture = formRepository.getCurrentDisplayedPicture()
+            formRepository.setDisplayedPicture(picture.copy(uri = uri))
+        } else {
+            initPicture(uri, "")
+        }
+    }
+
+    fun savePicture() {
+        val picture = FormEntity.PictureEntity(
+            uri = formRepository.getCurrentDisplayedPicture().uri,
+            description = formRepository.getCurrentDisplayedPicture().description,
+        )
+        val pictureList = formRepository.getCurrentForm().pictureList.toMutableList()
+        val positionToUpdate = formRepository.getPositionOfPictureToUpdate()
+
+        if (positionToUpdate == pictureList.size) {
+            pictureList.add(picture)
+        } else {
+            pictureList[positionToUpdate] = picture
+        }
+
+        formRepository.setForm(formRepository.getCurrentForm().copy(pictureList = pictureList))
     }
 
     fun removePhoto(position: Int) {

@@ -17,4 +17,6 @@ class GetFormUseCase @Inject constructor(
     fun getExitFormRequest(): LiveData<Boolean> = formRepository.getExitFormLiveData()
 
     fun getPicturePicker() = formRepository.getPicturePickerLiveData()
+
+    fun getDisplayedPicture() = formRepository.getDisplayedPictureLiveData()
 }

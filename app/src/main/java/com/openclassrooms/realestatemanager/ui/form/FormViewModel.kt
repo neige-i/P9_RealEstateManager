@@ -10,8 +10,6 @@ import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.form.DisplayedPictureEntity
 import com.openclassrooms.realestatemanager.data.form.FormInfoEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
-import com.openclassrooms.realestatemanager.domain.displayed_picture.GetDisplayedPictureUseCase
-import com.openclassrooms.realestatemanager.domain.displayed_picture.SetDisplayedPictureUseCase
 import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
@@ -24,8 +22,6 @@ class FormViewModel @Inject constructor(
     getFormUseCase: GetFormUseCase,
     private val checkFormErrorUseCase: CheckFormErrorUseCase,
     private val setFormUseCase: SetFormUseCase,
-    getDisplayedPictureUseCase: GetDisplayedPictureUseCase,
-    private val setDisplayedPictureUseCase: SetDisplayedPictureUseCase,
     private val application: Application,
 ) : ViewModel() {
 
@@ -48,7 +44,7 @@ class FormViewModel @Inject constructor(
             combineViewState(formInfoLiveData.value, it)
         }
 
-        val displayedPictureLiveData = getDisplayedPictureUseCase()
+        val displayedPictureLiveData = getFormUseCase.getDisplayedPicture()
         formSingleLiveEvent.addSource(displayedPictureLiveData) {
             combineDisplayedPicture(it, backStackEntryCountMutableLiveData.value)
         }
@@ -181,7 +177,7 @@ class FormViewModel @Inject constructor(
 
     fun onPhotoPicked(uri: Uri?, success: Boolean = true) {
         if (uri != null && success) {
-            setDisplayedPictureUseCase.setUri(uri)
+            setFormUseCase.setPictureUri(uri)
         }
     }
 

@@ -59,9 +59,11 @@ class FormRepository @Inject constructor() {
     private val formPageCountMutableLiveData = MutableLiveData<Int>()
     private val exitRequestMutableLiveData = MutableLiveData<Boolean>()
     private val showPictureDialogMutableLiveData = MutableLiveData<PicturePicker?>()
+    private val displayedPictureMutableLiveData = MutableLiveData<DisplayedPictureEntity?>()
     private var initialState: FormEntity? = null
     private var currentState: FormEntity? = null
     private var positionOfPictureToUpdate = -1
+    private var displayedPicture: DisplayedPictureEntity? = null
 
     init {
         formInfoMediatorLiveData.addSource(formMutableLiveData) {
@@ -137,6 +139,18 @@ class FormRepository @Inject constructor() {
 
     fun setPicturePicker(picturePicker: PicturePicker?) {
         showPictureDialogMutableLiveData.value = picturePicker
+    }
+
+    fun getDisplayedPictureLiveData() = displayedPictureMutableLiveData
+
+    fun getCurrentDisplayedPicture(): DisplayedPictureEntity =
+        displayedPicture ?: throw NullPointerException("Picture is not initialized!")
+
+    fun isPictureInitialized(): Boolean = displayedPicture != null
+
+    fun setDisplayedPicture(displayedPicture: DisplayedPictureEntity?) {
+        this.displayedPicture = displayedPicture
+        displayedPictureMutableLiveData.value = displayedPicture
     }
 
     enum class PicturePicker(@StringRes val labelId: Int) {
