@@ -101,7 +101,10 @@ class FormRepository @Inject constructor() {
 
     fun initForm(form: FormEntity? = null) {
         initialState = form ?: DEFAULT_FORM
-        setForm(form ?: currentState ?: DEFAULT_FORM)
+
+        val startingForm = form ?: currentState ?: DEFAULT_FORM
+
+        setForm(startingForm.copy(displayedPage = 0)) // Always start form from the first page
     }
 
     fun setForm(form: FormEntity) {
