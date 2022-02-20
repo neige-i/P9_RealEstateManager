@@ -42,7 +42,7 @@ class EditDetailInfoFragment : Fragment() {
         val photoAdapter = PhotoAdapter(object : PhotoAdapter.PhotoListener {
             override fun add(position: Int) {
                 viewModel.onPhotoAdded(position)
-                PicturePickerDialog().show(childFragmentManager, null)
+                PicturePickerDialog().show(parentFragmentManager, null)
             }
 
             override fun open(position: Int, picture: DetailInfoViewState.PhotoViewState.Picture) {

@@ -64,6 +64,10 @@ class PictureActivity : ImageLauncherActivity() {
         else -> false
     }
 
+    // Override finish() instead of onDestroy() to reset the repository's picture
+    // The parent activity observes the repository's picture and starts this activity if not null
+    // So the picture must be null BEFORE returning back to the parent activity
+    // But onDestroy() is called AFTER the parent activity is resumed
     override fun finish() {
         super.finish()
         viewModel.onActivityFinished()

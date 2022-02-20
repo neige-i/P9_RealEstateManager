@@ -15,7 +15,7 @@ class EditDetailInfoViewModel @Inject constructor(
     private val setFormUseCase: SetFormUseCase,
 ) : ViewModel() {
 
-    val viewStateLiveData = Transformations.map(getFormUseCase.getUpdates()) {
+    val viewStateLiveData = Transformations.map(getFormUseCase.getForm()) {
 
         it.pictureListError?.let { errorMessage ->
             showErrorSingleLiveEvent.value = errorMessage
@@ -56,6 +56,6 @@ class EditDetailInfoViewModel @Inject constructor(
     }
 
     fun onPhotoRemoved(position: Int) {
-        setFormUseCase.removePhoto(position)
+        setFormUseCase.removePictureAt(position)
     }
 }

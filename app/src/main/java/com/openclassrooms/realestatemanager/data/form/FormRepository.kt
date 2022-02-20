@@ -1,10 +1,7 @@
 package com.openclassrooms.realestatemanager.data.form
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import com.openclassrooms.realestatemanager.R
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,7 +9,7 @@ import javax.inject.Singleton
 class FormRepository @Inject constructor() {
 
     companion object {
-        private val DEFAULT_FORM = FormEntity(
+        val DEFAULT_FORM = FormEntity(
             type = "",
             typeError = null,
             price = "",
@@ -54,36 +51,22 @@ class FormRepository @Inject constructor() {
     }
 
     private val formMutableLiveData = MutableLiveData<FormEntity>()
-    private val exitRequestMutableLiveData = MutableLiveData<Boolean>()
-    private val showPictureDialogMutableLiveData = MutableLiveData<PicturePicker?>()
-    private val displayedPictureMutableLiveData = MutableLiveData<DisplayedPictureEntity?>()
     private var initialState: FormEntity? = null
     private var currentState: FormEntity? = null
-    private var positionOfPictureToUpdate = -1
-    private var displayedPicture: DisplayedPictureEntity? = null
+    private var currentPicturePosition = -1
 
     fun getFormLiveData(): LiveData<FormEntity> = formMutableLiveData
 
-    fun getFormInfoLiveData(): LiveData<FormInfoEntity> = Transformations.map(formMutableLiveData) {
-        FormInfoEntity(
-            form = it,
-            type = if (initialState == DEFAULT_FORM) {
-                FormInfoEntity.FormType.ADD
-            } else {
-                FormInfoEntity.FormType.EDIT
-            },
-            hasModifications = it != initialState
-        )
-    }
+    fun getInitialState(): FormEntity = initialState
+        ?: throw IllegalStateException("The form has not been initialized. Please call initForm() before accessing it")
 
-    fun getCurrentForm(): FormEntity = currentState ?: throw NullPointerException(
-        "The form has not been initialized. Please call initForm() before accessing it"
-    )
+    fun getNonNullForm(): FormEntity = currentState
+        ?: throw IllegalStateException("The form has not been set. Please call setForm() before accessing it")
 
-    fun initForm(form: FormEntity? = null) {
-        initialState = form ?: DEFAULT_FORM
+    fun getForm(): FormEntity? = currentState
 
-        setForm(form ?: currentState ?: DEFAULT_FORM)
+    fun initForm(form: FormEntity) {
+        initialState = form
     }
 
     fun setForm(form: FormEntity) {
@@ -96,38 +79,9 @@ class FormRepository @Inject constructor() {
         currentState = null
     }
 
-    fun getPositionOfPictureToUpdate(): Int = positionOfPictureToUpdate
+    fun getCurrentPicturePosition(): Int = currentPicturePosition
 
-    fun setPositionOfPictureToUpdate(position: Int) {
-        positionOfPictureToUpdate = position
-    }
-
-    fun getExitFormLiveData(): LiveData<Boolean> = exitRequestMutableLiveData
-
-    fun setExitRequest(exit: Boolean) {
-        exitRequestMutableLiveData.value = exit
-    }
-
-    fun getPicturePickerLiveData(): LiveData<PicturePicker?> = showPictureDialogMutableLiveData
-
-    fun setPicturePicker(picturePicker: PicturePicker?) {
-        showPictureDialogMutableLiveData.value = picturePicker
-    }
-
-    fun getDisplayedPictureLiveData() = displayedPictureMutableLiveData
-
-    fun getCurrentDisplayedPicture(): DisplayedPictureEntity =
-        displayedPicture ?: throw NullPointerException("Picture is not initialized!")
-
-    fun isPictureInitialized(): Boolean = displayedPicture != null
-
-    fun setDisplayedPicture(displayedPicture: DisplayedPictureEntity?) {
-        this.displayedPicture = displayedPicture
-        displayedPictureMutableLiveData.value = displayedPicture
-    }
-
-    enum class PicturePicker(@StringRes val labelId: Int) {
-        GALLERY(R.string.image_picker_dialog_gallery_item),
-        CAMERA(R.string.image_picker_dialog_camera_item),
+    fun setCurrentPicturePosition(position: Int) {
+        currentPicturePosition = position
     }
 }

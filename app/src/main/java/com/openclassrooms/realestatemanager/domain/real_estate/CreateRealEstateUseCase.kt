@@ -18,28 +18,30 @@ class CreateRealEstateUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke() {
-        val form = formRepository.getCurrentForm()
+        val form = formRepository.getNonNullForm()
 
-        realEstateRepository.createRealEstate(RealEstateEntity(
-            type = RealEstateType.fromLocaleString(form.type, applicationContext).name,
-            price = form.price.toDoubleOrNull(),
-            area = form.area.toIntOrNull(),
-            totalRoomCount = form.totalRoomCount,
-            bathroomCount = form.bathroomCount,
-            bedroomCount = form.bedroomCount,
-            description = form.description,
-            pictureList = form.pictureList.map { it.uri.toString() },
-            streetName = form.streetName,
-            additionalAddressInfo = form.additionalAddressInfo,
-            city = form.city,
-            state = form.state,
-            zipcode = form.zipcode,
-            country = form.country,
-            pointsOfInterests = form.pointsOfInterests.map { PointOfInterest.fromLabelId(it).name },
-            agentName = agentRepository.getAgentByName(form.agentName)?.id,
-            marketEntryDate = form.marketEntryDate,
-            saleDate = form.saleDate.ifEmpty { null },
-            isAvailableForSale = form.isAvailableForSale
-        ))
+        realEstateRepository.createRealEstate(
+            RealEstateEntity(
+                type = RealEstateType.fromLocaleString(form.type, applicationContext).name,
+                price = form.price.toDoubleOrNull(),
+                area = form.area.toIntOrNull(),
+                totalRoomCount = form.totalRoomCount,
+                bathroomCount = form.bathroomCount,
+                bedroomCount = form.bedroomCount,
+                description = form.description,
+                pictureList = form.pictureList.map { it.uri.toString() },
+                streetName = form.streetName,
+                additionalAddressInfo = form.additionalAddressInfo,
+                city = form.city,
+                state = form.state,
+                zipcode = form.zipcode,
+                country = form.country,
+                pointsOfInterests = form.pointsOfInterests.map { PointOfInterest.fromLabelId(it).name },
+                agentName = agentRepository.getAgentByName(form.agentName)?.id,
+                marketEntryDate = form.marketEntryDate,
+                saleDate = form.saleDate.ifEmpty { null },
+                isAvailableForSale = form.isAvailableForSale
+            )
+        )
     }
 }

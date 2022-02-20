@@ -34,8 +34,6 @@ class UtilsRepository @Inject constructor(
 
         val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
-        fun stringToDate(text: String): LocalDate = LocalDate.parse(text, DATE_FORMATTER)
-
         // Currency rate on January, 19th 2022
         private const val USD_EUR = .8815
     }
@@ -53,6 +51,8 @@ class UtilsRepository @Inject constructor(
     // DATE
 
     fun todayDate(): String = LocalDate.now(clock).format(DATE_FORMATTER)
+
+    fun stringToDate(text: String): LocalDate = LocalDate.parse(text, DATE_FORMATTER)
 
     // NETWORK CONNECTION
 

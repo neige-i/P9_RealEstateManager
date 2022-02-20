@@ -84,7 +84,7 @@ class UtilsRepositoryTest {
     @Test
     fun `return August, 6th 1991 from the String`() {
         // WHEN
-        val parsedDate = UtilsRepository.stringToDate("06/08/1991")
+        val parsedDate = utilsRepository.stringToDate("06/08/1991")
 
         // THEN
         Assert.assertEquals(LocalDate.of(1991, 8, 6), parsedDate)

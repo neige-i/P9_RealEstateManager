@@ -23,7 +23,7 @@ class PictureViewModel @Inject constructor(
     val exitEventLiveData: LiveData<Unit> = exitSingleLiveEvent
 
     init {
-        viewStateMediatorLiveData.addSource(getFormUseCase.getDisplayedPicture()) {
+        viewStateMediatorLiveData.addSource(getFormUseCase.getCurrentPicture()) {
             if (it != null) {
                 viewStateMediatorLiveData.value = PictureViewState(
                     uri = it.uri,

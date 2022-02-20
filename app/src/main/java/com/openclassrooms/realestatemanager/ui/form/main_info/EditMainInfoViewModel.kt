@@ -13,7 +13,7 @@ class EditMainInfoViewModel @Inject constructor(
     private val setFormUseCase: SetFormUseCase,
 ) : ViewModel() {
 
-    val viewStateLiveData = Transformations.map(getFormUseCase.getUpdates()) {
+    val viewStateLiveData = Transformations.map(getFormUseCase.getForm()) {
         MainInfoViewState(
             selectedType = it.type,
             typeError = it.typeError,

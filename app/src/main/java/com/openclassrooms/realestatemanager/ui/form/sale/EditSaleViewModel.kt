@@ -27,13 +27,9 @@ class EditSaleViewModel @Inject constructor(
     getAgentListUseCase: GetAgentListUseCase,
     private val defaultClock: Clock,
     private val defaultZoneId: ZoneId,
+    private val utilsRepository: UtilsRepository,
     private val application: Application,
 ) : ViewModel() {
-
-    companion object {
-        private const val MARKET_ENTRY_DATE = 0
-        private const val SALE_DATE = 1
-    }
 
     private val viewStateMediatorLiveData = MediatorLiveData<SaleViewState>()
     val viewStateLiveData: LiveData<SaleViewState> = viewStateMediatorLiveData
@@ -42,10 +38,8 @@ class EditSaleViewModel @Inject constructor(
 
     private var currentForm: FormEntity? = null
 
-    private var whichDatePicker = -1
-
     init {
-        val formLiveData = getFormUseCase.getUpdates()
+        val formLiveData = getFormUseCase.getForm()
         val agentListLiveData = getAgentListUseCase()
 
         viewStateMediatorLiveData.addSource(formLiveData) {
@@ -81,40 +75,49 @@ class EditSaleViewModel @Inject constructor(
     }
 
     fun onMarketEntryDateClicked() {
-        whichDatePicker = MARKET_ENTRY_DATE
-        setDatePickerInfo(currentForm?.marketEntryDate, R.string.picker_title_market_entry)
+        setDatePickerInfo(
+            datePickerType = DatePickerType.ENTRY_DATE,
+            titleId = R.string.picker_title_market_entry,
+            dateString = currentForm?.marketEntryDate
+        )
     }
 
     fun onSaleDateClicked() {
-        whichDatePicker = SALE_DATE
-        setDatePickerInfo(currentForm?.saleDate, R.string.picker_title_sale)
+        setDatePickerInfo(
+            datePickerType = DatePickerType.SALE_DATE,
+            titleId = R.string.picker_title_sale,
+            dateString = currentForm?.saleDate
+        )
     }
 
-    private fun setDatePickerInfo(dateString: String?, @StringRes titleId: Int) {
+    private fun setDatePickerInfo(
+        datePickerType: DatePickerType,
+        @StringRes titleId: Int,
+        dateString: String?
+    ) {
         val pickerDate = if (dateString?.isNotEmpty() == true) {
-            UtilsRepository.stringToDate(dateString)
+            utilsRepository.stringToDate(dateString)
         } else {
             LocalDate.now(defaultClock)
         }
 
         showDatePickerSingleLiveEvent.value = ShowDatePickerEvent(
+            type = datePickerType,
             title = application.getString(titleId),
             dateMillis = pickerDate.atStartOfDay(defaultZoneId).toInstant().toEpochMilli()
         )
     }
 
-    fun onDateSelected(dateMillis: Long) {
+    fun onDateSelected(dateMillis: Long, type: DatePickerType) {
         val selectedDateString = Instant.ofEpochMilli(dateMillis)
             .atZone(defaultZoneId)
             .toLocalDate()
             .format(UtilsRepository.DATE_FORMATTER)
 
-        when (whichDatePicker) {
-            MARKET_ENTRY_DATE -> setFormUseCase.updateMarketEntryDate(selectedDateString)
-            SALE_DATE -> setFormUseCase.updateSaleDate(selectedDateString)
+        when (type) {
+            DatePickerType.ENTRY_DATE -> setFormUseCase.updateMarketEntryDate(selectedDateString)
+            DatePickerType.SALE_DATE -> setFormUseCase.updateSaleDate(selectedDateString)
         }
-
-        whichDatePicker = -1
     }
 
     fun onAvailabilitySwitched(isAvailable: Boolean) {
@@ -123,5 +126,10 @@ class EditSaleViewModel @Inject constructor(
         if (!isAvailable) {
             setFormUseCase.updateSaleDate("")
         }
+    }
+
+    enum class DatePickerType {
+        ENTRY_DATE,
+        SALE_DATE,
     }
 }

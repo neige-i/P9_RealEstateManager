@@ -6,22 +6,22 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openclassrooms.realestatemanager.R
-import com.openclassrooms.realestatemanager.data.form.FormInfoEntity
-import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
-import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
-import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
+import com.openclassrooms.realestatemanager.domain.form.*
 import com.openclassrooms.realestatemanager.domain.real_estate.CreateRealEstateUseCase
 import com.openclassrooms.realestatemanager.ui.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class FormViewModel @Inject constructor(
-    getFormUseCase: GetFormUseCase,
+    private val getFormUseCase: GetFormUseCase,
+    getFormRequestUseCase: GetFormRequestUseCase,
     private val checkFormErrorUseCase: CheckFormErrorUseCase,
     private val setFormUseCase: SetFormUseCase,
+    private val setFormRequestUseCase: SetFormRequestUseCase,
     private val createRealEstateUseCase: CreateRealEstateUseCase,
     private val coroutineProvider: CoroutineProvider,
     private val application: Application,
@@ -32,45 +32,34 @@ class FormViewModel @Inject constructor(
     private val formSingleLiveEvent = SingleLiveEvent<FormEvent>()
     val formEventLiveData: LiveData<FormEvent> = formSingleLiveEvent
 
-    private lateinit var currentFormInfo: FormInfoEntity
-    private var checkDraft = true
     private var pageCount = -1
     private var currentPage = -1
 
     init {
-        formSingleLiveEvent.addSource(getFormUseCase.getWithInfo()) {
-            currentFormInfo = it
+        checkExistingDraft()
 
-            if (checkDraft) {
-                // Reset flag to display draft dialog only once: at ViewModel initialization
-                checkDraft = false
-
-                checkExistingDraft(it)
-            }
-        }
-
-        formSingleLiveEvent.addSource(getFormUseCase.getDisplayedPicture()) {
-            it?.let {
+        formSingleLiveEvent.addSource(getFormUseCase.getCurrentPicture()) {
+            if (it != null) {
                 formSingleLiveEvent.value = FormEvent.ShowPicture
             }
         }
 
-        formSingleLiveEvent.addSource(getFormUseCase.getExitFormRequest()) {
+        formSingleLiveEvent.addSource(getFormRequestUseCase.getExit()) {
             if (it) {
-                setFormUseCase.setExitRequest(false) // Reset flag
+                setFormRequestUseCase.exit(false) // Reset flag
                 formSingleLiveEvent.value = FormEvent.ExitActivity
             }
         }
     }
 
-    private fun checkExistingDraft(formInfo: FormInfoEntity) {
-        if (formInfo.type == FormInfoEntity.FormType.ADD && formInfo.hasModifications) {
+    private fun checkExistingDraft() {
+        if (getFormUseCase.getType() == GetFormUseCase.FormType.ADD && getFormUseCase.isModified()) {
             formSingleLiveEvent.value = FormEvent.ShowDialog(
                 type = DialogType.DRAFT,
                 title = application.getString(R.string.draft_form_dialog_title),
                 message = application.getString(
                     R.string.draft_form_dialog_message,
-                    formInfo.form.type
+                    getFormUseCase.getCurrentState().type
                 ),
                 positiveButtonText = application.getString(R.string.draft_form_dialog_positive_button),
                 negativeButtonText = application.getString(R.string.draft_form_dialog_negative_button)
@@ -111,8 +100,11 @@ class FormViewModel @Inject constructor(
     private fun onFormCompleted() {
         viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
             createRealEstateUseCase()
-            setFormUseCase.reset()
-            setFormUseCase.setExitRequest(true)
+
+            withContext(coroutineProvider.getMainDispatcher()) {
+                setFormUseCase.reset()
+                setFormRequestUseCase.exit(true)
+            }
         }
     }
 
@@ -129,13 +121,13 @@ class FormViewModel @Inject constructor(
     }
 
     private fun confirmExit() {
-        if (currentFormInfo.hasModifications) {
+        if (getFormUseCase.isModified()) {
             formSingleLiveEvent.value = FormEvent.ShowDialog(
                 type = DialogType.EXIT,
                 title = application.getString(R.string.exit_form_dialog_title),
-                message = when (currentFormInfo.type) {
-                    FormInfoEntity.FormType.ADD -> application.getString(R.string.exit_add_form_dialog_message)
-                    FormInfoEntity.FormType.EDIT -> application.getString(R.string.exit_edit_form_dialog_message)
+                message = when (getFormUseCase.getType()) {
+                    GetFormUseCase.FormType.ADD -> application.getString(R.string.exit_add_form_dialog_message)
+                    GetFormUseCase.FormType.EDIT -> application.getString(R.string.exit_edit_form_dialog_message)
                 },
                 positiveButtonText = application.getString(R.string.exit_form_dialog_positive_button),
                 negativeButtonText = application.getString(R.string.exit_form_dialog_negative_button)

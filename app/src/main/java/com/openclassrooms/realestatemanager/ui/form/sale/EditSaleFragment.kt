@@ -43,11 +43,13 @@ class EditSaleFragment : Fragment() {
         binding.saleDateInput.setOnClickListener { viewModel.onSaleDateClicked() }
 
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
-            binding.saleAgentInput.setAdapter(ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_list_item_1,
-                it.agentEntries
-            ))
+            binding.saleAgentInput.setAdapter(
+                ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_list_item_1,
+                    it.agentEntries
+                )
+            )
 
             binding.saleAgentInput.setText(it.selectedAgentName, false)
             binding.saleMarketEntryDateInput.setText(it.marketEntryDate)
@@ -68,7 +70,7 @@ class EditSaleFragment : Fragment() {
                 .build()
 
             datePicker.addOnPositiveButtonClickListener { dateMillis ->
-                viewModel.onDateSelected(dateMillis)
+                viewModel.onDateSelected(dateMillis, it.type)
             }
             datePicker.show(parentFragmentManager, null)
         }

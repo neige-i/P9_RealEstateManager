@@ -15,7 +15,7 @@ class EditAddressViewModel @Inject constructor(
     private val setFormUseCase: SetFormUseCase,
 ) : ViewModel() {
 
-    val viewStateLiveData = Transformations.map(getFormUseCase.getUpdates()) {
+    val viewStateLiveData = Transformations.map(getFormUseCase.getForm()) {
         AddressViewState(
             streetNumber = it.streetName,
             streetNumberError = it.streetNameError,

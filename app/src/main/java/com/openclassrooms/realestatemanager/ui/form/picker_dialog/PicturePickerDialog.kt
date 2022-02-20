@@ -6,7 +6,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.openclassrooms.realestatemanager.R
-import com.openclassrooms.realestatemanager.data.form.FormRepository
+import com.openclassrooms.realestatemanager.data.form.ImagePicker
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -15,9 +15,9 @@ class PicturePickerDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val viewModel = ViewModelProvider(this).get(PicturePickerViewModel::class.java)
 
-        val imagePickerDialogItems = FormRepository.PicturePicker.values().map {
-            getString(it.labelId)
-        }.toTypedArray()
+        val imagePickerDialogItems = ImagePicker.values()
+            .map { getString(it.labelId) }
+            .toTypedArray()
 
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.image_picker_dialog_title)

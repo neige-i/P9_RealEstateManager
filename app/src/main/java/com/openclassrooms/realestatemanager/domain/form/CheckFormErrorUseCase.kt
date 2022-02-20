@@ -3,6 +3,7 @@ package com.openclassrooms.realestatemanager.domain.form
 import android.content.Context
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.UtilsRepository
+import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -10,13 +11,15 @@ import javax.inject.Inject
 
 class CheckFormErrorUseCase @Inject constructor(
     private val formRepository: FormRepository,
+    private val currentPictureRepository: CurrentPictureRepository,
+    private val utilsRepository: UtilsRepository,
     @ApplicationContext private val appContext: Context,
 ) {
 
     fun containsNoError(pageToCheck: PageToCheck): Boolean = containsNoError(pageToCheck.ordinal)
 
     fun containsNoError(pageToCheck: Int): Boolean {
-        val form = formRepository.getCurrentForm()
+        val form = formRepository.getNonNullForm()
 
         return when (PageToCheck.values()[pageToCheck]) {
             PageToCheck.MAIN -> containsNoMainError(form)
@@ -40,8 +43,7 @@ class CheckFormErrorUseCase @Inject constructor(
     }
 
     private fun containsNoDetailError(form: FormEntity): Boolean {
-        val pictureList = form.pictureList
-        val pictureListError = if (pictureList.isEmpty()) {
+        val pictureListError = if (form.pictureList.isEmpty()) {
             appContext.getString(R.string.error_empty_photo_list)
         } else {
             null
@@ -53,15 +55,15 @@ class CheckFormErrorUseCase @Inject constructor(
     }
 
     private fun containsNoPictureError(): Boolean {
-        val displayedPicture = formRepository.getCurrentDisplayedPicture()
+        val picture = currentPictureRepository.getNonNullCurrentPicture()
 
-        val descriptionError = if (displayedPicture.description.isBlank()) {
+        val descriptionError = if (picture.description.isBlank()) {
             appContext.getString(R.string.error_mandatory_field)
         } else {
             null
         }
 
-        formRepository.setDisplayedPicture(displayedPicture.copy(descriptionError = descriptionError))
+        currentPictureRepository.setCurrentPicture(picture.copy(descriptionError = descriptionError))
 
         return descriptionError == null
     }
@@ -117,8 +119,8 @@ class CheckFormErrorUseCase @Inject constructor(
 
         val isDateOrderInconsistent = marketEntryDateString.isNotEmpty() &&
                 saleDateString.isNotEmpty() &&
-                UtilsRepository.stringToDate(marketEntryDateString)
-                    .isAfter(UtilsRepository.stringToDate(saleDateString))
+                utilsRepository.stringToDate(marketEntryDateString)
+                    .isAfter(utilsRepository.stringToDate(saleDateString))
 
         val marketEntryDateError = when {
             marketEntryDateString.isEmpty() -> appContext.getString(R.string.error_mandatory_field)
@@ -142,6 +144,9 @@ class CheckFormErrorUseCase @Inject constructor(
         return marketEntryDateError == null && saleDateError == null
     }
 
+    /**
+     * The enum values are declared in the same order as the corresponding fragments are displayed in the pager.
+     */
     enum class PageToCheck {
         MAIN,
         DETAIL,
