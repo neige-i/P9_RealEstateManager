@@ -1,20 +1,20 @@
 package com.openclassrooms.realestatemanager.ui.form
 
 import android.app.Application
-import android.net.Uri
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.openclassrooms.realestatemanager.R
-import com.openclassrooms.realestatemanager.data.form.DisplayedPictureEntity
 import com.openclassrooms.realestatemanager.data.form.FormInfoEntity
-import com.openclassrooms.realestatemanager.data.form.FormRepository
 import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
+import com.openclassrooms.realestatemanager.domain.real_estate.CreateRealEstateUseCase
+import com.openclassrooms.realestatemanager.ui.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,34 +22,37 @@ class FormViewModel @Inject constructor(
     getFormUseCase: GetFormUseCase,
     private val checkFormErrorUseCase: CheckFormErrorUseCase,
     private val setFormUseCase: SetFormUseCase,
+    private val createRealEstateUseCase: CreateRealEstateUseCase,
+    private val coroutineProvider: CoroutineProvider,
     private val application: Application,
 ) : ViewModel() {
 
-    private val viewStateMediatorLiveData = MediatorLiveData<String>()
-    val viewStateLiveData: LiveData<String> = viewStateMediatorLiveData
+    private val viewStateMutableLiveData = MutableLiveData<FormViewState>()
+    val viewStateLiveData: LiveData<FormViewState> = viewStateMutableLiveData
     private val formSingleLiveEvent = SingleLiveEvent<FormEvent>()
     val formEventLiveData: LiveData<FormEvent> = formSingleLiveEvent
 
-    private val backStackEntryCountMutableLiveData = MutableLiveData<Int>()
-
     private lateinit var currentFormInfo: FormInfoEntity
     private var checkDraft = true
+    private var pageCount = -1
+    private var currentPage = -1
 
     init {
-        val formInfoLiveData = getFormUseCase.getWithInfo()
-        viewStateMediatorLiveData.addSource(formInfoLiveData) {
-            combineViewState(it, backStackEntryCountMutableLiveData.value)
-        }
-        viewStateMediatorLiveData.addSource(backStackEntryCountMutableLiveData) {
-            combineViewState(formInfoLiveData.value, it)
+        formSingleLiveEvent.addSource(getFormUseCase.getWithInfo()) {
+            currentFormInfo = it
+
+            if (checkDraft) {
+                // Reset flag to display draft dialog only once: at ViewModel initialization
+                checkDraft = false
+
+                checkExistingDraft(it)
+            }
         }
 
-        val displayedPictureLiveData = getFormUseCase.getDisplayedPicture()
-        formSingleLiveEvent.addSource(displayedPictureLiveData) {
-            combineDisplayedPicture(it, backStackEntryCountMutableLiveData.value)
-        }
-        formSingleLiveEvent.addSource(backStackEntryCountMutableLiveData) {
-            combineDisplayedPicture(displayedPictureLiveData.value, it)
+        formSingleLiveEvent.addSource(getFormUseCase.getDisplayedPicture()) {
+            it?.let {
+                formSingleLiveEvent.value = FormEvent.ShowPicture
+            }
         }
 
         formSingleLiveEvent.addSource(getFormUseCase.getExitFormRequest()) {
@@ -58,51 +61,10 @@ class FormViewModel @Inject constructor(
                 formSingleLiveEvent.value = FormEvent.ExitActivity
             }
         }
-
-        formSingleLiveEvent.addSource(getFormUseCase.getPicturePicker()) {
-            it?.let {
-                setFormUseCase.setPicturePicker(null) // Reset flag
-
-                formSingleLiveEvent.value = when (it) {
-                    FormRepository.PicturePicker.GALLERY -> FormEvent.OpenGallery
-                    FormRepository.PicturePicker.CAMERA -> FormEvent.OpenCamera
-                }
-            }
-        }
-    }
-
-    private fun combineViewState(formInfo: FormInfoEntity?, backStackEntryCount: Int?) {
-        if (formInfo == null) {
-            return
-        }
-
-        currentFormInfo = formInfo
-
-        checkExistingDraft(formInfo)
-
-        viewStateMediatorLiveData.value =
-            if (backStackEntryCount == null || backStackEntryCount == 0) {
-                application.getString(R.string.toolbar_title_add) +
-                        " (" + (formInfo.form.displayedPage + 1) +
-                        "/" + formInfo.pageCount +
-                        ")"
-            } else {
-                application.getString(R.string.toolbar_title_edit_picture)
-            }
-    }
-
-    private fun combineDisplayedPicture(
-        displayedPicture: DisplayedPictureEntity?,
-        backStackEntryCount: Int?,
-    ) {
-        val isPagerDisplayed = backStackEntryCount == null || backStackEntryCount == 0
-        if (displayedPicture != null && isPagerDisplayed) {
-            formSingleLiveEvent.value = FormEvent.ShowPicture
-        }
     }
 
     private fun checkExistingDraft(formInfo: FormInfoEntity) {
-        if (checkDraft && formInfo.type == FormInfoEntity.FormType.ADD && formInfo.hasModifications) {
+        if (formInfo.type == FormInfoEntity.FormType.ADD && formInfo.hasModifications) {
             formSingleLiveEvent.value = FormEvent.ShowDialog(
                 type = DialogType.DRAFT,
                 title = application.getString(R.string.draft_form_dialog_title),
@@ -114,25 +76,51 @@ class FormViewModel @Inject constructor(
                 negativeButtonText = application.getString(R.string.draft_form_dialog_negative_button)
             )
         }
-
-        // Reset flag to display draft dialog only once (when the ViewModel is initialized)
-        checkDraft = false
     }
 
-    fun onBackStackChanged(backStackEntryCount: Int) {
-        backStackEntryCountMutableLiveData.value = backStackEntryCount
+    fun onInitPagerAdapter(pageCount: Int) {
+        this.pageCount = pageCount
     }
 
-    fun onGoBack(backStackEntryCount: Int) {
-        if (backStackEntryCount == 0) {
-            val currentFormPage = currentFormInfo.form.displayedPage
-            if (currentFormPage > 0) {
-                setFormUseCase.setPagePosition(currentFormPage.dec())
+    fun onPageChanged(position: Int) {
+        currentPage = position
+
+        viewStateMutableLiveData.value = FormViewState(
+            toolbarTitle = application.getString(R.string.toolbar_title_add) +
+                    " (" + (currentPage + 1) +
+                    "/" + pageCount +
+                    ")",
+            submitButtonText = if (isLastPageDisplayed()) {
+                application.getString(R.string.button_text_save)
             } else {
-                confirmExit()
+                application.getString(R.string.button_text_next)
             }
+        )
+    }
+
+    fun onSubmitButtonClicked() {
+        if (checkFormErrorUseCase.containsNoError(pageToCheck = currentPage)) {
+            if (isLastPageDisplayed()) {
+                onFormCompleted()
+            } else {
+                formSingleLiveEvent.value = FormEvent.GoToPage(currentPage + 1)
+            }
+        }
+    }
+
+    private fun onFormCompleted() {
+        viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
+            createRealEstateUseCase()
+            setFormUseCase.reset()
+            setFormUseCase.setExitRequest(true)
+        }
+    }
+
+    fun onGoBack() {
+        if (currentPage > 0) {
+            formSingleLiveEvent.value = FormEvent.GoToPage(currentPage - 1)
         } else {
-            formSingleLiveEvent.value = FormEvent.ExitFragment
+            confirmExit()
         }
     }
 
@@ -175,11 +163,7 @@ class FormViewModel @Inject constructor(
         }
     }
 
-    fun onPhotoPicked(uri: Uri?, success: Boolean = true) {
-        if (uri != null && success) {
-            setFormUseCase.setPictureUri(uri)
-        }
-    }
+    private fun isLastPageDisplayed(): Boolean = currentPage == pageCount - 1
 
     enum class DialogType {
         EXIT,

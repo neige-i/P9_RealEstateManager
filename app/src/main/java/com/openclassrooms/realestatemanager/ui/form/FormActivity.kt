@@ -1,27 +1,24 @@
 package com.openclassrooms.realestatemanager.ui.form
 
-import android.net.Uri
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
-import androidx.fragment.app.add
-import androidx.fragment.app.commit
-import androidx.fragment.app.replace
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.openclassrooms.realestatemanager.BuildConfig
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ActivityFormBinding
-import com.openclassrooms.realestatemanager.ui.form.pager.FormPagerFragment
-import com.openclassrooms.realestatemanager.ui.form.picture.PictureFragment
+import com.openclassrooms.realestatemanager.ui.form.address.EditAddressFragment
+import com.openclassrooms.realestatemanager.ui.form.detail_info.EditDetailInfoFragment
+import com.openclassrooms.realestatemanager.ui.form.image_launcher.ImageLauncherActivity
+import com.openclassrooms.realestatemanager.ui.form.main_info.EditMainInfoFragment
+import com.openclassrooms.realestatemanager.ui.form.picture.PictureActivity
+import com.openclassrooms.realestatemanager.ui.form.sale.EditSaleFragment
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 
 @AndroidEntryPoint
-class FormActivity : AppCompatActivity() {
+class FormActivity : ImageLauncherActivity() {
 
     private val viewModel: FormViewModel by viewModels()
 
@@ -34,29 +31,36 @@ class FormActivity : AppCompatActivity() {
         setSupportActionBar(binding.formToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            add<FormPagerFragment>(binding.formContainer.id)
-        }
-        supportFragmentManager.addOnBackStackChangedListener {
-            viewModel.onBackStackChanged(supportFragmentManager.backStackEntryCount)
-        }
+        val addEditPagerAdapter = FormPagerAdapter(
+            fragmentActivity = this,
+            fragmentList = listOf(
+                EditMainInfoFragment(),
+                EditDetailInfoFragment(),
+                EditAddressFragment(),
+                EditSaleFragment()
+            ),
+        )
+        viewModel.onInitPagerAdapter(addEditPagerAdapter.itemCount)
 
-        var cameraPictureUri: Uri? = null
+        binding.formPager.isUserInputEnabled = false
+        binding.formPager.adapter = addEditPagerAdapter
+        binding.formPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                viewModel.onPageChanged(position)
+            }
+        })
 
-        val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) {
-            viewModel.onPhotoPicked(uri = it)
-        }
-        val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) {
-            viewModel.onPhotoPicked(uri = cameraPictureUri, success = it)
-        }
+        binding.formSubmitButton.setOnClickListener { viewModel.onSubmitButtonClicked() }
 
-        viewModel.viewStateLiveData.observe(this) { binding.formToolbar.title = it }
+        viewModel.viewStateLiveData.observe(this) {
+            binding.formToolbar.title = it.toolbarTitle
+            binding.formSubmitButton.text = it.submitButtonText
+        }
 
         viewModel.formEventLiveData.observe(this) {
             when (it) {
                 FormEvent.ExitActivity -> finish()
-                FormEvent.ExitFragment -> supportFragmentManager.popBackStack()
+                is FormEvent.GoToPage -> binding.formPager.currentItem = it.pageToGo
                 is FormEvent.ShowDialog -> MaterialAlertDialogBuilder(this)
                     .setTitle(it.title)
                     .setMessage(it.message)
@@ -67,33 +71,13 @@ class FormActivity : AppCompatActivity() {
                         viewModel.onDialogNegativeButtonClicked(it.type)
                     }
                     .show()
-                FormEvent.ShowPicture -> supportFragmentManager.commit {
-                    replace<PictureFragment>(binding.formContainer.id)
-                    setReorderingAllowed(true)
-                    addToBackStack(null)
-                }
-                FormEvent.OpenGallery -> galleryLauncher.launch("image/*")
-                FormEvent.OpenCamera -> {
-                    cameraPictureUri = getCameraPictureUri()
-                    cameraLauncher.launch(cameraPictureUri)
-                }
+                FormEvent.ShowPicture -> startActivity(Intent(this, PictureActivity::class.java))
             }
         }
     }
 
-    private fun getCameraPictureUri(): Uri = FileProvider.getUriForFile(
-        this,
-        BuildConfig.APPLICATION_ID + ".provider",
-        File.createTempFile("tmp_camera_pic_", ".jpg")
-    )
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_form, menu)
-        return true
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        menu?.findItem(R.id.close_form)?.isVisible = supportFragmentManager.backStackEntryCount == 0
         return true
     }
 
@@ -110,6 +94,6 @@ class FormActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        viewModel.onGoBack(supportFragmentManager.backStackEntryCount)
+        viewModel.onGoBack()
     }
 }

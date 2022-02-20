@@ -2,8 +2,8 @@ package com.openclassrooms.realestatemanager.data.form
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import com.openclassrooms.realestatemanager.R
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -13,7 +13,6 @@ class FormRepository @Inject constructor() {
 
     companion object {
         private val DEFAULT_FORM = FormEntity(
-            displayedPage = 0,
             type = "",
             typeError = null,
             price = "",
@@ -54,9 +53,7 @@ class FormRepository @Inject constructor() {
         )
     }
 
-    private val formInfoMediatorLiveData = MediatorLiveData<FormInfoEntity>()
     private val formMutableLiveData = MutableLiveData<FormEntity>()
-    private val formPageCountMutableLiveData = MutableLiveData<Int>()
     private val exitRequestMutableLiveData = MutableLiveData<Boolean>()
     private val showPictureDialogMutableLiveData = MutableLiveData<PicturePicker?>()
     private val displayedPictureMutableLiveData = MutableLiveData<DisplayedPictureEntity?>()
@@ -65,37 +62,19 @@ class FormRepository @Inject constructor() {
     private var positionOfPictureToUpdate = -1
     private var displayedPicture: DisplayedPictureEntity? = null
 
-    init {
-        formInfoMediatorLiveData.addSource(formMutableLiveData) {
-            combineFormInfo(it, formPageCountMutableLiveData.value)
-        }
-        formInfoMediatorLiveData.addSource(formPageCountMutableLiveData) {
-            combineFormInfo(formMutableLiveData.value, it)
-        }
-    }
+    fun getFormLiveData(): LiveData<FormEntity> = formMutableLiveData
 
-    private fun combineFormInfo(form: FormEntity?, pageCount: Int?) {
-        val capturedInitialState = initialState
-
-        if (form == null || pageCount == null || capturedInitialState == null) {
-            return
-        }
-
-        formInfoMediatorLiveData.value = FormInfoEntity(
-            form = form,
-            pageCount = pageCount,
+    fun getFormInfoLiveData(): LiveData<FormInfoEntity> = Transformations.map(formMutableLiveData) {
+        FormInfoEntity(
+            form = it,
             type = if (initialState == DEFAULT_FORM) {
                 FormInfoEntity.FormType.ADD
             } else {
                 FormInfoEntity.FormType.EDIT
             },
-            hasModifications = form != capturedInitialState
+            hasModifications = it != initialState
         )
     }
-
-    fun getFormLiveData(): LiveData<FormEntity> = formMutableLiveData
-
-    fun getFormInfoLiveData(): LiveData<FormInfoEntity> = formInfoMediatorLiveData
 
     fun getCurrentForm(): FormEntity = currentState ?: throw NullPointerException(
         "The form has not been initialized. Please call initForm() before accessing it"
@@ -104,9 +83,7 @@ class FormRepository @Inject constructor() {
     fun initForm(form: FormEntity? = null) {
         initialState = form ?: DEFAULT_FORM
 
-        val startingForm = form ?: currentState ?: DEFAULT_FORM
-
-        setForm(startingForm.copy(displayedPage = 0)) // Always start form from the first page
+        setForm(form ?: currentState ?: DEFAULT_FORM)
     }
 
     fun setForm(form: FormEntity) {
@@ -123,10 +100,6 @@ class FormRepository @Inject constructor() {
 
     fun setPositionOfPictureToUpdate(position: Int) {
         positionOfPictureToUpdate = position
-    }
-
-    fun setPageCount(pageCount: Int) {
-        formPageCountMutableLiveData.value = pageCount
     }
 
     fun getExitFormLiveData(): LiveData<Boolean> = exitRequestMutableLiveData

@@ -4,7 +4,9 @@ sealed class FormEvent {
 
     object ExitActivity : FormEvent()
 
-    object ExitFragment : FormEvent()
+    data class GoToPage(
+        val pageToGo: Int,
+    ) : FormEvent()
 
     data class ShowDialog(
         val type: FormViewModel.DialogType,
@@ -15,8 +17,4 @@ sealed class FormEvent {
     ) : FormEvent()
 
     object ShowPicture : FormEvent()
-
-    object OpenGallery : FormEvent()
-
-    object OpenCamera : FormEvent()
 }

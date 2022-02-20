@@ -3,7 +3,6 @@ package com.openclassrooms.realestatemanager.ui.form.picture
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import com.openclassrooms.realestatemanager.data.form.DisplayedPictureEntity
 import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
@@ -18,15 +17,20 @@ class PictureViewModel @Inject constructor(
     private val setFormUseCase: SetFormUseCase,
 ) : ViewModel() {
 
-    private val viewStateMediatorLiveData = MediatorLiveData<DisplayedPictureEntity>()
-    val viewStateLiveData: LiveData<DisplayedPictureEntity> = viewStateMediatorLiveData
+    private val viewStateMediatorLiveData = MediatorLiveData<PictureViewState>()
+    val viewStateLiveData: LiveData<PictureViewState> = viewStateMediatorLiveData
     private val exitSingleLiveEvent = SingleLiveEvent<Unit>()
     val exitEventLiveData: LiveData<Unit> = exitSingleLiveEvent
 
     init {
         viewStateMediatorLiveData.addSource(getFormUseCase.getDisplayedPicture()) {
             if (it != null) {
-                viewStateMediatorLiveData.value = it
+                viewStateMediatorLiveData.value = PictureViewState(
+                    uri = it.uri,
+                    description = it.description,
+                    descriptionError = it.descriptionError,
+                    descriptionSelection = it.descriptionCursor
+                )
             }
         }
     }
@@ -42,7 +46,7 @@ class PictureViewModel @Inject constructor(
         }
     }
 
-    fun onFragmentViewDestroyed() {
+    fun onActivityFinished() {
         setFormUseCase.resetPicture()
     }
 }
