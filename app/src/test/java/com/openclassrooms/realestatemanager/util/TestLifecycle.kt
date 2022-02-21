@@ -2,7 +2,7 @@ package com.openclassrooms.realestatemanager.util
 
 import androidx.lifecycle.LiveData
 
-object TestLifecycleRule {
+object TestLifecycle {
     fun <T> getValueForTesting(liveData: LiveData<T>): T? {
         liveData.observeForever { }
         return liveData.value

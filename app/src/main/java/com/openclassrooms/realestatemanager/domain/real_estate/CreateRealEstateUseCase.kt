@@ -37,10 +37,9 @@ class CreateRealEstateUseCase @Inject constructor(
                 zipcode = form.zipcode,
                 country = form.country,
                 pointsOfInterests = form.pointsOfInterests.map { PointOfInterest.fromLabelId(it).name },
-                agentName = agentRepository.getAgentByName(form.agentName)?.id,
+                agentId = agentRepository.getAgentByName(form.agentName)?.id,
                 marketEntryDate = form.marketEntryDate,
                 saleDate = form.saleDate.ifEmpty { null },
-                isAvailableForSale = form.isAvailableForSale
             )
         )
     }

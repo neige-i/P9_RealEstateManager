@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
+import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase.PageToCheck
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
@@ -40,7 +41,7 @@ class PictureViewModel @Inject constructor(
     }
 
     fun onSaveMenuItemClicked() {
-        if (checkFormErrorUseCase.containsNoError(CheckFormErrorUseCase.PageToCheck.PICTURE)) {
+        if (checkFormErrorUseCase.containsNoError(PageToCheck.PICTURE)) {
             setFormUseCase.savePicture()
             exitSingleLiveEvent.call()
         }

@@ -22,8 +22,7 @@ data class RealEstateEntity(
     val zipcode: String,
     val country: String,
     @ColumnInfo(name = "points_of_interests") val pointsOfInterests: List<String>,
-    @ColumnInfo(name = "agent_name") val agentName: String?,
+    @ColumnInfo(name = "agent_id") val agentId: String?,
     @ColumnInfo(name = "market_entry_date") val marketEntryDate: String,
     @ColumnInfo(name = "sale_date") val saleDate: String?,
-    @ColumnInfo(name = "is_available_for_sale") val isAvailableForSale: Boolean,
 )
