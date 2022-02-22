@@ -8,14 +8,7 @@ import javax.inject.Singleton
 @Singleton
 class ActionRepository @Inject constructor() {
 
-    private val exitMutableLiveData = MutableLiveData<Boolean>()
     private val imagePickerMutableLiveData = MutableLiveData<ImagePicker?>()
-
-    fun getExitLiveData(): LiveData<Boolean> = exitMutableLiveData
-
-    fun setExit(exit: Boolean) {
-        exitMutableLiveData.value = exit
-    }
 
     fun getImagePickerLiveData(): LiveData<ImagePicker?> = imagePickerMutableLiveData
 

@@ -24,41 +24,15 @@ class GetFormRequestUseCaseTest {
 
     private lateinit var getFormRequestUseCase: GetFormRequestUseCase
 
-    private val exitMutableLiveData = MutableLiveData<Boolean>()
     private val imagePickerMutableLiveData = MutableLiveData<ImagePicker>()
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
 
-        every { mockActionRepository.getExitLiveData() } returns exitMutableLiveData
         every { mockActionRepository.getImagePickerLiveData() } returns imagePickerMutableLiveData
 
         getFormRequestUseCase = GetFormRequestUseCase(mockActionRepository)
-    }
-
-    @Test
-    fun `return true when get exit request with true value`() {
-        // GIVEN
-        exitMutableLiveData.value = true
-
-        // WHEN
-        val exitRequest = getValueForTesting(getFormRequestUseCase.getExit())
-
-        // THEN
-        assertEquals(true, exitRequest)
-    }
-
-    @Test
-    fun `return false when get exit request with false value`() {
-        // GIVEN
-        exitMutableLiveData.value = false
-
-        // WHEN
-        val exitRequest = getValueForTesting(getFormRequestUseCase.getExit())
-
-        // THEN
-        assertEquals(false, exitRequest)
     }
 
     @Test

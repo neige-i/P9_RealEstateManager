@@ -8,10 +8,6 @@ class SetFormRequestUseCase @Inject constructor(
     private val actionRepository: ActionRepository,
 ) {
 
-    fun exit(exit: Boolean) {
-        actionRepository.setExit(exit)
-    }
-
     fun pickImage(position: Int?) {
         actionRepository.setImagePicker(position?.let { ImagePicker.values()[it] })
     }

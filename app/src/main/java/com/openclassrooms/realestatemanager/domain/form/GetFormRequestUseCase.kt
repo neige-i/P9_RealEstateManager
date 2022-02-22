@@ -9,7 +9,5 @@ class GetFormRequestUseCase @Inject constructor(
     private val actionRepository: ActionRepository,
 ) {
 
-    fun getExit(): LiveData<Boolean> = actionRepository.getExitLiveData()
-
     fun getImagePicker(): LiveData<ImagePicker?> = actionRepository.getImagePickerLiveData()
 }

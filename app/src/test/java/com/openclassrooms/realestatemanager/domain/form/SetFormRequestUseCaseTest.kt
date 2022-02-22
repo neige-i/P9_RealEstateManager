@@ -27,7 +27,6 @@ class SetFormRequestUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this)
 
-        justRun { mockActionRepository.setExit(any()) }
         justRun { mockActionRepository.setImagePicker(any()) }
 
         setFormRequestUseCase = SetFormRequestUseCase(mockActionRepository)
@@ -36,24 +35,6 @@ class SetFormRequestUseCaseTest {
     @After
     fun tearDown() {
         confirmVerified(mockActionRepository)
-    }
-
-    @Test
-    fun `call setExit(true) when exit with true value`() {
-        // WHEN
-        setFormRequestUseCase.exit(true)
-
-        // THEN
-        verify(exactly = 1) { mockActionRepository.setExit(true) }
-    }
-
-    @Test
-    fun `call setExit(false) when exit with false value`() {
-        // WHEN
-        setFormRequestUseCase.exit(false)
-
-        // THEN
-        verify(exactly = 1) { mockActionRepository.setExit(false) }
     }
 
     @Test

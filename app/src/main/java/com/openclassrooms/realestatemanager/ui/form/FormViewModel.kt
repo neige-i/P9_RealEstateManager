@@ -6,7 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openclassrooms.realestatemanager.R
-import com.openclassrooms.realestatemanager.domain.form.*
+import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
+import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
+import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.CreateRealEstateUseCase
 import com.openclassrooms.realestatemanager.ui.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
@@ -18,10 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class FormViewModel @Inject constructor(
     private val getFormUseCase: GetFormUseCase,
-    getFormRequestUseCase: GetFormRequestUseCase,
     private val checkFormErrorUseCase: CheckFormErrorUseCase,
     private val setFormUseCase: SetFormUseCase,
-    private val setFormRequestUseCase: SetFormRequestUseCase,
     private val createRealEstateUseCase: CreateRealEstateUseCase,
     private val coroutineProvider: CoroutineProvider,
     private val application: Application,
@@ -41,13 +41,6 @@ class FormViewModel @Inject constructor(
         formSingleLiveEvent.addSource(getFormUseCase.getCurrentPicture()) {
             if (it != null) {
                 formSingleLiveEvent.value = FormEvent.ShowPicture
-            }
-        }
-
-        formSingleLiveEvent.addSource(getFormRequestUseCase.getExit()) {
-            if (it) {
-                setFormRequestUseCase.exit(false) // Reset flag
-                formSingleLiveEvent.value = FormEvent.ExitActivity
             }
         }
     }
@@ -103,7 +96,7 @@ class FormViewModel @Inject constructor(
 
             withContext(coroutineProvider.getMainDispatcher()) {
                 setFormUseCase.reset()
-                setFormRequestUseCase.exit(true)
+                formSingleLiveEvent.value = FormEvent.ExitActivity
             }
         }
     }

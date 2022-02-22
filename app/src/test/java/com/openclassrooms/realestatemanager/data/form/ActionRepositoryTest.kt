@@ -15,26 +15,6 @@ class ActionRepositoryTest {
     private val actionRepository = ActionRepository()
 
     @Test
-    fun `trigger exit request when set value to true`() {
-        // WHEN
-        actionRepository.setExit(true)
-        val exitRequest = getValueForTesting(actionRepository.getExitLiveData())
-
-        // THEN
-        assertEquals(true, exitRequest)
-    }
-
-    @Test
-    fun `reset exit request when set value to false`() {
-        // WHEN
-        actionRepository.setExit(false)
-        val exitRequest = getValueForTesting(actionRepository.getExitLiveData())
-
-        // THEN
-        assertEquals(false, exitRequest)
-    }
-
-    @Test
     fun `trigger image picker request when set value`() {
         // WHEN
         actionRepository.setImagePicker(ImagePicker.CAMERA) // Arbitrary value
