@@ -3,20 +3,20 @@ package com.openclassrooms.realestatemanager.ui.form.image_launcher
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.lifecycle.ViewModelProvider
 import com.openclassrooms.realestatemanager.BuildConfig
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 
 @AndroidEntryPoint
-open class ImageLauncherActivity : AppCompatActivity() {
+abstract class ImageLauncherActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val viewModel = ViewModelProvider(this).get(ImageLauncherViewModel::class.java)
+        val viewModel: ImageLauncherViewModel by viewModels()
 
         var cameraPictureUri: Uri? = null
 

@@ -1,99 +1,148 @@
 package com.openclassrooms.realestatemanager.data.form
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.openclassrooms.realestatemanager.util.TestLifecycle.getValueForTesting
+import android.net.Uri
 import io.mockk.mockk
-import org.junit.Assert.*
-import org.junit.Rule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class CurrentPictureRepositoryTest {
 
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
-
     private val currentPictureRepository = CurrentPictureRepository()
 
     companion object {
-        private val TEST_PICTURE = CurrentPictureEntity(
-            uri = mockk(),
-            description = "Lounge",
+        // region IN
+        private val DEFAULT_URI = mockk<Uri>()
+        private const val DEFAULT_DESCRIPTION = "Lounge"
+        // endregion IN
+
+        // region OUT
+        private val DEFAULT_PICTURE = CurrentPictureEntity(
+            uri = DEFAULT_URI,
+            description = DEFAULT_DESCRIPTION,
             descriptionError = null,
-            descriptionCursor = 0
+            descriptionCursor = 0,
+        )
+        // endregion OUT
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun `return null picture when initialize repository`() = runTest {
+        val pictureAsync = currentPictureRepository.getCurrentPictureFlow().first()
+        val pictureSync = currentPictureRepository.getCurrentPicture()
+
+        // THEN
+        assertNull(pictureAsync)
+        assertNull(pictureSync)
+    }
+
+    @Test
+    fun `return initial picture when initialize`() {
+        // WHEN
+        initDefaultPicture()
+        val picture = currentPictureRepository.getCurrentPicture()
+
+        // THEN
+        assertEquals(DEFAULT_PICTURE, picture)
+    }
+
+    @Test
+    fun `change uri when set a new uri`() {
+        // GIVEN
+        initDefaultPicture()
+
+        // WHEN
+        val newUri = mockk<Uri>()
+        currentPictureRepository.setUri(newUri)
+        val picture = currentPictureRepository.getCurrentPicture()
+
+        // THEN
+        assertEquals(
+            DEFAULT_PICTURE.copy(uri = newUri),
+            picture
         )
     }
 
     @Test
-    fun `return picture when observe after setting a non-null value`() {
-        // GIVEN
-        currentPictureRepository.setCurrentPicture(TEST_PICTURE)
-
+    fun `return null when set a new uri on a null picture`() {
         // WHEN
-        val resultPicture = getValueForTesting(currentPictureRepository.getCurrentPictureLiveData())
+        currentPictureRepository.setUri(mockk())
+        val picture = currentPictureRepository.getCurrentPicture()
 
         // THEN
-        assertEquals(TEST_PICTURE, resultPicture)
+        assertNull(picture)
     }
 
     @Test
-    fun `return null when observe after setting a null value`() {
+    fun `change change when set a new description`() {
         // GIVEN
-        currentPictureRepository.setCurrentPicture(null)
+        initDefaultPicture()
 
         // WHEN
-        val resultPicture = getValueForTesting(currentPictureRepository.getCurrentPictureLiveData())
+        currentPictureRepository.setDescription("Bedroom", 4)
+        val picture = currentPictureRepository.getCurrentPicture()
 
         // THEN
-        assertNull(resultPicture)
+        assertEquals(
+            DEFAULT_PICTURE.copy(description = "Bedroom", descriptionCursor = 4),
+            picture
+        )
     }
 
     @Test
-    fun `return picture when safely fetch after setting a non-null value`() {
-        // GIVEN
-        currentPictureRepository.setCurrentPicture(TEST_PICTURE)
-
+    fun `return null when set a new description on a null picture`() {
         // WHEN
-        val safePicture = currentPictureRepository.getCurrentPicture()
+        currentPictureRepository.setDescription("Bedroom", 4)
+        val picture = currentPictureRepository.getCurrentPicture()
 
         // THEN
-        assertEquals(TEST_PICTURE, safePicture)
+        assertNull(picture)
     }
 
     @Test
-    fun `return null when safely fetch after setting a null value`() {
+    fun `change description error when set a new error`() {
         // GIVEN
-        currentPictureRepository.setCurrentPicture(null)
+        initDefaultPicture()
 
         // WHEN
-        val safePicture = currentPictureRepository.getCurrentPicture()
+        currentPictureRepository.setDescriptionError("This is an error")
+        val picture = currentPictureRepository.getCurrentPicture()
 
         // THEN
-        assertNull(safePicture)
+        assertEquals(
+            DEFAULT_PICTURE.copy(descriptionError = "This is an error"),
+            picture
+        )
     }
 
     @Test
-    fun `return picture when unsafely fetch after setting a non-null value`() {
-        // GIVEN
-        currentPictureRepository.setCurrentPicture(TEST_PICTURE)
-
+    fun `return null when set a description error on a null picture`() {
         // WHEN
-        val unSafePicture = currentPictureRepository.getNonNullCurrentPicture()
+        currentPictureRepository.setDescriptionError("This is an error")
+        val picture = currentPictureRepository.getCurrentPicture()
 
         // THEN
-        assertEquals(TEST_PICTURE, unSafePicture)
+        assertNull(picture)
     }
 
     @Test
-    fun `throw exception when unsafely fetch after setting a null value`() {
+    fun `return null when reset picture`() {
         // GIVEN
-        currentPictureRepository.setCurrentPicture(null)
+        initDefaultPicture()
 
         // WHEN
-        val exception = assertThrows(IllegalStateException::class.java) {
-            currentPictureRepository.getNonNullCurrentPicture()
-        }
+        currentPictureRepository.reset()
+        val picture = currentPictureRepository.getCurrentPicture()
 
         // THEN
-        assertEquals("Picture is not initialized!", exception.message)
+        assertNull(picture)
+    }
+
+    private fun initDefaultPicture() {
+        currentPictureRepository.initPicture(DEFAULT_URI, DEFAULT_DESCRIPTION)
     }
 }

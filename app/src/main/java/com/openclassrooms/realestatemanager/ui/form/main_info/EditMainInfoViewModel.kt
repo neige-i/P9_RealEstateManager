@@ -1,19 +1,22 @@
 package com.openclassrooms.realestatemanager.ui.form.main_info
 
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
+import com.openclassrooms.realestatemanager.ui.CoroutineProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
 class EditMainInfoViewModel @Inject constructor(
     getFormUseCase: GetFormUseCase,
     private val setFormUseCase: SetFormUseCase,
+    coroutineProvider: CoroutineProvider,
 ) : ViewModel() {
 
-    val viewStateLiveData = Transformations.map(getFormUseCase.getForm()) {
+    val viewStateLiveData = getFormUseCase.getFormFlow().map {
         MainInfoViewState(
             selectedType = it.type,
             typeError = it.typeError,
@@ -25,7 +28,7 @@ class EditMainInfoViewModel @Inject constructor(
             bathroomCount = it.bathroomCount.toString(),
             bedroomCount = it.bedroomCount.toString()
         )
-    }
+    }.asLiveData(coroutineProvider.getIoDispatcher())
 
     fun onTypeSelected(selectedType: String) {
         setFormUseCase.updateType(selectedType)

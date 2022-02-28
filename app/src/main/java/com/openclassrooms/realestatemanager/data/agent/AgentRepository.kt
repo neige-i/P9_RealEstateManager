@@ -1,7 +1,7 @@
 package com.openclassrooms.realestatemanager.data.agent
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,9 +14,8 @@ class AgentRepository @Inject constructor() {
         AgentEntity("3", "Agent Z"),
         AgentEntity("4", "Agent L"),
     )
-    private val agentListMutableLiveData = MutableLiveData(agentList)
 
-    fun getAgentList(): LiveData<List<AgentEntity>> = agentListMutableLiveData
+    fun getAgentListFlow(): Flow<List<AgentEntity>> = flowOf(agentList)
 
     fun getAgentByName(agentName: String): AgentEntity? = agentList.firstOrNull {
         agentName == it.name

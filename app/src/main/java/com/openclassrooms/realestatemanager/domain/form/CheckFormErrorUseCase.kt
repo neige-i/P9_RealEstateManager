@@ -19,7 +19,7 @@ class CheckFormErrorUseCase @Inject constructor(
     fun containsNoError(pageToCheck: PageToCheck): Boolean = containsNoError(pageToCheck.ordinal)
 
     fun containsNoError(pageToCheck: Int): Boolean {
-        val form = formRepository.getNonNullForm()
+        val form = formRepository.getForm()
 
         return when (PageToCheck.values()[pageToCheck]) {
             PageToCheck.MAIN -> containsNoMainError(form)
@@ -37,7 +37,7 @@ class CheckFormErrorUseCase @Inject constructor(
             null
         }
 
-        formRepository.setForm(form.copy(typeError = typeError))
+        formRepository.setTypeError(typeError)
 
         return typeError == null
     }
@@ -49,13 +49,14 @@ class CheckFormErrorUseCase @Inject constructor(
             null
         }
 
-        formRepository.setForm(form.copy(pictureListError = pictureListError))
+        formRepository.setPictureListError(pictureListError)
 
         return pictureListError == null
     }
 
     private fun containsNoPictureError(): Boolean {
-        val picture = currentPictureRepository.getNonNullCurrentPicture()
+        val picture = currentPictureRepository.getCurrentPicture()
+            ?: throw IllegalStateException("Picture shouldn't be null when checking for errors")
 
         val descriptionError = if (picture.description.isBlank()) {
             appContext.getString(R.string.error_mandatory_field)
@@ -63,7 +64,7 @@ class CheckFormErrorUseCase @Inject constructor(
             null
         }
 
-        currentPictureRepository.setCurrentPicture(picture.copy(descriptionError = descriptionError))
+        currentPictureRepository.setDescriptionError(descriptionError)
 
         return descriptionError == null
     }
@@ -99,15 +100,11 @@ class CheckFormErrorUseCase @Inject constructor(
             else -> null
         }
 
-        formRepository.setForm(
-            form.copy(
-                streetNameError = streetNameError,
-                cityError = cityError,
-                stateError = stateError,
-                zipcodeError = zipcodeError,
-                countryError = countryError,
-            )
-        )
+        formRepository.setStreetNameError(streetNameError)
+        formRepository.setCityError(cityError)
+        formRepository.setStateError(stateError)
+        formRepository.setZipcodeError(zipcodeError)
+        formRepository.setCountryError(countryError)
 
         return streetNameError == null && cityError == null && stateError == null &&
                 zipcodeError == null && countryError == null
@@ -134,12 +131,8 @@ class CheckFormErrorUseCase @Inject constructor(
             else -> null
         }
 
-        formRepository.setForm(
-            form.copy(
-                marketEntryDateError = marketEntryDateError,
-                saleDateError = saleDateError
-            )
-        )
+        formRepository.setEntryDateError(marketEntryDateError)
+        formRepository.setSaleDateError(saleDateError)
 
         return marketEntryDateError == null && saleDateError == null
     }

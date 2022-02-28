@@ -3,8 +3,8 @@ package com.openclassrooms.realestatemanager.ui.form.sale
 import android.app.Application
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.UtilsRepository
 import com.openclassrooms.realestatemanager.data.agent.AgentEntity
@@ -12,8 +12,10 @@ import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.domain.GetAgentListUseCase
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
+import com.openclassrooms.realestatemanager.ui.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.combine
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
@@ -28,38 +30,19 @@ class EditSaleViewModel @Inject constructor(
     private val defaultClock: Clock,
     private val defaultZoneId: ZoneId,
     private val utilsRepository: UtilsRepository,
+    coroutineProvider: CoroutineProvider,
     private val application: Application,
 ) : ViewModel() {
 
-    private val viewStateMediatorLiveData = MediatorLiveData<SaleViewState>()
-    val viewStateLiveData: LiveData<SaleViewState> = viewStateMediatorLiveData
-    private val showDatePickerSingleLiveEvent = SingleLiveEvent<ShowDatePickerEvent>()
-    val showDatePickerEventLiveData: LiveData<ShowDatePickerEvent> = showDatePickerSingleLiveEvent
-
-    private var currentForm: FormEntity? = null
-
-    init {
-        val formLiveData = getFormUseCase.getForm()
-        val agentListLiveData = getAgentListUseCase()
-
-        viewStateMediatorLiveData.addSource(formLiveData) {
-            combine(it, agentListLiveData.value)
-        }
-        viewStateMediatorLiveData.addSource(agentListLiveData) {
-            combine(formLiveData.value, it)
-        }
-    }
-
-    private fun combine(form: FormEntity?, agentList: List<AgentEntity>?) {
-        if (form == null || agentList == null) {
-            return
-        }
-
+    val viewStateLiveData: LiveData<SaleViewState> = combine(
+        getFormUseCase.getFormFlow(),
+        getAgentListUseCase()
+    ) { form: FormEntity, agentList: List<AgentEntity> ->
         currentForm = form
 
         val agentNameList = agentList.map { it.name }
 
-        viewStateMediatorLiveData.value = SaleViewState(
+        SaleViewState(
             agentEntries = agentNameList,
             selectedAgentName = agentNameList.firstOrNull { it == form.agentName } ?: "",
             marketEntryDate = form.marketEntryDate,
@@ -68,7 +51,11 @@ class EditSaleViewModel @Inject constructor(
             saleDateError = form.saleDateError,
             isAvailableForSale = form.isAvailableForSale
         )
-    }
+    }.asLiveData(coroutineProvider.getIoDispatcher())
+    private val showDatePickerSingleLiveEvent = SingleLiveEvent<ShowDatePickerEvent>()
+    val showDatePickerEventLiveData: LiveData<ShowDatePickerEvent> = showDatePickerSingleLiveEvent
+
+    private lateinit var currentForm: FormEntity
 
     fun onAgentSelected(agentName: String) {
         setFormUseCase.updateAgent(agentName)
@@ -78,7 +65,7 @@ class EditSaleViewModel @Inject constructor(
         setDatePickerInfo(
             datePickerType = DatePickerType.ENTRY_DATE,
             titleId = R.string.picker_title_market_entry,
-            dateString = currentForm?.marketEntryDate
+            dateString = currentForm.marketEntryDate
         )
     }
 
@@ -86,7 +73,7 @@ class EditSaleViewModel @Inject constructor(
         setDatePickerInfo(
             datePickerType = DatePickerType.SALE_DATE,
             titleId = R.string.picker_title_sale,
-            dateString = currentForm?.saleDate
+            dateString = currentForm.saleDate
         )
     }
 
@@ -122,10 +109,6 @@ class EditSaleViewModel @Inject constructor(
 
     fun onAvailabilitySwitched(isAvailable: Boolean) {
         setFormUseCase.updateAvailability(isAvailable)
-
-        if (!isAvailable) {
-            setFormUseCase.updateSaleDate("")
-        }
     }
 
     enum class DatePickerType {

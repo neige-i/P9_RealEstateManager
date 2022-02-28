@@ -1,10 +1,11 @@
 package com.openclassrooms.realestatemanager.domain.form
 
-import androidx.lifecycle.LiveData
 import com.openclassrooms.realestatemanager.data.form.CurrentPictureEntity
 import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 import javax.inject.Inject
 
 class GetFormUseCase @Inject constructor(
@@ -12,24 +13,24 @@ class GetFormUseCase @Inject constructor(
     private val currentPictureRepository: CurrentPictureRepository,
 ) {
 
-    fun getForm(): LiveData<FormEntity> = formRepository.getFormLiveData()
+    fun getFormFlow(): Flow<FormEntity> = formRepository.getFormFlow()
 
-    fun getCurrentState(): FormEntity = formRepository.getNonNullForm()
+    fun getFormInfo(): FormInfo {
+        val initialState = formRepository.getInitialState()
+        val currentState = formRepository.getForm()
 
-    fun getType(): FormType =
-        if (FormRepository.DEFAULT_FORM == formRepository.getInitialState()) {
-            FormType.ADD
-        } else {
-            FormType.EDIT
-        }
-
-    fun isModified(): Boolean = formRepository.getNonNullForm() != formRepository.getInitialState()
-
-    fun getCurrentPicture(): LiveData<CurrentPictureEntity?> =
-        currentPictureRepository.getCurrentPictureLiveData()
-
-    enum class FormType {
-        ADD,
-        EDIT,
+        return FormInfo(
+            formType = if (FormRepository.DEFAULT_FORM == initialState) {
+                FormInfo.FormType.ADD
+            } else {
+                FormInfo.FormType.EDIT
+            },
+            isModified = currentState != initialState,
+            estateType = currentState.type
+        )
     }
+
+    fun getCurrentPictureFlow(): Flow<CurrentPictureEntity> = currentPictureRepository
+        .getCurrentPictureFlow()
+        .filterNotNull()
 }

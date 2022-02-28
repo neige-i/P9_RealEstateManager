@@ -1,25 +1,26 @@
 package com.openclassrooms.realestatemanager.domain.form
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.MutableLiveData
 import com.openclassrooms.realestatemanager.data.form.CurrentPictureEntity
 import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
-import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
-import com.openclassrooms.realestatemanager.util.TestLifecycle.getValueForTesting
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import com.openclassrooms.realestatemanager.util.TestCoroutineRule
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import org.junit.Assert.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
+import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class GetFormUseCaseTest {
 
     @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
+    val testCoroutineRule = TestCoroutineRule()
 
     @MockK
     private lateinit var mockFormRepository: FormRepository
@@ -29,120 +30,140 @@ class GetFormUseCaseTest {
 
     private lateinit var getFormUseCase: GetFormUseCase
 
-    private val formMutableLiveData = MutableLiveData<FormEntity>()
-    private val currentPictureMutableLiveData = MutableLiveData<CurrentPictureEntity>()
-
     companion object {
-        // OUT
-        private val CURRENT_STATE = FormRepository.DEFAULT_FORM.copy(
-            type = "Big house",
-            price = "430789.97"
-        )
-        private val INITIAL_STATE = FormRepository.DEFAULT_FORM
+        // region IN
+        private val CURRENT_FORM = FormRepository.DEFAULT_FORM.copy(type = "Big house")
         private val TEST_PICTURE = CurrentPictureEntity(
             uri = mockk(),
             description = "Lounge",
             descriptionError = null,
             descriptionCursor = 0
         )
+        // endregion IN
     }
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
 
-        every { mockFormRepository.getFormLiveData() } returns formMutableLiveData
-        every { mockFormRepository.getNonNullForm() } returns CURRENT_STATE
-        every { mockFormRepository.getInitialState() } returns INITIAL_STATE
-        every { mockCurrentPictureRepository.getCurrentPictureLiveData() } returns currentPictureMutableLiveData
+        every { mockFormRepository.getFormFlow() } returns flowOf(CURRENT_FORM)
+        every { mockFormRepository.getForm() } returns CURRENT_FORM
+        every { mockFormRepository.getInitialState() } returns FormRepository.DEFAULT_FORM
+        every { mockCurrentPictureRepository.getCurrentPictureFlow() } returns flowOf(TEST_PICTURE)
 
         getFormUseCase = GetFormUseCase(mockFormRepository, mockCurrentPictureRepository)
     }
 
+    @After
+    fun tearDown() {
+        confirmVerified(mockFormRepository, mockCurrentPictureRepository)
+    }
+
     @Test
-    fun `return form when get LiveData`() {
+    fun `return form when collect value`() = runTest {
+        // WHEN
+        val form = getFormUseCase.getFormFlow().first()
+
+        // THEN
+        assertEquals(CURRENT_FORM, form)
+
+        verify(exactly = 1) { mockFormRepository.getFormFlow() }
+    }
+
+    @Test
+    fun `return modified ADD form info when collect value`() {
+        // WHEN
+        val formInfo = getFormUseCase.getFormInfo()
+
+        // THEN
+        assertEquals(
+            FormInfo(
+                formType = FormInfo.FormType.ADD,
+                isModified = true,
+                estateType = "Big house"
+            ),
+            formInfo
+        )
+
+        verify(exactly = 1) { mockFormRepository.getForm() }
+        verify(exactly = 1) { mockFormRepository.getInitialState() }
+    }
+
+    @Test
+    fun `return unmodified ADD form info when collect value`() {
         // GIVEN
-        formMutableLiveData.value = INITIAL_STATE
+        every { mockFormRepository.getForm() } returns FormRepository.DEFAULT_FORM
 
         // WHEN
-        val resultForm = getValueForTesting(getFormUseCase.getForm())
+        val formInfo = getFormUseCase.getFormInfo()
 
         // THEN
-        assertEquals(INITIAL_STATE, resultForm)
+        assertEquals(
+            FormInfo(
+                formType = FormInfo.FormType.ADD,
+                isModified = false,
+                estateType = ""
+            ),
+            formInfo
+        )
+
+        verify(exactly = 1) { mockFormRepository.getForm() }
+        verify(exactly = 1) { mockFormRepository.getInitialState() }
     }
 
     @Test
-    fun `return non-null form when get current state`() {
-        // WHEN
-        val resultForm = getFormUseCase.getCurrentState()
-
-        // THEN
-        assertEquals(CURRENT_STATE, resultForm)
-    }
-
-    @Test
-    fun `return ADD form type when get initial state with default form`() {
-        // WHEN
-        val resultType = getFormUseCase.getType()
-
-        // THEN
-        assertEquals(GetFormUseCase.FormType.ADD, resultType)
-    }
-
-    @Test
-    fun `return EDIT form type when get initial state with different default form`() {
+    fun `return modified EDIT form info when collect value`() {
         // GIVEN
-        every { mockFormRepository.getInitialState() } returns CURRENT_STATE
+        every { mockFormRepository.getInitialState() } returns CURRENT_FORM
+        every { mockFormRepository.getForm() } returns CURRENT_FORM.copy(type = "Very big house")
 
         // WHEN
-        val resultType = getFormUseCase.getType()
+        val formInfo = getFormUseCase.getFormInfo()
 
         // THEN
-        assertEquals(GetFormUseCase.FormType.EDIT, resultType)
+        assertEquals(
+            FormInfo(
+                formType = FormInfo.FormType.EDIT,
+                isModified = true,
+                estateType = "Very big house"
+            ),
+            formInfo
+        )
+
+        verify(exactly = 1) { mockFormRepository.getForm() }
+        verify(exactly = 1) { mockFormRepository.getInitialState() }
     }
 
     @Test
-    fun `return true when form is modified`() {
-        // WHEN
-        val hasModifications = getFormUseCase.isModified()
-
-        // THEN
-        assertTrue(hasModifications)
-    }
-
-    @Test
-    fun `return false when form is not modified`() {
+    fun `return unmodified EDIT form info when collect value`() {
         // GIVEN
-        every { mockFormRepository.getNonNullForm() } returns INITIAL_STATE
+        every { mockFormRepository.getInitialState() } returns CURRENT_FORM
 
         // WHEN
-        val hasModifications = getFormUseCase.isModified()
+        val formInfo = getFormUseCase.getFormInfo()
 
         // THEN
-        assertFalse(hasModifications)
+        assertEquals(
+            FormInfo(
+                formType = FormInfo.FormType.EDIT,
+                isModified = false,
+                estateType = "Big house"
+            ),
+            formInfo
+        )
+
+        verify(exactly = 1) { mockFormRepository.getForm() }
+        verify(exactly = 1) { mockFormRepository.getInitialState() }
     }
 
     @Test
-    fun `return current picture when get LiveData with non-null value`() {
-        // GIVEN
-        currentPictureMutableLiveData.value = TEST_PICTURE
-
+    fun `return current picture when get async with non-null value`() = runTest {
         // WHEN
-        val pictureResult = getValueForTesting(getFormUseCase.getCurrentPicture())
+        val picture = getFormUseCase.getCurrentPictureFlow().first()
 
         // THEN
-        assertEquals(TEST_PICTURE, pictureResult)
-    }
+        assertEquals(TEST_PICTURE, picture)
 
-    @Test
-    fun `return null when get LiveData with null value`() {
-        // GIVEN
-        currentPictureMutableLiveData.value = null
-
-        // WHEN
-        val pictureResult = getValueForTesting(getFormUseCase.getCurrentPicture())
-
-        // THEN
-        assertNull(pictureResult)
+        verify(exactly = 1) { mockCurrentPictureRepository.getCurrentPictureFlow() }
     }
 }

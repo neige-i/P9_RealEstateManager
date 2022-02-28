@@ -2,29 +2,32 @@ package com.openclassrooms.realestatemanager.ui.form.image_launcher
 
 import android.net.Uri
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import com.openclassrooms.realestatemanager.data.form.ActionRepository
 import com.openclassrooms.realestatemanager.data.form.ImagePicker
-import com.openclassrooms.realestatemanager.domain.form.GetFormRequestUseCase
-import com.openclassrooms.realestatemanager.domain.form.SetFormRequestUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
+import com.openclassrooms.realestatemanager.ui.CoroutineProvider
+import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class ImageLauncherViewModel @Inject constructor(
-    getFormRequestUseCase: GetFormRequestUseCase,
+    private val actionRepository: ActionRepository,
     private val setFormUseCase: SetFormUseCase,
-    private val setFormRequestUseCase: SetFormRequestUseCase,
+    coroutineProvider: CoroutineProvider,
 ) : ViewModel() {
 
-    private val imageLauncherSingleLiveEvent = MediatorLiveData<ImageLauncherEvent>()
+    private val imageLauncherSingleLiveEvent = SingleLiveEvent<ImageLauncherEvent>()
     val imageLauncherEventLiveData: LiveData<ImageLauncherEvent> = imageLauncherSingleLiveEvent
 
     init {
-        imageLauncherSingleLiveEvent.addSource(getFormRequestUseCase.getImagePicker()) {
+        imageLauncherSingleLiveEvent.addSource(
+            actionRepository.getImagePickerFlow().asLiveData(coroutineProvider.getIoDispatcher())
+        ) {
             if (it != null) {
-                setFormRequestUseCase.pickImage(null) // Reset flag
+                actionRepository.flushImagePickerFlow()
 
                 imageLauncherSingleLiveEvent.value = when (it) {
                     ImagePicker.GALLERY -> ImageLauncherEvent.OpenGallery

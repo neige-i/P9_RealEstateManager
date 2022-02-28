@@ -1,26 +1,24 @@
 package com.openclassrooms.realestatemanager.ui.form.detail_info
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
+import com.openclassrooms.realestatemanager.ui.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
 class EditDetailInfoViewModel @Inject constructor(
     getFormUseCase: GetFormUseCase,
     private val setFormUseCase: SetFormUseCase,
+    coroutineProvider: CoroutineProvider,
 ) : ViewModel() {
 
-    val viewStateLiveData = Transformations.map(getFormUseCase.getForm()) {
-
-        it.pictureListError?.let { errorMessage ->
-            showErrorSingleLiveEvent.value = errorMessage
-            setFormUseCase.resetPictureError()
-        }
+    val viewStateLiveData = getFormUseCase.getFormFlow().map {
 
         val photoList = mutableListOf<DetailInfoViewState.PhotoViewState>()
         it.pictureList.forEach { picture ->
@@ -38,21 +36,32 @@ class EditDetailInfoViewModel @Inject constructor(
             descriptionSelection = it.descriptionCursor,
             photoList = photoList
         )
-    }
+    }.asLiveData(coroutineProvider.getIoDispatcher())
     private val showErrorSingleLiveEvent = SingleLiveEvent<String>()
     val showErrorEventLiveData: LiveData<String> = showErrorSingleLiveEvent
+
+    init {
+        showErrorSingleLiveEvent.addSource(
+            getFormUseCase.getFormFlow().asLiveData(coroutineProvider.getIoDispatcher())
+        ) {
+            it.pictureListError?.let { errorMessage ->
+                showErrorSingleLiveEvent.value = errorMessage
+                setFormUseCase.resetPictureError()
+            }
+        }
+    }
 
     fun onDescriptionChanged(description: String?, cursorPosition: Int) {
         setFormUseCase.updateDescription(description ?: "", cursorPosition)
     }
 
     fun onPhotoAdded(position: Int) {
-        setFormUseCase.setPicturePosition(position)
+        setFormUseCase.updatePicturePosition(position)
     }
 
     fun onPhotoOpened(position: Int, picture: DetailInfoViewState.PhotoViewState.Picture) {
-        setFormUseCase.setPicturePosition(position)
-        setFormUseCase.initPicture(picture.uri, picture.description)
+        setFormUseCase.updatePicturePosition(position)
+        setFormUseCase.setPicture(picture.uri, picture.description)
     }
 
     fun onPhotoRemoved(position: Int) {

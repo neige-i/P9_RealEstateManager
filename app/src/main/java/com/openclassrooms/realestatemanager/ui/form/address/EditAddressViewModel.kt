@@ -1,21 +1,25 @@
 package com.openclassrooms.realestatemanager.ui.form.address
 
 import androidx.annotation.StringRes
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import com.openclassrooms.realestatemanager.data.PointOfInterest
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
+import com.openclassrooms.realestatemanager.ui.CoroutineProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
 class EditAddressViewModel @Inject constructor(
     getFormUseCase: GetFormUseCase,
     private val setFormUseCase: SetFormUseCase,
+    coroutineProvider: CoroutineProvider,
 ) : ViewModel() {
 
-    val viewStateLiveData = Transformations.map(getFormUseCase.getForm()) {
+    val viewStateLiveData: LiveData<AddressViewState> = getFormUseCase.getFormFlow().map {
         AddressViewState(
             streetNumber = it.streetName,
             streetNumberError = it.streetNameError,
@@ -41,7 +45,7 @@ class EditAddressViewModel @Inject constructor(
                 )
             }
         )
-    }
+    }.asLiveData(coroutineProvider.getIoDispatcher())
 
     fun onStreetNameChanged(streetName: String?, cursorPosition: Int) {
         setFormUseCase.updateStreetName(streetName ?: "", cursorPosition)

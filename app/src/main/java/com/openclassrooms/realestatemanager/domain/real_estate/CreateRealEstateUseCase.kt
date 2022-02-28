@@ -18,7 +18,7 @@ class CreateRealEstateUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke() {
-        val form = formRepository.getNonNullForm()
+        val form = formRepository.getForm()
 
         realEstateRepository.createRealEstate(
             RealEstateEntity(

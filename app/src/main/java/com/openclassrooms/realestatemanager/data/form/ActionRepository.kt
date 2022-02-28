@@ -1,18 +1,31 @@
 package com.openclassrooms.realestatemanager.data.form
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ActionRepository @Inject constructor() {
 
-    private val imagePickerMutableLiveData = MutableLiveData<ImagePicker?>()
+    private val imagePickerMutableSharedFlow = MutableSharedFlow<ImagePicker?>(replay = 1)
+    private val pictureOpenerChannel = Channel<Boolean>(Channel.CONFLATED)
 
-    fun getImagePickerLiveData(): LiveData<ImagePicker?> = imagePickerMutableLiveData
+    fun getImagePickerFlow(): Flow<ImagePicker?> = imagePickerMutableSharedFlow
 
-    fun setImagePicker(imagePicker: ImagePicker?) {
-        imagePickerMutableLiveData.value = imagePicker
+    fun requestImagePicking(imagePicker: ImagePicker) {
+        imagePickerMutableSharedFlow.tryEmit(imagePicker)
+    }
+
+    fun flushImagePickerFlow() {
+        imagePickerMutableSharedFlow.tryEmit(null)
+    }
+
+    fun getPictureOpenerFlow(): Flow<Boolean> = pictureOpenerChannel.receiveAsFlow()
+
+    fun requestPictureOpening() {
+        pictureOpenerChannel.trySend(true)
     }
 }
