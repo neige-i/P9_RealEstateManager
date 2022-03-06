@@ -80,9 +80,9 @@ class EditSaleViewModel @Inject constructor(
     private fun setDatePickerInfo(
         datePickerType: DatePickerType,
         @StringRes titleId: Int,
-        dateString: String?
+        dateString: String
     ) {
-        val pickerDate = if (dateString?.isNotEmpty() == true) {
+        val pickerDate = if (dateString.isNotEmpty()) {
             utilsRepository.stringToDate(dateString)
         } else {
             LocalDate.now(defaultClock)
