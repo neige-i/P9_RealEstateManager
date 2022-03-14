@@ -1,6 +1,7 @@
 package com.openclassrooms.realestatemanager.ui.list
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,7 +20,12 @@ class ListFragment : Fragment(R.layout.fragment_list) {
 
         val viewModel: ListViewModel by viewModels()
 
-        binding.listRv.adapter = SimpleAdapter { viewModel.onItemClicked(it) }
-            .apply { submitList(listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")) }
+        val simpleAdapter = SimpleAdapter { viewModel.onItemClicked(it) }
+        binding.listRv.adapter = simpleAdapter
+
+        viewModel.viewState.observe(viewLifecycleOwner) {
+            Log.d("Neige", "onViewCreated: observe view state: $it")
+            simpleAdapter.submitList(it)
+        }
     }
 }

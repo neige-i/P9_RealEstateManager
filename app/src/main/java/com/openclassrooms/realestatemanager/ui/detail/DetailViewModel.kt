@@ -3,12 +3,17 @@ package com.openclassrooms.realestatemanager.ui.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import com.openclassrooms.realestatemanager.data.DetailRepository
+import androidx.lifecycle.asLiveData
+import com.openclassrooms.realestatemanager.data.real_estate.CurrentEstateRepository
+import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class DetailViewModel @Inject constructor(detailRepository: DetailRepository) : ViewModel() {
+class DetailViewModel @Inject constructor(
+    currentEstateRepository: CurrentEstateRepository,
+    coroutineProvider: CoroutineProvider,
+) : ViewModel() {
 
     private val viewStateMediatorLiveData = MediatorLiveData<String>()
     val viewState: LiveData<String> = viewStateMediatorLiveData
@@ -16,8 +21,11 @@ class DetailViewModel @Inject constructor(detailRepository: DetailRepository) : 
     init {
         viewStateMediatorLiveData.value = "No item selected"
 
-        viewStateMediatorLiveData.addSource(detailRepository.getItemLiveData()) {
-            viewStateMediatorLiveData.value = it
+        viewStateMediatorLiveData.addSource(
+            currentEstateRepository.getCurrentEstateId()
+                .asLiveData(coroutineProvider.getIoDispatcher())
+        ) {
+            viewStateMediatorLiveData.value = it.toString()
         }
     }
 }
