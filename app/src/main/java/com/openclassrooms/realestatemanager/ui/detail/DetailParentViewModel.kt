@@ -2,7 +2,7 @@ package com.openclassrooms.realestatemanager.ui.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
+import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

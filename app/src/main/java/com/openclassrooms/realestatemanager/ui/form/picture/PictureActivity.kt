@@ -9,7 +9,7 @@ import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.FragmentPictureBinding
 import com.openclassrooms.realestatemanager.ui.form.image_launcher.ImageLauncherActivity
 import com.openclassrooms.realestatemanager.ui.form.picker_dialog.PicturePickerDialog
-import com.openclassrooms.realestatemanager.ui.onAfterTextChanged
+import com.openclassrooms.realestatemanager.ui.util.onAfterTextChanged
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

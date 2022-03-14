@@ -9,7 +9,7 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.UtilsRepository
 import com.openclassrooms.realestatemanager.databinding.FragmentEditAddressBinding
-import com.openclassrooms.realestatemanager.ui.onAfterTextChanged
+import com.openclassrooms.realestatemanager.ui.util.onAfterTextChanged
 import com.openclassrooms.realestatemanager.ui.util.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 

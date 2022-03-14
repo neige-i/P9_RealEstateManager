@@ -1,4 +1,4 @@
-package com.openclassrooms.realestatemanager.ui
+package com.openclassrooms.realestatemanager.ui.util
 
 import android.text.Editable
 import android.text.TextWatcher

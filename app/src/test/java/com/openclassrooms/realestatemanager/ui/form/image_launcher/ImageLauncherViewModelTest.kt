@@ -5,7 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.openclassrooms.realestatemanager.data.form.ActionRepository
 import com.openclassrooms.realestatemanager.data.form.ImagePicker
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
-import com.openclassrooms.realestatemanager.ui.CoroutineProvider
+import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.util.TestCoroutineRule
 import com.openclassrooms.realestatemanager.util.TestLifecycle.getValueForTesting
 import com.openclassrooms.realestatemanager.util.TestLifecycle.isLiveDataTriggered

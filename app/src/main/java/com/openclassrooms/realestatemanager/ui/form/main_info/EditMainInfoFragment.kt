@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.RealEstateType
 import com.openclassrooms.realestatemanager.databinding.FragmentEditMainInfoBinding
-import com.openclassrooms.realestatemanager.ui.onAfterTextChanged
+import com.openclassrooms.realestatemanager.ui.util.onAfterTextChanged
 import com.openclassrooms.realestatemanager.ui.util.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
