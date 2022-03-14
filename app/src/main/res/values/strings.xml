@@ -6,6 +6,9 @@
     <string name="menu_item_save">Save</string>
     <string name="menu_item_edit">Edit</string>
 
+    <string name="undefined_price">Undefined price</string>
+    <string name="price_in_dollars">$%s</string>
+
     <string name="toolbar_title_add">Add a real estate</string>
     <string name="toolbar_title_edit_picture">Edit picture</string>
 
@@ -68,6 +71,7 @@
     <string name="description_button_remove">Remove button</string>
     <string name="description_button_add_photo">Add photo button</string>
     <string name="description_picture">Picture</string>
+    <string name="real_estate_photo">Real estate photo</string>
 
     <string name="error_mandatory_field">Mandatory field</string>
     <string name="error_empty_photo_list">Please select at least one photo</string>

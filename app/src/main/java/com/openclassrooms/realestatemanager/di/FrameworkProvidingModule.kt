@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import java.text.NumberFormat
 import java.time.Clock
 import java.time.ZoneId
 import javax.inject.Singleton
@@ -19,4 +20,8 @@ object FrameworkProvidingModule {
     @Singleton
     @Provides
     fun provideDefaultZoneId(): ZoneId = ZoneId.systemDefault()
+
+    @Singleton
+    @Provides
+    fun provideNumberFormatInstance(): NumberFormat = NumberFormat.getInstance()
 }

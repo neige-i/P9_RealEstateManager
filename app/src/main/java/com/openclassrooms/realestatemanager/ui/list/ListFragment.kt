@@ -1,10 +1,10 @@
 package com.openclassrooms.realestatemanager.ui.list
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.FragmentListBinding
 import com.openclassrooms.realestatemanager.ui.util.viewBinding
@@ -20,11 +20,13 @@ class ListFragment : Fragment(R.layout.fragment_list) {
 
         val viewModel: ListViewModel by viewModels()
 
-        val simpleAdapter = SimpleAdapter { viewModel.onItemClicked(it) }
-        binding.listRv.adapter = simpleAdapter
+        val simpleAdapter = RealEstateAdapter { viewModel.onItemClicked(it) }
+        binding.listRv.apply {
+            adapter = simpleAdapter
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        }
 
         viewModel.viewState.observe(viewLifecycleOwner) {
-            Log.d("Neige", "onViewCreated: observe view state: $it")
             simpleAdapter.submitList(it)
         }
     }
