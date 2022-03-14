@@ -6,7 +6,7 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import com.bumptech.glide.Glide
 import com.openclassrooms.realestatemanager.R
-import com.openclassrooms.realestatemanager.databinding.FragmentPictureBinding
+import com.openclassrooms.realestatemanager.databinding.ActivityPictureBinding
 import com.openclassrooms.realestatemanager.ui.form.image_launcher.ImageLauncherActivity
 import com.openclassrooms.realestatemanager.ui.form.picker_dialog.PicturePickerDialog
 import com.openclassrooms.realestatemanager.ui.util.onAfterTextChanged
@@ -20,7 +20,7 @@ class PictureActivity : ImageLauncherActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding = FragmentPictureBinding.inflate(layoutInflater)
+        val binding = ActivityPictureBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
         setSupportActionBar(binding.pictureToolbar)
