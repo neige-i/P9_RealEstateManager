@@ -9,6 +9,9 @@
     <string name="undefined_price">Undefined price</string>
     <string name="price_in_dollars">$%s</string>
 
+    <string name="toolbar_title_detail">Detail</string>
+    <string name="no_real_estate_selected">Select a real estate in the list to display its detailed info.</string>
+
     <string name="toolbar_title_add">Add a real estate</string>
     <string name="toolbar_title_edit_picture">Edit picture</string>
 

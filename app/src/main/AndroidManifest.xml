@@ -23,7 +23,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.detail.DetailActivity" />
+        <activity
+            android:name=".ui.detail.DetailActivity"
+            android:label="@string/toolbar_title_detail"
+            />
         <activity android:name=".ui.form.FormActivity" />
         <activity
             android:name=".ui.form.picture.PictureActivity"
