@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.DetailRepository
+import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -12,17 +13,23 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     detailRepository: DetailRepository,
+    private val editFormUseCase: SetFormUseCase,
     private val application: Application,
 ) : ViewModel() {
 
-    private val startDetailActivityMutableEvent = SingleLiveEvent<Unit>()
-    val startDetailActivityEvent: LiveData<Unit> = startDetailActivityMutableEvent
+    private val mainEventSingleLiveEvent = SingleLiveEvent<MainEvent>()
+    val mainEventLiveData: LiveData<MainEvent> = mainEventSingleLiveEvent
 
     init {
-        startDetailActivityMutableEvent.addSource(detailRepository.getItemLiveData()) {
+        mainEventSingleLiveEvent.addSource(detailRepository.getItemLiveData()) {
             if (!application.resources.getBoolean(R.bool.is_tablet)) {
-                startDetailActivityMutableEvent.call()
+                mainEventSingleLiveEvent.value = MainEvent.GoToDetailActivity
             }
         }
+    }
+
+    fun onAddMenuItemClicked() {
+        editFormUseCase.initAddForm()
+        mainEventSingleLiveEvent.value = MainEvent.GoToFormActivity
     }
 }

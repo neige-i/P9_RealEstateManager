@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context=".ui.form.main_info.EditMainInfoFragment"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingStart="@dimen/form_padding_horizontal"
+        android:paddingTop="@dimen/form_padding_vertical"
+        android:paddingEnd="@dimen/form_padding_horizontal"
+        android:paddingBottom="@dimen/form_padding_vertical"
+        >
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/main_info_type_input_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_type"
+            android:labelFor="@id/main_info_type_input"
+            app:layout_constraintBottom_toTopOf="@id/main_info_price_input_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+            <AutoCompleteTextView
+                android:id="@+id/main_info_type_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="none"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/main_info_price_input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_price"
+            android:labelFor="@id/main_info_price_input"
+            app:layout_constraintBottom_toTopOf="@id/main_info_area_input_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/main_info_type_input_layout"
+            app:suffixText="$"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/main_info_price_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberDecimal"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/main_info_area_input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_area"
+            android:labelFor="@id/main_info_area_input"
+            app:layout_constraintBottom_toTopOf="@id/main_info_add_total_room_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/main_info_price_input_layout"
+            app:suffixText="m²"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/main_info_area_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="number"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/main_info_total_room_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_total_room"
+            android:textColor="@android:color/black"
+            app:layout_constraintBottom_toBottomOf="@id/main_info_add_total_room_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/main_info_add_total_room_button"
+            />
+
+        <ImageButton
+            android:id="@+id/main_info_remove_total_room_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:contentDescription="@string/description_button_remove"
+            android:src="@drawable/ic_remove"
+            app:layout_constraintEnd_toStartOf="@id/main_info_total_room_count"
+            app:layout_constraintTop_toTopOf="@id/main_info_add_total_room_button"
+            />
+
+        <TextView
+            android:id="@+id/main_info_total_room_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:textColor="@android:color/black"
+            app:layout_constraintBaseline_toBaselineOf="@id/main_info_total_room_text"
+            app:layout_constraintEnd_toStartOf="@id/main_info_add_total_room_button"
+            tools:text="0"
+            />
+
+        <ImageButton
+            android:id="@+id/main_info_add_total_room_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/description_button_add"
+            android:src="@drawable/ic_add"
+            app:layout_constraintBottom_toTopOf="@id/main_info_add_bathroom_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/main_info_area_input_layout"
+            />
+
+        <TextView
+            android:id="@+id/main_info_bathroom_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_bathroom"
+            android:textColor="@android:color/black"
+            app:layout_constraintBottom_toBottomOf="@id/main_info_add_bathroom_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/main_info_add_bathroom_button"
+            />
+
+        <ImageButton
+            android:id="@+id/main_info_remove_bathroom_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:contentDescription="@string/description_button_remove"
+            android:src="@drawable/ic_remove"
+            app:layout_constraintEnd_toStartOf="@id/main_info_bathroom_count"
+            app:layout_constraintTop_toTopOf="@id/main_info_add_bathroom_button"
+            />
+
+        <TextView
+            android:id="@+id/main_info_bathroom_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:textColor="@android:color/black"
+            app:layout_constraintBaseline_toBaselineOf="@id/main_info_bathroom_text"
+            app:layout_constraintEnd_toStartOf="@id/main_info_add_bathroom_button"
+            tools:text="0"
+            />
+
+        <ImageButton
+            android:id="@+id/main_info_add_bathroom_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/description_button_add"
+            android:src="@drawable/ic_add"
+            app:layout_constraintBottom_toTopOf="@id/main_info_add_bedroom_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/main_info_add_total_room_button"
+            />
+
+        <TextView
+            android:id="@+id/main_info_bedroom_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_bedroom"
+            android:textColor="@android:color/black"
+            app:layout_constraintBottom_toBottomOf="@id/main_info_add_bedroom_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/main_info_add_bedroom_button"
+            />
+
+        <ImageButton
+            android:id="@+id/main_info_remove_bedroom_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:contentDescription="@string/description_button_remove"
+            android:src="@drawable/ic_remove"
+            app:layout_constraintEnd_toStartOf="@id/main_info_bedroom_count"
+            app:layout_constraintTop_toTopOf="@id/main_info_add_bedroom_button"
+            />
+
+        <TextView
+            android:id="@+id/main_info_bedroom_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:textColor="@android:color/black"
+            app:layout_constraintBaseline_toBaselineOf="@id/main_info_bedroom_text"
+            app:layout_constraintEnd_toStartOf="@id/main_info_add_bedroom_button"
+            tools:text="0"
+            />
+
+        <ImageButton
+            android:id="@+id/main_info_add_bedroom_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/description_button_add"
+            android:src="@drawable/ic_add"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/main_info_add_bathroom_button"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

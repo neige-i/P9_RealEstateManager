@@ -25,6 +25,15 @@ class UtilsRepository @Inject constructor(
 ) {
 
     companion object {
+        val STATE_POSTAL_ABBR = listOf(
+            "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL", "GA", "HI", "ID", "IL",
+            "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE",
+            "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "PR", "RI", "SC",
+            "SD", "TN", "TX", "UT", "VT", "VA", "VI", "WA", "WV", "WI", "WY",
+        )
+
+        val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
         // Currency rate on January, 19th 2022
         private const val USD_EUR = .8815
     }
@@ -41,7 +50,9 @@ class UtilsRepository @Inject constructor(
 
     // DATE
 
-    fun todayDate(): String = LocalDate.now(clock).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+    fun todayDate(): String = LocalDate.now(clock).format(DATE_FORMATTER)
+
+    fun stringToDate(text: String): LocalDate = LocalDate.parse(text, DATE_FORMATTER)
 
     // NETWORK CONNECTION
 

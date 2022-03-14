@@ -1,0 +1,11 @@
+package com.openclassrooms.realestatemanager.ui.form.sale
+
+data class SaleViewState(
+    val agentEntries: List<String>,
+    val selectedAgentName: String,
+    val marketEntryDate: String,
+    val marketEntryDateError: String?,
+    val saleDate: String,
+    val saleDateError: String?,
+    val isAvailableForSale: Boolean,
+)

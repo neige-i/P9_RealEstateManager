@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context=".ui.form.sale.EditSaleFragment"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:paddingStart="@dimen/form_padding_horizontal"
+        android:paddingTop="@dimen/form_padding_vertical"
+        android:paddingEnd="@dimen/form_padding_horizontal"
+        android:paddingBottom="@dimen/form_padding_vertical"
+        >
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/sale_agent_input_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_agent"
+            android:labelFor="@id/sale_agent_input"
+            app:layout_constraintBottom_toTopOf="@id/sale_market_entry_date_input_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+            <AutoCompleteTextView
+                android:id="@+id/sale_agent_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="none"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/sale_market_entry_date_input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_market_entry_date"
+            android:labelFor="@id/sale_market_entry_date_input"
+            app:layout_constraintBottom_toTopOf="@id/sale_switch"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sale_agent_input_layout"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/sale_market_entry_date_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:focusableInTouchMode="false"
+                android:inputType="none"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/sale_switch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/hint_status"
+            app:layout_constraintBottom_toTopOf="@id/sale_date_input_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sale_market_entry_date_input_layout"
+            />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/sale_date_input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_sale_date"
+            android:labelFor="@id/sale_date_input"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sale_switch"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/sale_date_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:focusableInTouchMode="false"
+                android:inputType="none"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

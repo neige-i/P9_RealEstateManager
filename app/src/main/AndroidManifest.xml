@@ -8,8 +8,6 @@
 
     <application
         android:name=".MyApplication"
-        android:allowBackup="true"
-        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -26,6 +24,24 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.detail.DetailActivity" />
+        <activity android:name=".ui.form.FormActivity" />
+        <activity
+            android:name=".ui.form.picture.PictureActivity"
+            android:label="@string/toolbar_title_edit_picture"
+            android:windowSoftInputMode="adjustResize"
+            />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"
+                />
+        </provider>
     </application>
 
 </manifest>

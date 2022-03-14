@@ -1,3 +1,77 @@
 <resources>
     <string name="app_name">Real Estate Manager</string>
+
+    <string name="menu_item_add">Add</string>
+    <string name="menu_item_close">Close</string>
+    <string name="menu_item_save">Save</string>
+    <string name="menu_item_edit">Edit</string>
+
+    <string name="toolbar_title_add">Add a real estate</string>
+    <string name="toolbar_title_edit_picture">Edit picture</string>
+
+    <string name="button_text_next">Next</string>
+    <string name="button_text_save">Save</string>
+
+    <string name="exit_form_dialog_title">Exit form</string>
+    <string name="exit_add_form_dialog_message">Keep modifications in memory?</string>
+    <string name="exit_edit_form_dialog_message">Save modifications?</string>
+    <string name="exit_form_dialog_positive_button">Yes, save modifications</string>
+    <string name="exit_form_dialog_negative_button">No, discard modifications</string>
+
+    <string name="draft_form_dialog_title">There is a real estate saved in memory</string>
+    <string name="draft_form_dialog_message">You have partially added a \'%s\'. Do you want to resume it?</string>
+    <string name="draft_form_dialog_positive_button">Yes, resume it</string>
+    <string name="draft_form_dialog_negative_button">No, start a new one</string>
+
+    <string name="image_picker_dialog_title">Pick an image</string>
+    <string name="image_picker_dialog_gallery_item">From gallery</string>
+    <string name="image_picker_dialog_camera_item">From camera</string>
+
+    <string name="real_estate_type_flat">Flat</string>
+    <string name="real_estate_type_house">House</string>
+    <string name="real_estate_type_duplex">Duplex</string>
+    <string name="real_estate_type_penthouse">Penthouse</string>
+    <string name="hint_type">Type</string>
+    <string name="hint_price">Price</string>
+    <string name="hint_area">Area</string>
+    <string name="label_total_room">Number of rooms</string>
+    <string name="label_bathroom">Number of bathrooms</string>
+    <string name="label_bedroom">Number of bedrooms</string>
+    <string name="hint_description">Description</string>
+    <string name="hint_address_street">Street name &amp; house number</string>
+    <string name="hint_address_additional">Additional information</string>
+    <string name="hint_address_city">City</string>
+    <string name="hint_address_state">State</string>
+    <string name="hint_address_zipcode">Zipcode</string>
+    <string name="hint_address_country">Country</string>
+    <string name="label_points_of_interest">Points of interest</string>
+    <string name="label_poi_school">School</string>
+    <string name="label_poi_university">University</string>
+    <string name="label_poi_stadium">Stadium</string>
+    <string name="label_poi_movie_theater">Movie theater</string>
+    <string name="label_poi_restaurant">Restaurant</string>
+    <string name="label_poi_bar">Bar</string>
+    <string name="label_poi_cafe">Cafe</string>
+    <string name="label_poi_shopping_mall">Shopping_mall</string>
+    <string name="label_poi_park">Park</string>
+    <string name="label_poi_hospital">Hospital</string>
+    <string name="label_poi_train_station">Train station</string>
+    <string name="label_poi_subway_station">Subway station</string>
+    <string name="hint_status">Available for sale</string>
+    <string name="hint_market_entry_date">Market entry date</string>
+    <string name="hint_sale_date">Sale date</string>
+    <string name="hint_agent">Real estate agent</string>
+    <string name="picker_title_market_entry">Select the market entry date</string>
+    <string name="picker_title_sale">Select the sale date</string>
+
+    <string name="description_button_add">Add button</string>
+    <string name="description_button_remove">Remove button</string>
+    <string name="description_button_add_photo">Add photo button</string>
+    <string name="description_picture">Picture</string>
+
+    <string name="error_mandatory_field">Mandatory field</string>
+    <string name="error_empty_photo_list">Please select at least one photo</string>
+    <string name="error_unknown_state">Unknown state</string>
+    <string name="error_incomplete_zipcode">Incomplete zipcode</string>
+    <string name="error_inconsistent_date_order">Inconsistent date order</string>
 </resources>
