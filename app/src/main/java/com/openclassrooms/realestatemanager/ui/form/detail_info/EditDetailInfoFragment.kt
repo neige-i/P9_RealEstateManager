@@ -2,32 +2,22 @@ package com.openclassrooms.realestatemanager.ui.form.detail_info
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
+import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.FragmentEditDetailInfoBinding
 import com.openclassrooms.realestatemanager.ui.form.picker_dialog.PicturePickerDialog
 import com.openclassrooms.realestatemanager.ui.onAfterTextChanged
+import com.openclassrooms.realestatemanager.ui.util.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class EditDetailInfoFragment : Fragment() {
+class EditDetailInfoFragment : Fragment(R.layout.fragment_edit_detail_info) {
 
-    private var mutableBinding: FragmentEditDetailInfoBinding? = null
-    private val binding get() = mutableBinding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        mutableBinding = FragmentEditDetailInfoBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    private val binding by viewBinding { FragmentEditDetailInfoBinding.bind(it) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -77,11 +67,5 @@ class EditDetailInfoFragment : Fragment() {
             v.parent.requestDisallowInterceptTouchEvent(true)
             false
         }
-    }
-
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mutableBinding = null
     }
 }

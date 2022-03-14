@@ -1,31 +1,21 @@
 package com.openclassrooms.realestatemanager.ui.form.main_info
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.RealEstateType
 import com.openclassrooms.realestatemanager.databinding.FragmentEditMainInfoBinding
 import com.openclassrooms.realestatemanager.ui.onAfterTextChanged
+import com.openclassrooms.realestatemanager.ui.util.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class EditMainInfoFragment : Fragment() {
+class EditMainInfoFragment : Fragment(R.layout.fragment_edit_main_info) {
 
-    private var mutableBinding: FragmentEditMainInfoBinding? = null
-    private val binding get() = mutableBinding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        mutableBinding = FragmentEditMainInfoBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    private val binding by viewBinding { FragmentEditMainInfoBinding.bind(it) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -68,10 +58,5 @@ class EditMainInfoFragment : Fragment() {
 
             binding.mainInfoTypeInputLayout.error = it.typeError
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mutableBinding = null
     }
 }

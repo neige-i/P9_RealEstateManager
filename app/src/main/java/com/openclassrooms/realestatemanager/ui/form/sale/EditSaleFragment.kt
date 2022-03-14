@@ -1,31 +1,21 @@
 package com.openclassrooms.realestatemanager.ui.form.sale
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.FragmentEditSaleBinding
+import com.openclassrooms.realestatemanager.ui.util.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class EditSaleFragment : Fragment() {
+class EditSaleFragment : Fragment(R.layout.fragment_edit_sale) {
 
-    private var mutableBinding: FragmentEditSaleBinding? = null
-    private val binding get() = mutableBinding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        mutableBinding = FragmentEditSaleBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    private val binding by viewBinding { FragmentEditSaleBinding.bind(it) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -74,10 +64,5 @@ class EditSaleFragment : Fragment() {
             }
             datePicker.show(parentFragmentManager, null)
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mutableBinding = null
     }
 }

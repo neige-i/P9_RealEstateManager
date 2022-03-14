@@ -1,38 +1,23 @@
 package com.openclassrooms.realestatemanager.ui.list
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.FragmentListBinding
+import com.openclassrooms.realestatemanager.ui.util.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ListFragment : Fragment() {
+class ListFragment : Fragment(R.layout.fragment_list) {
 
-    private var mutableBinding: FragmentListBinding? = null
-    private val binding get() = mutableBinding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        mutableBinding = FragmentListBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    private val binding by viewBinding { FragmentListBinding.bind(it) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val viewModel: ListViewModel by viewModels()
 
         binding.listRv.adapter = SimpleAdapter { viewModel.onItemClicked(it) }
             .apply { submitList(listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")) }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mutableBinding = null
     }
 }

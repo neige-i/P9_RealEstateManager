@@ -1,32 +1,22 @@
 package com.openclassrooms.realestatemanager.ui.form.address
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.flexbox.FlexboxLayoutManager
+import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.UtilsRepository
 import com.openclassrooms.realestatemanager.databinding.FragmentEditAddressBinding
 import com.openclassrooms.realestatemanager.ui.onAfterTextChanged
+import com.openclassrooms.realestatemanager.ui.util.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class EditAddressFragment : Fragment() {
+class EditAddressFragment : Fragment(R.layout.fragment_edit_address) {
 
-    private var mutableBinding: FragmentEditAddressBinding? = null
-    private val binding get() = mutableBinding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        mutableBinding = FragmentEditAddressBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    private val binding by viewBinding { FragmentEditAddressBinding.bind(it) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -87,10 +77,5 @@ class EditAddressFragment : Fragment() {
 
             chipAdapter.submitList(it.pointOfInterestList)
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mutableBinding = null
     }
 }
