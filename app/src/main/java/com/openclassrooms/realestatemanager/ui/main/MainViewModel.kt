@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.openclassrooms.realestatemanager.R
-import com.openclassrooms.realestatemanager.data.real_estate.CurrentEstateRepository
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
+import com.openclassrooms.realestatemanager.domain.real_estate.GetCurrentEstateIdUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    currentEstateRepository: CurrentEstateRepository,
+    getCurrentEstateIdUseCase: GetCurrentEstateIdUseCase,
     private val editFormUseCase: SetFormUseCase,
     coroutineProvider: CoroutineProvider,
     private val application: Application,
@@ -25,8 +25,7 @@ class MainViewModel @Inject constructor(
 
     init {
         mainEventSingleLiveEvent.addSource(
-            currentEstateRepository.getCurrentEstateId()
-                .asLiveData(coroutineProvider.getIoDispatcher())
+            getCurrentEstateIdUseCase.invoke().asLiveData(coroutineProvider.getIoDispatcher())
         ) {
             if (!application.resources.getBoolean(R.bool.is_tablet)) {
                 mainEventSingleLiveEvent.value = MainEvent.GoToDetailActivity
