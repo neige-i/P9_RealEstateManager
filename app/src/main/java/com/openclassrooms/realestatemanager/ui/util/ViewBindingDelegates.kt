@@ -24,14 +24,16 @@ fun <T : ViewBinding> Fragment.viewBinding(factory: (View) -> T): ReadOnlyProper
     object : ReadOnlyProperty<Fragment, T>, DefaultLifecycleObserver {
         private var binding: T? = null
 
-        override fun getValue(thisRef: Fragment, property: KProperty<*>): T =
-            binding ?: factory(requireView()).also {
-                // if binding is accessed after Lifecycle is DESTROYED, create new instance, but don't cache it
-                if (viewLifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED)) {
-                    viewLifecycleOwner.lifecycle.addObserver(this)
-                    binding = it
-                }
+        override fun getValue(thisRef: Fragment, property: KProperty<*>): T {
+            // if binding is accessed too early or too late, throw an exception
+            if (!viewLifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED)) {
+                throw IllegalStateException("View is not initialized or already destroyed ! State = ${viewLifecycleOwner.lifecycle.currentState}")
             }
+            return binding ?: factory(requireView()).also {
+                viewLifecycleOwner.lifecycle.addObserver(this)
+                binding = it
+            }
+        }
 
         override fun onDestroy(owner: LifecycleOwner) {
             binding = null

@@ -15,6 +15,8 @@ class ListFragment : Fragment(R.layout.fragment_list) {
     private val binding by viewBinding { FragmentListBinding.bind(it) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         val viewModel: ListViewModel by viewModels()
 
         binding.listRv.adapter = SimpleAdapter { viewModel.onItemClicked(it) }
