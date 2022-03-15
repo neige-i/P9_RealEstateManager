@@ -17,6 +17,8 @@ class AgentRepository @Inject constructor() {
 
     fun getAgentListFlow(): Flow<List<AgentEntity>> = flowOf(agentList)
 
+    fun getAgentById(agentId: String): AgentEntity? = agentList.firstOrNull { it.id == agentId }
+
     fun getAgentByName(agentName: String): AgentEntity? = agentList.firstOrNull {
         agentName == it.name
     }

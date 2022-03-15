@@ -13,4 +13,6 @@ class RealEstateRepository @Inject constructor(
     }
 
     fun getAllEstates(): Flow<List<RealEstateEntity>> = realEstateDao.getAllRealEstates()
+
+    fun getEstate(id: Long): Flow<RealEstateEntity?> = realEstateDao.getRealEstateById(id)
 }

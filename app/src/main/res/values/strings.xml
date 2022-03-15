@@ -11,6 +11,7 @@
 
     <string name="toolbar_title_detail">Detail</string>
     <string name="no_real_estate_selected">Select a real estate in the list to display its detailed info.</string>
+    <string name="unknown_real_estate_selected">ERROR! No real estate exists with this ID: "%d".</string>
 
     <string name="toolbar_title_add">Add a real estate</string>
     <string name="toolbar_title_edit_picture">Edit picture</string>
@@ -39,7 +40,7 @@
     <string name="real_estate_type_penthouse">Penthouse</string>
     <string name="hint_type">Type</string>
     <string name="hint_price">Price</string>
-    <string name="hint_area">Area</string>
+    <string name="hint_area">Surface</string>
     <string name="label_total_room">Number of rooms</string>
     <string name="label_bathroom">Number of bathrooms</string>
     <string name="label_bedroom">Number of bedrooms</string>
@@ -81,4 +82,24 @@
     <string name="error_unknown_state">Unknown state</string>
     <string name="error_incomplete_zipcode">Incomplete zipcode</string>
     <string name="error_inconsistent_date_order">Inconsistent date order</string>
+
+    <string name="for_sale">For sale</string>
+    <string name="sold">Sold</string>
+    <string name="media">Media</string>
+    <string name="not_available">N/A</string>
+    <string name="square_meters">%s sq m</string>
+    <string name="location">Location</string>
+    <string name="on_market">On the market</string>
+    <string name="since_date">Since %s</string>
+    <string name="from_sold_date">From %s\nSold on %s</string>
+    <string name="in_charge_agent">In-charge agent</string>
+    <string name="unknown_agent">Unknown agent</string>
+    <string name="media_description">Real estate media</string>
+    <string name="surface_description">Surface logo</string>
+    <string name="number_of_room_description">Number of rooms logo</string>
+    <string name="number_of_bathroom_description">Number of bathrooms logo</string>
+    <string name="number_of_bedroom_description">Number of bedrooms logo</string>
+    <string name="market_description">Market logo</string>
+    <string name="location_description">Location logo</string>
+    <string name="agent_description">Agent logo</string>
 </resources>
