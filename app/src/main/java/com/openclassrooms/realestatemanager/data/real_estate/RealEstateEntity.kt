@@ -14,7 +14,7 @@ data class RealEstateEntity(
     @ColumnInfo(name = "bathroom_count") val bathroomCount: Int,
     @ColumnInfo(name = "bedroom_count") val bedroomCount: Int,
     val description: String,
-    @ColumnInfo(name = "picture_list") val pictureList: List<String>,
+    @ColumnInfo(name = "picture_list") val pictureList: Map<String, String>,
     @ColumnInfo(name = "street_name") val streetName: String,
     @ColumnInfo(name = "additional_address_info") val additionalAddressInfo: String,
     val city: String,

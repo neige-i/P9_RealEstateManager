@@ -63,10 +63,10 @@ class DetailViewModel @Inject constructor(
                 android.R.color.holo_red_dark
             },
             photoList = realEstate.pictureList
-                .map { pictureUri: String ->
+                .map {
                     DetailViewState.Info.Photo(
-                        url = pictureUri,
-                        description = "Lorem ipsum"
+                        url = it.key,
+                        description = it.value
                     )
                 },
             description = realEstate.description

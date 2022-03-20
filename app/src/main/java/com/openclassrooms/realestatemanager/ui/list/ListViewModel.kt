@@ -33,7 +33,7 @@ class ListViewModel @Inject constructor(
 
             RealEstateViewState(
                 id = realEstate.id,
-                photoUrl = realEstate.pictureList.first(),
+                photoUrl = realEstate.pictureList.keys.first(),
                 type = realEstate.type,
                 city = realEstate.city,
                 price = realEstate.price?.let { price ->

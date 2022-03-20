@@ -9,4 +9,21 @@ object RoomConverter {
 
     @TypeConverter
     fun listToString(list: List<String>): String = list.joinToString()
+
+    @TypeConverter
+    fun stringToMap(s: String): Map<String, String> = if (s.isNotEmpty()) {
+        s.removePrefix("{")
+            .removeSuffix("}")
+            .split(", ")
+            .associate { keyValue ->
+                keyValue.split("=").let {
+                    it[0] to it[1]
+                }
+            }
+    } else {
+        emptyMap()
+    }
+
+    @TypeConverter
+    fun mapToString(map: Map<String, String>) = map.toString()
 }

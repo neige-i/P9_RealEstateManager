@@ -29,7 +29,7 @@ class CreateRealEstateUseCase @Inject constructor(
                 bathroomCount = form.bathroomCount,
                 bedroomCount = form.bedroomCount,
                 description = form.description,
-                pictureList = form.pictureList.map { it.uri.toString() },
+                pictureList = form.pictureList.associate { it.uri.toString() to it.description },
                 streetName = form.streetName,
                 additionalAddressInfo = form.additionalAddressInfo,
                 city = form.city,
