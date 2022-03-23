@@ -14,6 +14,7 @@
     <string name="unknown_real_estate_selected">ERROR! No real estate exists with this ID: "%d".</string>
 
     <string name="toolbar_title_add">Add a real estate</string>
+    <string name="toolbar_title_edit">Edit real estate</string>
     <string name="toolbar_title_edit_picture">Edit picture</string>
 
     <string name="button_text_next">Next</string>

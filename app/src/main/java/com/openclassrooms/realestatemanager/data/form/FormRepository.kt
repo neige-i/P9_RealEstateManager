@@ -1,6 +1,5 @@
 package com.openclassrooms.realestatemanager.data.form
 
-import androidx.annotation.VisibleForTesting
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -12,6 +11,7 @@ class FormRepository @Inject constructor() {
 
     companion object {
         val DEFAULT_FORM = FormEntity(
+            id = 0,
             type = "",
             typeError = null,
             price = "",
@@ -66,8 +66,7 @@ class FormRepository @Inject constructor() {
         initialState = form
     }
 
-    @VisibleForTesting
-    internal fun setForm(form: FormEntity) {
+    fun setForm(form: FormEntity) {
         formMutableStateFlow.value = form
     }
 

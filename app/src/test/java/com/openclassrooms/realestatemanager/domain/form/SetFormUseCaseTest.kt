@@ -115,7 +115,7 @@ class SetFormUseCaseTest {
     @Test
     fun `update initial & reset errors when init ADD form`() {
         // WHEN
-        setFormUseCase.initAddForm()
+        setFormUseCase.initForm()
 
         // THEN
         verify(exactly = 1) { mockFormRepository.initForm(FormRepository.DEFAULT_FORM) }

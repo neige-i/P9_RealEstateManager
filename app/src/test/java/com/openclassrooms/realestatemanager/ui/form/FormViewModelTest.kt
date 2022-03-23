@@ -8,7 +8,7 @@ import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
 import com.openclassrooms.realestatemanager.domain.form.FormInfo
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
-import com.openclassrooms.realestatemanager.domain.real_estate.CreateRealEstateUseCase
+import com.openclassrooms.realestatemanager.domain.real_estate.SaveRealEstateUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.util.TestCoroutineRule
 import com.openclassrooms.realestatemanager.util.TestLifecycle.getValueForTesting
@@ -47,7 +47,7 @@ class FormViewModelTest {
     private lateinit var mockSetFormUseCase: SetFormUseCase
 
     @MockK
-    private lateinit var mockCreateRealEstateUseCase: CreateRealEstateUseCase
+    private lateinit var mockSaveRealEstateUseCase: SaveRealEstateUseCase
 
     @MockK
     private lateinit var mockCoroutineProvider: CoroutineProvider
@@ -80,7 +80,7 @@ class FormViewModelTest {
         justRun { mockSetFormUseCase.updateSaleDate(any()) }
         justRun { mockSetFormUseCase.updateAvailability(any()) }
         justRun { mockSetFormUseCase.reset() }
-        justRun { mockSetFormUseCase.initAddForm() }
+        justRun { mockSetFormUseCase.initForm() }
         every { mockApplication.getString(R.string.draft_form_dialog_title) } returns "Draft"
         every { mockApplication.getString(R.string.exit_form_dialog_title) } returns "Exit"
         every {
@@ -96,7 +96,7 @@ class FormViewModelTest {
         every { mockApplication.getString(R.string.button_text_save) } returns "SAVE"
         every { mockApplication.getString(R.string.button_text_next) } returns "NEXT"
         every { mockCheckFormUseCase.containsNoError(any<Int>()) } returns true
-        coJustRun { mockCreateRealEstateUseCase.invoke() }
+        coJustRun { mockSaveRealEstateUseCase.invoke() }
 
         formViewModel = getViewModel()
     }
@@ -113,7 +113,7 @@ class FormViewModelTest {
             mockActionRepository,
             mockCheckFormUseCase,
             mockSetFormUseCase,
-            mockCreateRealEstateUseCase,
+            mockSaveRealEstateUseCase,
             mockCoroutineProvider,
             mockApplication,
         )
@@ -232,7 +232,7 @@ class FormViewModelTest {
         assertEquals(FormEvent.ExitActivity, formEvent)
 
         verify(exactly = 1) { mockCheckFormUseCase.containsNoError(9) }
-        coVerify(exactly = 1) { mockCreateRealEstateUseCase.invoke() }
+        coVerify(exactly = 1) { mockSaveRealEstateUseCase.invoke() }
         verify(exactly = 1) { mockCoroutineProvider.getMainDispatcher() }
         verify(exactly = 1) { mockSetFormUseCase.reset() }
     }
@@ -441,7 +441,7 @@ class FormViewModelTest {
         // THEN
         verifySequence {
             mockSetFormUseCase.reset()
-            mockSetFormUseCase.initAddForm()
+            mockSetFormUseCase.initForm()
         }
     }
 
@@ -450,7 +450,7 @@ class FormViewModelTest {
         mockActionRepository,
         mockCheckFormUseCase,
         mockSetFormUseCase,
-        mockCreateRealEstateUseCase,
+        mockSaveRealEstateUseCase,
         mockCoroutineProvider,
         mockApplication,
     )

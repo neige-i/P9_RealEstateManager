@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.openclassrooms.realestatemanager.R
+import com.openclassrooms.realestatemanager.data.RealEstateType
 import com.openclassrooms.realestatemanager.data.real_estate.CurrentEstateRepository
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateRepository
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
@@ -38,7 +39,7 @@ class ListViewModel @Inject constructor(
             RealEstateViewState(
                 id = realEstate.id,
                 photoUrl = realEstate.pictureList.keys.first(),
-                type = realEstate.type,
+                type = application.getString(RealEstateType.valueOf(realEstate.type).labelId),
                 city = realEstate.city,
                 price = realEstate.price?.let { price ->
                     application.getString(R.string.price_in_dollars, numberFormat.format(price))

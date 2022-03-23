@@ -20,7 +20,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class CreateRealEstateUseCaseTest {
+class SaveRealEstateUseCaseTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
@@ -37,7 +37,7 @@ class CreateRealEstateUseCaseTest {
     @MockK
     private lateinit var mockContext: Context
 
-    private lateinit var createRealEstateUseCase: CreateRealEstateUseCase
+    private lateinit var saveRealEstateUseCase: SaveRealEstateUseCase
 
     companion object {
         // region IN
@@ -121,7 +121,7 @@ class CreateRealEstateUseCaseTest {
             .returns(AgentEntity("1", DEFAULT_AGENT_NAME))
         every { mockAgentRepository.getAgentByName(UNKNOWN_AGENT_NAME) } returns null
 
-        createRealEstateUseCase = CreateRealEstateUseCase(
+        saveRealEstateUseCase = SaveRealEstateUseCase(
             mockFormRepository,
             mockRealEstateRepository,
             mockAgentRepository,
@@ -144,7 +144,7 @@ class CreateRealEstateUseCaseTest {
     @Test
     fun `add real estate to DB when create it`() = runTest {
         // WHEN
-        createRealEstateUseCase.invoke()
+        saveRealEstateUseCase.invoke()
 
         // THEN
         coVerify(exactly = 1) { mockRealEstateRepository.createRealEstate(DEFAULT_ESTATE) }
@@ -157,7 +157,7 @@ class CreateRealEstateUseCaseTest {
         every { mockFormRepository.getForm() } returns DEFAULT_FORM.copy(agentName = UNKNOWN_AGENT_NAME)
 
         // WHEN
-        createRealEstateUseCase.invoke()
+        saveRealEstateUseCase.invoke()
 
         // THEN
         coVerify(exactly = 1) {
@@ -172,7 +172,7 @@ class CreateRealEstateUseCaseTest {
         every { mockFormRepository.getForm() } returns DEFAULT_FORM.copy(saleDate = "")
 
         // WHEN
-        createRealEstateUseCase.invoke()
+        saveRealEstateUseCase.invoke()
 
         // THEN
         coVerify(exactly = 1) {
