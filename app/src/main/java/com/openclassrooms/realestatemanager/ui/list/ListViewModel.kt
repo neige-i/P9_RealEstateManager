@@ -24,7 +24,7 @@ class ListViewModel @Inject constructor(
 
     val viewState: LiveData<List<RealEstateViewState>> = combine(
         realEstateRepository.getAllEstates(),
-        currentEstateRepository.getCurrentEstateId()
+        currentEstateRepository.getIdOrNull(),
     ) { allEstates, currentEstateId ->
 
         allEstates.map { realEstate ->
@@ -59,6 +59,6 @@ class ListViewModel @Inject constructor(
     }.asLiveData(coroutineProvider.getIoDispatcher())
 
     fun onItemClicked(realEstateId: Long) {
-        currentEstateRepository.setCurrentEstateId(realEstateId)
+        currentEstateRepository.setId(realEstateId)
     }
 }

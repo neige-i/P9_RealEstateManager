@@ -14,7 +14,7 @@ class GetCurrentEstateUseCase @Inject constructor(
     private val realEstateRepository: RealEstateRepository,
 ) {
 
-    operator fun invoke(): Flow<RealEstateResult> = currentEstateRepository.getCurrentEstateId()
+    operator fun invoke(): Flow<RealEstateResult> = currentEstateRepository.getIdOrNull()
         .flatMapLatest { estateId ->
             if (estateId == null) {
                 flowOf(RealEstateResult.Idle)

@@ -1,18 +1,23 @@
 package com.openclassrooms.realestatemanager.data.real_estate
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.filterNotNull
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class CurrentEstateRepository @Inject constructor() {
 
-    private val estateIdChannel = MutableStateFlow<Long?>(null)
+    private val estateIdMutableSharedFlow = MutableSharedFlow<Long?>(replay = 1).apply {
+        tryEmit(null)
+    }
 
-    fun getCurrentEstateId(): Flow<Long?> = estateIdChannel
+    fun getId(): Flow<Long> = estateIdMutableSharedFlow.filterNotNull()
 
-    fun setCurrentEstateId(estateId: Long) {
-        estateIdChannel.tryEmit(estateId)
+    fun getIdOrNull(): Flow<Long?> = estateIdMutableSharedFlow
+
+    fun setId(estateId: Long) {
+        estateIdMutableSharedFlow.tryEmit(estateId)
     }
 }
