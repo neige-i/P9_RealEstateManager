@@ -14,11 +14,10 @@ import dagger.hilt.android.AndroidEntryPoint
 class ListFragment : Fragment(R.layout.fragment_list) {
 
     private val binding by viewBinding { FragmentListBinding.bind(it) }
+    private val viewModel by viewModels<ListViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val viewModel: ListViewModel by viewModels()
 
         val simpleAdapter = RealEstateAdapter { viewModel.onItemClicked(it) }
         binding.listRv.apply {
@@ -29,5 +28,10 @@ class ListFragment : Fragment(R.layout.fragment_list) {
         viewModel.viewState.observe(viewLifecycleOwner) {
             simpleAdapter.submitList(it)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onFragmentResumed()
     }
 }

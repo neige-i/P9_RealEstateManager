@@ -9,6 +9,7 @@ import com.openclassrooms.realestatemanager.data.real_estate.CurrentEstateReposi
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateRepository
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
 import java.text.NumberFormat
 import javax.inject.Inject
@@ -22,10 +23,13 @@ class ListViewModel @Inject constructor(
     numberFormat: NumberFormat,
 ) : ViewModel() {
 
+    private val pingMutableSharedFlow = MutableSharedFlow<Boolean>(replay = 1)
+
     val viewState: LiveData<List<RealEstateViewState>> = combine(
         realEstateRepository.getAllEstates(),
         currentEstateRepository.getIdOrNull(),
-    ) { allEstates, currentEstateId ->
+        pingMutableSharedFlow,
+    ) { allEstates, currentEstateId, _ ->
 
         allEstates.map { realEstate ->
             val isCurrentEstateSelected = currentEstateId == realEstate.id &&
@@ -57,6 +61,10 @@ class ListViewModel @Inject constructor(
             )
         }
     }.asLiveData(coroutineProvider.getIoDispatcher())
+
+    fun onFragmentResumed() {
+        pingMutableSharedFlow.tryEmit(true)
+    }
 
     fun onItemClicked(realEstateId: Long) {
         currentEstateRepository.setId(realEstateId)
