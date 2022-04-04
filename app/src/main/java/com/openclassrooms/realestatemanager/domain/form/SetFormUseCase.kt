@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.annotation.StringRes
 import com.openclassrooms.realestatemanager.data.PointOfInterest
 import com.openclassrooms.realestatemanager.data.RealEstateType
-import com.openclassrooms.realestatemanager.data.agent.AgentRepository
 import com.openclassrooms.realestatemanager.data.form.ActionRepository
 import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
 import com.openclassrooms.realestatemanager.data.form.FormEntity
@@ -16,7 +15,6 @@ import javax.inject.Inject
 class SetFormUseCase @Inject constructor(
     private val formRepository: FormRepository,
     private val currentPictureRepository: CurrentPictureRepository,
-    private val agentRepository: AgentRepository,
     private val actionRepository: ActionRepository,
     private val application: Application,
 ) {
@@ -33,50 +31,48 @@ class SetFormUseCase @Inject constructor(
     }
 
     private fun mapEstateToForm(realEstate: RealEstateEntity) = FormEntity(
-        id = realEstate.id,
-        type = application.getString(RealEstateType.valueOf(realEstate.type).labelId),
+        id = realEstate.info.realEstateId,
+        type = application.getString(RealEstateType.valueOf(realEstate.info.type).labelId),
         typeError = null,
-        price = realEstate.price?.toString() ?: "",
+        price = realEstate.info.price?.toString() ?: "",
         priceCursor = 0,
-        area = realEstate.area?.toString() ?: "",
+        area = realEstate.info.area?.toString() ?: "",
         areaCursor = 0,
-        totalRoomCount = realEstate.totalRoomCount,
-        bathroomCount = realEstate.bathroomCount,
-        bedroomCount = realEstate.bedroomCount,
-        description = realEstate.description,
+        totalRoomCount = realEstate.info.totalRoomCount,
+        bathroomCount = realEstate.info.bathroomCount,
+        bedroomCount = realEstate.info.bedroomCount,
+        description = realEstate.info.description,
         descriptionCursor = 0,
-        pictureList = realEstate.pictureList.map {
-            FormEntity.PictureEntity(uri = Uri.parse(it.key), description = it.value)
+        pictureList = realEstate.photoList.map {
+            FormEntity.PictureEntity(uri = Uri.parse(it.uri), description = it.description)
         },
         pictureListError = null,
-        streetName = realEstate.streetName,
+        streetName = realEstate.info.streetName,
         streetNameError = null,
         streetNameCursor = 0,
-        additionalAddressInfo = realEstate.additionalAddressInfo,
+        additionalAddressInfo = realEstate.info.additionalAddressInfo,
         additionalAddressInfoCursor = 0,
-        city = realEstate.city,
+        city = realEstate.info.city,
         cityError = null,
         cityCursor = 0,
-        state = realEstate.state,
+        state = realEstate.info.state,
         stateError = null,
         stateCursor = 0,
-        zipcode = realEstate.zipcode,
+        zipcode = realEstate.info.zipcode,
         zipcodeError = null,
         zipcodeCursor = 0,
-        country = realEstate.country,
+        country = realEstate.info.country,
         countryError = null,
         countryCursor = 0,
-        pointsOfInterests = realEstate.pointsOfInterests.map {
-            PointOfInterest.valueOf(it).labelId
+        pointsOfInterests = realEstate.poiList.map {
+            PointOfInterest.valueOf(it.poiValue).labelId
         },
-        agentName = realEstate.agentId?.let {
-            agentRepository.getAgentById(it)?.name
-        } ?: "",
-        marketEntryDate = realEstate.marketEntryDate,
+        agentName = realEstate.agent?.username.orEmpty(),
+        marketEntryDate = realEstate.info.marketEntryDate,
         marketEntryDateError = null,
-        saleDate = realEstate.saleDate ?: "",
+        saleDate = realEstate.info.saleDate ?: "",
         saleDateError = null,
-        isAvailableForSale = realEstate.saleDate == null,
+        isAvailableForSale = realEstate.info.saleDate == null,
     )
 
     fun reset() {

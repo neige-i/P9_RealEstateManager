@@ -3,8 +3,6 @@ package com.openclassrooms.realestatemanager.domain.real_estate
 import android.content.Context
 import android.net.Uri
 import com.openclassrooms.realestatemanager.R
-import com.openclassrooms.realestatemanager.data.agent.AgentEntity
-import com.openclassrooms.realestatemanager.data.agent.AgentRepository
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateEntity
@@ -114,7 +112,7 @@ class SaveRealEstateUseCaseTest {
         MockKAnnotations.init(this)
 
         every { mockFormRepository.getForm() } returns DEFAULT_FORM
-        coJustRun { mockRealEstateRepository.createRealEstate(any()) }
+        coJustRun { mockRealEstateRepository.addEstate(any()) }
         every { mockContext.getString(any()) } returns "Flat"
         every { DEFAULT_URI.toString() } returns "Uri String"
         every { mockAgentRepository.getAgentByName(DEFAULT_AGENT_NAME) }
@@ -147,7 +145,7 @@ class SaveRealEstateUseCaseTest {
         saveRealEstateUseCase.invoke()
 
         // THEN
-        coVerify(exactly = 1) { mockRealEstateRepository.createRealEstate(DEFAULT_ESTATE) }
+        coVerify(exactly = 1) { mockRealEstateRepository.addEstate(DEFAULT_ESTATE) }
         verify(exactly = 1) { mockAgentRepository.getAgentByName(DEFAULT_AGENT_NAME) }
     }
 
@@ -161,7 +159,7 @@ class SaveRealEstateUseCaseTest {
 
         // THEN
         coVerify(exactly = 1) {
-            mockRealEstateRepository.createRealEstate(DEFAULT_ESTATE.copy(agentId = null))
+            mockRealEstateRepository.addEstate(DEFAULT_ESTATE.copy(agentId = null))
         }
         verify(exactly = 1) { mockAgentRepository.getAgentByName(UNKNOWN_AGENT_NAME) }
     }
@@ -176,7 +174,7 @@ class SaveRealEstateUseCaseTest {
 
         // THEN
         coVerify(exactly = 1) {
-            mockRealEstateRepository.createRealEstate(DEFAULT_ESTATE.copy(saleDate = null))
+            mockRealEstateRepository.addEstate(DEFAULT_ESTATE.copy(saleDate = null))
         }
         verify(exactly = 1) { mockAgentRepository.getAgentByName(DEFAULT_AGENT_NAME) }
     }

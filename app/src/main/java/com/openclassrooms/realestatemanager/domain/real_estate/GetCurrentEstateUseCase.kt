@@ -19,7 +19,7 @@ class GetCurrentEstateUseCase @Inject constructor(
             if (estateId == null) {
                 flowOf(RealEstateResult.Idle)
             } else {
-                realEstateRepository.getEstate(estateId)
+                realEstateRepository.getRealEstate(estateId)
                     .map { realEstate: RealEstateEntity? ->
                         if (realEstate != null) {
                             RealEstateResult.Success(realEstate)

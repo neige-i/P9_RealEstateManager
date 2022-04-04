@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.PointOfInterest
-import com.openclassrooms.realestatemanager.data.agent.AgentRepository
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateEntity
 import com.openclassrooms.realestatemanager.domain.real_estate.GetCurrentEstateUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.RealEstateResult
@@ -19,7 +18,6 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     getCurrentEstateUseCase: GetCurrentEstateUseCase,
-    agentRepository: AgentRepository,
     coroutineProvider: CoroutineProvider,
     application: Application,
 ) : ViewModel() {
@@ -28,11 +26,13 @@ class DetailViewModel @Inject constructor(
         when (it) {
             is RealEstateResult.Success -> getInfoViewState(
                 realEstate = it.realEstate,
-                agentRepository = agentRepository,
                 application = application
             )
             is RealEstateResult.Failure -> DetailViewState.Empty(
-                noSelectionLabelText = application.getString(R.string.unknown_real_estate_selected, it.estateId)
+                noSelectionLabelText = application.getString(
+                    R.string.unknown_real_estate_selected,
+                    it.estateId
+                )
             )
             RealEstateResult.Idle -> DetailViewState.Empty(
                 noSelectionLabelText = application.getString(R.string.no_real_estate_selected)
@@ -42,13 +42,12 @@ class DetailViewModel @Inject constructor(
 
     private fun getInfoViewState(
         realEstate: RealEstateEntity,
-        agentRepository: AgentRepository,
         application: Application
     ): DetailViewState.Info {
-        val availableForSale = realEstate.saleDate == null
+        val availableForSale = realEstate.info.saleDate == null
 
-        val additionalAddressText = if (realEstate.additionalAddressInfo.isNotEmpty()) {
-            "${realEstate.additionalAddressInfo}\n"
+        val additionalAddressText = if (realEstate.info.additionalAddressInfo.isNotEmpty()) {
+            "${realEstate.info.additionalAddressInfo}\n"
         } else {
             ""
         }
@@ -62,44 +61,38 @@ class DetailViewModel @Inject constructor(
             } else {
                 android.R.color.holo_red_dark
             },
-            photoList = realEstate.pictureList
+            photoList = realEstate.photoList
                 .map {
                     DetailViewState.Info.Photo(
-                        url = it.key,
-                        description = it.value
+                        url = it.uri,
+                        description = it.description
                     )
                 },
-            description = realEstate.description
+            description = realEstate.info.description
                 .ifEmpty {
                     application.getString(R.string.not_available)
                 },
-            surface = realEstate.area?.toString() ?: application.getString(R.string.not_available),
-            roomCount = realEstate.totalRoomCount.toString(),
-            bathroomCount = realEstate.bathroomCount.toString(),
-            bedroomCount = realEstate.bedroomCount.toString(),
-            address = "${realEstate.streetName}\n" +
+            surface = realEstate.info.area?.toString()
+                ?: application.getString(R.string.not_available),
+            roomCount = realEstate.info.totalRoomCount.toString(),
+            bathroomCount = realEstate.info.bathroomCount.toString(),
+            bedroomCount = realEstate.info.bedroomCount.toString(),
+            address = "${realEstate.info.streetName}\n" +
                     additionalAddressText +
-                    "${realEstate.city}\n" +
-                    "${realEstate.state} ${realEstate.zipcode}\n" +
-                    realEstate.country,
-            poiList = realEstate.pointsOfInterests.map { PointOfInterest.valueOf(it).labelId },
+                    "${realEstate.info.city}\n" +
+                    "${realEstate.info.state} ${realEstate.info.zipcode}\n" +
+                    realEstate.info.country,
+            poiList = realEstate.poiList.map { PointOfInterest.valueOf(it.poiValue).labelId },
             market_dates = if (availableForSale) {
-                application.getString(R.string.since_date, realEstate.marketEntryDate)
+                application.getString(R.string.since_date, realEstate.info.marketEntryDate)
             } else {
                 application.getString(
                     R.string.from_sold_date,
-                    realEstate.marketEntryDate,
-                    realEstate.saleDate
+                    realEstate.info.marketEntryDate,
+                    realEstate.info.saleDate
                 )
             },
-            agentName = if (realEstate.agentId != null) {
-                agentRepository
-                    .getAgentById(realEstate.agentId)
-                    ?.name
-                    ?: application.getString(R.string.unknown_agent)
-            } else {
-                application.getString(R.string.not_available)
-            }
+            agentName = realEstate.agent?.username ?: application.getString(R.string.not_available)
         )
     }
 

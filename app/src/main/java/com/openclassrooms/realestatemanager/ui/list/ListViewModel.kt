@@ -27,21 +27,21 @@ class ListViewModel @Inject constructor(
     private val pingMutableSharedFlow = MutableSharedFlow<Boolean>(replay = 1)
 
     val viewState: LiveData<List<RealEstateViewState>> = combine(
-        realEstateRepository.getAllEstates(),
+        realEstateRepository.getAllRealEstates(),
         currentEstateRepository.getIdOrNull(),
         pingMutableSharedFlow,
     ) { allEstates, currentEstateId, _ ->
 
         allEstates.map { realEstate ->
-            val isCurrentEstateSelected = currentEstateId == realEstate.id &&
+            val isCurrentEstateSelected = currentEstateId == realEstate.info.realEstateId &&
                     application.resources.getBoolean(R.bool.is_tablet)
 
             RealEstateViewState(
-                id = realEstate.id,
-                photoUrl = realEstate.pictureList.keys.first(),
-                type = application.getString(RealEstateType.valueOf(realEstate.type).labelId),
-                city = realEstate.city,
-                price = realEstate.price?.let { price ->
+                id = realEstate.info.realEstateId,
+                photoUrl = realEstate.photoList.first().uri,
+                type = application.getString(RealEstateType.valueOf(realEstate.info.type).labelId),
+                city = realEstate.info.city,
+                price = realEstate.info.price?.let { price ->
                     application.getString(R.string.price_in_dollars, numberFormat.format(price))
                 } ?: application.getString(R.string.undefined_price),
                 backgroundColor = if (isCurrentEstateSelected) {
