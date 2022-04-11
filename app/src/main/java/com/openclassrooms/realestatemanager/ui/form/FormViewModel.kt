@@ -8,7 +8,7 @@ import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
 import com.openclassrooms.realestatemanager.domain.form.FormInfo
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
-import com.openclassrooms.realestatemanager.domain.real_estate.CreateRealEstateUseCase
+import com.openclassrooms.realestatemanager.domain.real_estate.SaveRealEstateUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +22,7 @@ class FormViewModel @Inject constructor(
     actionRepository: ActionRepository,
     private val checkFormErrorUseCase: CheckFormErrorUseCase,
     private val setFormUseCase: SetFormUseCase,
-    private val createRealEstateUseCase: CreateRealEstateUseCase,
+    private val saveRealEstateUseCase: SaveRealEstateUseCase,
     private val coroutineProvider: CoroutineProvider,
     private val application: Application,
 ) : ViewModel() {
@@ -70,11 +70,15 @@ class FormViewModel @Inject constructor(
     fun onPageChanged(position: Int) {
         currentPage = position
 
+        val addOrEdit = application.getString(
+            when (getFormInfo().formType) {
+                FormInfo.FormType.ADD -> R.string.toolbar_title_add
+                FormInfo.FormType.EDIT -> R.string.toolbar_title_edit
+            }
+        )
+
         viewStateMutableLiveData.value = FormViewState(
-            toolbarTitle = application.getString(R.string.toolbar_title_add) +
-                    " (" + (currentPage + 1) +
-                    "/" + pageCount +
-                    ")",
+            toolbarTitle = "$addOrEdit (${currentPage + 1}/$pageCount)",
             submitButtonText = if (isLastPageDisplayed()) {
                 application.getString(R.string.button_text_save)
             } else {
@@ -95,7 +99,7 @@ class FormViewModel @Inject constructor(
 
     private fun onFormCompleted() {
         viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            createRealEstateUseCase()
+            saveRealEstateUseCase(getFormInfo().formType)
 
             withContext(coroutineProvider.getMainDispatcher()) {
                 setFormUseCase.reset()
@@ -147,7 +151,7 @@ class FormViewModel @Inject constructor(
 
         when (type) {
             DialogType.EXIT -> formSingleLiveEvent.value = FormEvent.ExitActivity
-            DialogType.DRAFT -> setFormUseCase.initAddForm()
+            DialogType.DRAFT -> setFormUseCase.initForm()
         }
     }
 

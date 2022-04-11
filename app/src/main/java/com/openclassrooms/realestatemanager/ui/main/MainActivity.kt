@@ -16,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
+    private var editMenuItem: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +26,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.mainToolbar)
 
+        viewModel.viewStateLiveData.observe(this) {
+            editMenuItem?.isVisible = it.isEditMenuItemVisible
+        }
         viewModel.mainEventLiveData.observe(this) {
             when (it) {
                 MainEvent.GoToDetailActivity -> redirectTo(DetailActivity::class.java)
@@ -39,11 +43,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
+
+        editMenuItem = menu?.findItem(R.id.main_menu_edit_estate)
+        viewModel.onOptionsMenuCreated()
+
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.toolbar_menu_add -> {
+        R.id.main_menu_edit_estate -> {
+            viewModel.onEditMenuItemClicked()
+            true
+        }
+        R.id.main_menu_add_estate -> {
             viewModel.onAddMenuItemClicked()
             true
         }

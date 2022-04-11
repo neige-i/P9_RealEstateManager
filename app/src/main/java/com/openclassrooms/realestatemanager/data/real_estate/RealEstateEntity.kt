@@ -1,28 +1,27 @@
 package com.openclassrooms.realestatemanager.data.real_estate
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.Embedded
+import androidx.room.Junction
+import androidx.room.Relation
+import com.openclassrooms.realestatemanager.data.room.*
 
-@Entity
 data class RealEstateEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val type: String,
-    val price: Double?,
-    val area: Int?,
-    @ColumnInfo(name = "total_room_count") val totalRoomCount: Int,
-    @ColumnInfo(name = "bathroom_count") val bathroomCount: Int,
-    @ColumnInfo(name = "bedroom_count") val bedroomCount: Int,
-    val description: String,
-    @ColumnInfo(name = "picture_list") val pictureList: List<String>,
-    @ColumnInfo(name = "street_name") val streetName: String,
-    @ColumnInfo(name = "additional_address_info") val additionalAddressInfo: String,
-    val city: String,
-    val state: String,
-    val zipcode: String,
-    val country: String,
-    @ColumnInfo(name = "points_of_interests") val pointsOfInterests: List<String>,
-    @ColumnInfo(name = "agent_id") val agentId: String?,
-    @ColumnInfo(name = "market_entry_date") val marketEntryDate: String,
-    @ColumnInfo(name = "sale_date") val saleDate: String?,
+    @Embedded val info: EstateEntity,
+    @Relation(
+        parentColumn = "realEstateId",
+        entityColumn = "estateId"
+    )
+    val photoList: List<PhotoEntity>,
+    @Relation(
+        parentColumn = "realEstateId",
+        entityColumn = "poiValue",
+        associateBy = Junction(EstatePoiCrossRef::class)
+    )
+    val poiList: List<PoiEntity>,
+    @Relation(
+        parentColumn = "realEstateId",
+        entityColumn = "username",
+        associateBy = Junction(EstateAgentCrossRef::class)
+    )
+    val agent: AgentEntity?,
 )

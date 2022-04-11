@@ -1,18 +1,343 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/detail_tv"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#4F00"
-    android:gravity="center"
-    android:textSize="40sp"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
+    android:fillViewport="true"
+    android:padding="20dp"
     tools:context=".ui.detail.DetailFragment"
-    tools:text="1"
-    />
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <TextView
+            android:id="@+id/detail_availability_lbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corners"
+            android:padding="7dp"
+            android:textColor="@android:color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:backgroundTint="@android:color/holo_green_dark"
+            tools:text="@string/for_sale"
+            />
+
+        <TextView
+            android:id="@+id/detail_media_lbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/media"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/detail_media_list"
+            android:layout_width="0dp"
+            android:layout_height="170dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detail_availability_lbl"
+            tools:listitem="@layout/item_media"
+            />
+
+        <TextView
+            android:id="@+id/detail_description_lbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="@string/hint_description"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detail_media_list"
+            />
+
+        <TextView
+            android:id="@+id/detail_description_txt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detail_description_lbl"
+            tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras at orci sed sapien tincidunt euismod. Etiam ullamcorper velit euismod, pretium urna sed, ornare tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+            />
+
+        <ImageView
+            android:id="@+id/detail_surface_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:contentDescription="@string/surface_description"
+            android:src="@drawable/ic_texture"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detail_description_txt"
+            />
+
+        <TextView
+            android:id="@+id/detail_surface_lbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/hint_area"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/detail_surface_img"
+            app:layout_constraintTop_toTopOf="@id/detail_surface_img"
+            />
+
+        <TextView
+            android:id="@+id/detail_surface_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintStart_toStartOf="@id/detail_surface_lbl"
+            app:layout_constraintTop_toBottomOf="@id/detail_surface_lbl"
+            tools:text="750 sq m"
+            />
+
+        <ImageView
+            android:id="@+id/detail_room_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:contentDescription="@string/number_of_room_description"
+            android:src="@drawable/ic_home"
+            app:layout_constraintStart_toStartOf="@id/detail_surface_img"
+            app:layout_constraintTop_toBottomOf="@id/detail_surface_txt"
+            />
+
+        <TextView
+            android:id="@+id/detail_room_lbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/label_total_room"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/detail_room_img"
+            app:layout_constraintTop_toTopOf="@id/detail_room_img"
+            />
+
+        <TextView
+            android:id="@+id/detail_room_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintStart_toStartOf="@id/detail_room_lbl"
+            app:layout_constraintTop_toBottomOf="@id/detail_room_lbl"
+            tools:text="8"
+            />
+
+        <ImageView
+            android:id="@+id/detail_bath_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:contentDescription="@string/number_of_bathroom_description"
+            android:src="@drawable/ic_bathtub"
+            app:layout_constraintStart_toStartOf="@id/detail_surface_img"
+            app:layout_constraintTop_toBottomOf="@id/detail_room_txt"
+            />
+
+        <TextView
+            android:id="@+id/detail_bath_lbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/label_bathroom"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/detail_bath_img"
+            app:layout_constraintTop_toTopOf="@id/detail_bath_img"
+            />
+
+        <TextView
+            android:id="@+id/detail_bath_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintStart_toStartOf="@id/detail_bath_lbl"
+            app:layout_constraintTop_toBottomOf="@id/detail_bath_lbl"
+            tools:text="2"
+            />
+
+        <ImageView
+            android:id="@+id/detail_bed_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:contentDescription="@string/number_of_bedroom_description"
+            android:src="@drawable/ic_hotel"
+            app:layout_constraintStart_toStartOf="@id/detail_surface_img"
+            app:layout_constraintTop_toBottomOf="@id/detail_bath_txt"
+            />
+
+        <TextView
+            android:id="@+id/detail_bed_lbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/label_bedroom"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/detail_bed_img"
+            app:layout_constraintTop_toTopOf="@id/detail_bed_img"
+            />
+
+        <TextView
+            android:id="@+id/detail_bed_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintStart_toStartOf="@id/detail_bed_lbl"
+            app:layout_constraintTop_toBottomOf="@id/detail_bed_lbl"
+            tools:text="4"
+            />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/detail_barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="end"
+            app:constraint_referenced_ids="detail_surface_lbl,detail_room_lbl,detail_bath_lbl,detail_bed_lbl"
+            />
+
+        <ImageView
+            android:id="@+id/detail_location_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:contentDescription="@string/location_description"
+            android:src="@drawable/ic_location_on"
+            app:layout_constraintStart_toEndOf="@id/detail_barrier"
+            app:layout_constraintTop_toTopOf="@id/detail_surface_img"
+            />
+
+        <TextView
+            android:id="@+id/detail_location_lbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/location"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/detail_location_img"
+            app:layout_constraintTop_toTopOf="@id/detail_location_img"
+            />
+
+        <TextView
+            android:id="@+id/detail_location_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintStart_toStartOf="@id/detail_location_lbl"
+            app:layout_constraintTop_toBottomOf="@id/detail_location_lbl"
+            tools:text="740 Park Avenue\nApt 6/7A\nNewYork\nNY 10021\nUnitedStates"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/detail_poi_list"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            app:layout_constraintStart_toEndOf="@id/detail_location_txt"
+            app:layout_constraintTop_toTopOf="@id/detail_surface_img"
+            tools:listitem="@layout/item_chip"
+            />
+
+        <ImageView
+            android:id="@+id/detail_market_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:contentDescription="@string/market_description"
+            android:src="@drawable/ic_calendar_today"
+            app:layout_constraintStart_toStartOf="@id/detail_surface_img"
+            app:layout_constraintTop_toBottomOf="@id/detail_bed_txt"
+            />
+
+        <TextView
+            android:id="@+id/detail_market_lbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/on_market"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/detail_market_img"
+            app:layout_constraintTop_toTopOf="@id/detail_market_img"
+            />
+
+        <TextView
+            android:id="@+id/detail_market_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintStart_toStartOf="@id/detail_market_lbl"
+            app:layout_constraintTop_toBottomOf="@id/detail_market_lbl"
+            tools:text="Since 15/03/2022"
+            />
+
+        <ImageView
+            android:id="@+id/detail_agent_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/agent_description"
+            android:src="@drawable/ic_person"
+            app:layout_constraintStart_toStartOf="@id/detail_location_img"
+            app:layout_constraintTop_toTopOf="@id/detail_market_img"
+            />
+
+        <TextView
+            android:id="@+id/detail_agent_lbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/in_charge_agent"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/detail_agent_img"
+            app:layout_constraintTop_toTopOf="@id/detail_agent_img"
+            />
+
+        <TextView
+            android:id="@+id/detail_agent_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintStart_toStartOf="@id/detail_agent_lbl"
+            app:layout_constraintTop_toBottomOf="@id/detail_agent_lbl"
+            tools:text="Agent K"
+            />
+
+        <TextView
+            android:id="@+id/detail_no_selection_lbl"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:padding="30dp"
+            android:textSize="30sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/no_real_estate_selected"
+            tools:visibility="gone"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

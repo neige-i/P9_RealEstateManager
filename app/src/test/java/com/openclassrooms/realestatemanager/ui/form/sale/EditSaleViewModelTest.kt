@@ -4,9 +4,7 @@ import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.UtilsRepository
-import com.openclassrooms.realestatemanager.data.agent.AgentEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
-import com.openclassrooms.realestatemanager.domain.GetAgentListUseCase
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider

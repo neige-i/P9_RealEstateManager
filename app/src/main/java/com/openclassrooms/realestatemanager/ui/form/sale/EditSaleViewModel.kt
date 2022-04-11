@@ -7,9 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.UtilsRepository
-import com.openclassrooms.realestatemanager.data.agent.AgentEntity
 import com.openclassrooms.realestatemanager.data.form.FormEntity
-import com.openclassrooms.realestatemanager.domain.GetAgentListUseCase
+import com.openclassrooms.realestatemanager.data.real_estate.RealEstateRepository
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
@@ -25,8 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class EditSaleViewModel @Inject constructor(
     getFormUseCase: GetFormUseCase,
+    realEstateRepository: RealEstateRepository,
     private val setFormUseCase: SetFormUseCase,
-    getAgentListUseCase: GetAgentListUseCase,
     private val defaultClock: Clock,
     private val defaultZoneId: ZoneId,
     private val utilsRepository: UtilsRepository,
@@ -36,11 +35,11 @@ class EditSaleViewModel @Inject constructor(
 
     val viewStateLiveData: LiveData<SaleViewState> = combine(
         getFormUseCase.getFormFlow(),
-        getAgentListUseCase()
-    ) { form: FormEntity, agentList: List<AgentEntity> ->
+        realEstateRepository.getAllAgents(),
+    ) { form, agentList ->
         currentForm = form
 
-        val agentNameList = agentList.map { it.name }
+        val agentNameList = agentList.map { it.username }
 
         SaleViewState(
             agentEntries = agentNameList,

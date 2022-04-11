@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <ImageView
+        android:id="@+id/real_estate_photo"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="@string/real_estate_photo"
+        android:scaleType="centerCrop"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent=".3"
+        tools:src="@drawable/ic_photo"
+        />
+
+    <TextView
+        android:id="@+id/real_estate_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/real_estate_city"
+        app:layout_constraintStart_toEndOf="@id/real_estate_photo"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Flat"
+        />
+
+    <TextView
+        android:id="@+id/real_estate_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        app:layout_constraintBottom_toTopOf="@id/real_estate_price"
+        app:layout_constraintStart_toEndOf="@id/real_estate_photo"
+        app:layout_constraintTop_toBottomOf="@id/real_estate_type"
+        tools:text="Manhattan"
+        />
+
+    <TextView
+        android:id="@+id/real_estate_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:textColor="@color/colorAccent"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/real_estate_photo"
+        app:layout_constraintTop_toBottomOf="@id/real_estate_city"
+        tools:text="$17,870,000"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,16 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
     <item
-        android:id="@+id/main_menu_edit_estate"
+        android:id="@+id/detail_menu_edit_estate"
         android:icon="@drawable/ic_edit"
         android:title="@string/menu_item_edit"
-        android:visible="false"
-        app:showAsAction="ifRoom"
-        />
-    <item
-        android:id="@+id/main_menu_add_estate"
-        android:icon="@drawable/ic_add"
-        android:title="@string/menu_item_add"
         app:showAsAction="ifRoom"
         />
 </menu>
