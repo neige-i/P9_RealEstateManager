@@ -29,9 +29,4 @@ class ListFragment : Fragment(R.layout.fragment_list) {
             simpleAdapter.submitList(it)
         }
     }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.onFragmentResumed()
-    }
 }

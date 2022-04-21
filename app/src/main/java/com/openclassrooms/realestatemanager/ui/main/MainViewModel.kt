@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.openclassrooms.realestatemanager.R
+import com.openclassrooms.realestatemanager.data.ResourcesRepository
 import com.openclassrooms.realestatemanager.data.real_estate.CurrentEstateRepository
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.GetCurrentEstateUseCase
@@ -25,6 +26,7 @@ class MainViewModel @Inject constructor(
     currentEstateRepository: CurrentEstateRepository,
     private val getCurrentEstateUseCase: GetCurrentEstateUseCase,
     private val setFormUseCase: SetFormUseCase,
+    private val resourcesRepository: ResourcesRepository,
     private val coroutineProvider: CoroutineProvider,
     private val application: Application,
 ) : ViewModel() {
@@ -34,7 +36,8 @@ class MainViewModel @Inject constructor(
     val viewStateLiveData: LiveData<MainViewState> = combine(
         currentEstateRepository.getIdOrNull(),
         backStackEntryCountMutableStateFlow,
-    ) { _, backStackEntryCount ->
+        resourcesRepository.isTabletFlow(),
+    ) { _, backStackEntryCount, isTablet ->
         MainViewState(
             toolbarTitle = if (backStackEntryCount == 0) {
                 application.getString(R.string.app_name)
@@ -46,7 +49,7 @@ class MainViewModel @Inject constructor(
             } else {
                 null
             },
-            isEditMenuItemVisible = application.resources.getBoolean(R.bool.is_tablet)
+            isEditMenuItemVisible = isTablet,
         )
     }.asLiveData(coroutineProvider.getIoDispatcher())
 
@@ -54,11 +57,15 @@ class MainViewModel @Inject constructor(
     val mainEventLiveData: LiveData<MainEvent> = mainEventSingleLiveEvent
 
     init {
-        mainEventSingleLiveEvent.addSource(
-            currentEstateRepository.getId().asLiveData(coroutineProvider.getIoDispatcher())
-        ) {
-            if (!application.resources.getBoolean(R.bool.is_tablet)) {
-                mainEventSingleLiveEvent.value = MainEvent.OpenEstateDetail
+        viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
+            currentEstateRepository.getId().collect {
+                val isTablet = resourcesRepository.isTabletFlow().first()
+
+                withContext(coroutineProvider.getMainDispatcher()) {
+                    if (!isTablet) {
+                        mainEventSingleLiveEvent.value = MainEvent.OpenEstateDetail
+                    }
+                }
             }
         }
     }
@@ -84,5 +91,9 @@ class MainViewModel @Inject constructor(
 
     fun onBackStackChanged(backStackEntryCount: Int) {
         backStackEntryCountMutableStateFlow.value = backStackEntryCount
+    }
+
+    fun onActivityResumed() {
+        resourcesRepository.refreshOrientation()
     }
 }

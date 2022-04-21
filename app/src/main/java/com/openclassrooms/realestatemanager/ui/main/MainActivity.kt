@@ -18,11 +18,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
+    private val viewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val binding = ActivityMainBinding.inflate(layoutInflater)
-        val viewModel: MainViewModel by viewModels()
 
         setContentView(binding.root)
 
@@ -70,5 +71,10 @@ class MainActivity : AppCompatActivity() {
                 OpenEstateForm -> startActivity(Intent(this, FormActivity::class.java))
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onActivityResumed()
     }
 }
