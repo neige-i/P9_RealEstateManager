@@ -13,7 +13,7 @@ import com.openclassrooms.realestatemanager.domain.real_estate.RealEstateResult
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -29,13 +29,23 @@ class MainViewModel @Inject constructor(
     private val application: Application,
 ) : ViewModel() {
 
-    private val isMenuItemReadyMutableSharedFlow = MutableSharedFlow<Boolean>(replay = 1)
+    private val backStackEntryCountMutableStateFlow = MutableStateFlow(0)
 
     val viewStateLiveData: LiveData<MainViewState> = combine(
-        currentEstateRepository.getId(),
-        isMenuItemReadyMutableSharedFlow,
-    ) { _, _ ->
+        currentEstateRepository.getIdOrNull(),
+        backStackEntryCountMutableStateFlow,
+    ) { _, backStackEntryCount ->
         MainViewState(
+            toolbarTitle = if (backStackEntryCount == 0) {
+                application.getString(R.string.app_name)
+            } else {
+                application.getString(R.string.toolbar_title_detail)
+            },
+            navigationIconId = if (backStackEntryCount != 0) {
+                R.drawable.ic_arrow_back
+            } else {
+                null
+            },
             isEditMenuItemVisible = application.resources.getBoolean(R.bool.is_tablet)
         )
     }.asLiveData(coroutineProvider.getIoDispatcher())
@@ -48,18 +58,14 @@ class MainViewModel @Inject constructor(
             currentEstateRepository.getId().asLiveData(coroutineProvider.getIoDispatcher())
         ) {
             if (!application.resources.getBoolean(R.bool.is_tablet)) {
-                mainEventSingleLiveEvent.value = MainEvent.GoToDetailActivity
+                mainEventSingleLiveEvent.value = MainEvent.OpenEstateDetail
             }
         }
     }
 
-    fun onOptionsMenuCreated() {
-        isMenuItemReadyMutableSharedFlow.tryEmit(true)
-    }
-
     fun onAddMenuItemClicked() {
         setFormUseCase.initForm()
-        mainEventSingleLiveEvent.value = MainEvent.GoToFormActivity
+        mainEventSingleLiveEvent.value = MainEvent.OpenEstateForm
     }
 
     fun onEditMenuItemClicked() {
@@ -70,9 +76,13 @@ class MainViewModel @Inject constructor(
                 setFormUseCase.initForm(currentEstateResult.realEstate)
 
                 withContext(coroutineProvider.getMainDispatcher()) {
-                    mainEventSingleLiveEvent.value = MainEvent.GoToFormActivity
+                    mainEventSingleLiveEvent.value = MainEvent.OpenEstateForm
                 }
             }
         }
+    }
+
+    fun onBackStackChanged(backStackEntryCount: Int) {
+        backStackEntryCountMutableStateFlow.value = backStackEntryCount
     }
 }

@@ -7,7 +7,6 @@
         android:id="@+id/main_menu_edit_estate"
         android:icon="@drawable/ic_edit"
         android:title="@string/menu_item_edit"
-        android:visible="false"
         app:showAsAction="ifRoom"
         />
     <item
