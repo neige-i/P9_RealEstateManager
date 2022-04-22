@@ -37,19 +37,17 @@ class MainViewModel @Inject constructor(
         currentEstateRepository.getIdOrNull(),
         backStackEntryCountMutableStateFlow,
         resourcesRepository.isTabletFlow(),
-    ) { _, backStackEntryCount, isTablet ->
+    ) { currentEstateId, backStackEntryCount, isTablet ->
+        val isDetailInPortrait = !isTablet && backStackEntryCount == 1
+
         MainViewState(
-            toolbarTitle = if (backStackEntryCount == 0) {
-                application.getString(R.string.app_name)
-            } else {
+            toolbarTitle = if (isDetailInPortrait) {
                 application.getString(R.string.toolbar_title_detail)
-            },
-            navigationIconId = if (backStackEntryCount != 0) {
-                R.drawable.ic_arrow_back
             } else {
-                null
+                application.getString(R.string.app_name)
             },
-            isEditMenuItemVisible = isTablet,
+            navigationIconId = if (isDetailInPortrait) R.drawable.ic_arrow_back else null,
+            isEditMenuItemVisible = isTablet && currentEstateId != null || isDetailInPortrait,
         )
     }.asLiveData(coroutineProvider.getIoDispatcher())
 
