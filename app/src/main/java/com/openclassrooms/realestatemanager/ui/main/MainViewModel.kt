@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    currentEstateRepository: CurrentEstateRepository,
+    private val currentEstateRepository: CurrentEstateRepository,
     private val getCurrentEstateUseCase: GetCurrentEstateUseCase,
     private val setFormUseCase: SetFormUseCase,
     private val resourcesRepository: ResourcesRepository,
@@ -38,6 +38,14 @@ class MainViewModel @Inject constructor(
         backStackEntryCountMutableStateFlow,
         resourcesRepository.isTabletFlow(),
     ) { currentEstateId, backStackEntryCount, isTablet ->
+
+        // Set when to open the estate details
+        withContext(coroutineProvider.getMainDispatcher()) {
+            if (currentEstateId != null && !isTablet && backStackEntryCount == 0) {
+                mainEventSingleLiveEvent.value = MainEvent.OpenEstateDetail
+            }
+        }
+
         val isDetailInPortrait = !isTablet && backStackEntryCount == 1
 
         MainViewState(
@@ -47,26 +55,12 @@ class MainViewModel @Inject constructor(
                 application.getString(R.string.app_name)
             },
             navigationIconId = if (isDetailInPortrait) R.drawable.ic_arrow_back else null,
-            isEditMenuItemVisible = isTablet && currentEstateId != null || isDetailInPortrait,
+            isEditMenuItemVisible = currentEstateId != null,
         )
     }.asLiveData(coroutineProvider.getIoDispatcher())
 
     private val mainEventSingleLiveEvent = SingleLiveEvent<MainEvent>()
     val mainEventLiveData: LiveData<MainEvent> = mainEventSingleLiveEvent
-
-    init {
-        viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            currentEstateRepository.getId().collect {
-                val isTablet = resourcesRepository.isTabletFlow().first()
-
-                withContext(coroutineProvider.getMainDispatcher()) {
-                    if (!isTablet) {
-                        mainEventSingleLiveEvent.value = MainEvent.OpenEstateDetail
-                    }
-                }
-            }
-        }
-    }
 
     fun onAddMenuItemClicked() {
         setFormUseCase.initForm()
@@ -88,6 +82,10 @@ class MainViewModel @Inject constructor(
     }
 
     fun onBackStackChanged(backStackEntryCount: Int) {
+        // Reset current estate ID, if go back to list view from detail view in portrait orientation
+        if (backStackEntryCountMutableStateFlow.value == 1 && backStackEntryCount == 0) {
+            currentEstateRepository.setId(null)
+        }
         backStackEntryCountMutableStateFlow.value = backStackEntryCount
     }
 

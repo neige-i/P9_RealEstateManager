@@ -17,7 +17,7 @@ class CurrentEstateRepository @Inject constructor() {
 
     fun getIdOrNull(): Flow<Long?> = estateIdMutableSharedFlow
 
-    fun setId(estateId: Long) {
+    fun setId(estateId: Long?) {
         estateIdMutableSharedFlow.tryEmit(estateId)
     }
 }
