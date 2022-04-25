@@ -10,23 +10,36 @@ import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateEntity
+import com.openclassrooms.realestatemanager.domain.form.FormType.ADD_ESTATE
+import com.openclassrooms.realestatemanager.domain.form.FormType.EDIT_ESTATE
+import com.openclassrooms.realestatemanager.domain.real_estate.GetCurrentEstateUseCase
+import com.openclassrooms.realestatemanager.domain.real_estate.RealEstateResult
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class SetFormUseCase @Inject constructor(
     private val formRepository: FormRepository,
+    private val getCurrentEstateUseCase: GetCurrentEstateUseCase,
     private val currentPictureRepository: CurrentPictureRepository,
     private val actionRepository: ActionRepository,
     private val application: Application,
 ) {
 
-    fun initForm(realEstateEntity: RealEstateEntity? = null) {
-        if (realEstateEntity == null) {
-            formRepository.initForm(FormRepository.DEFAULT_FORM)
-            formRepository.resetAllErrors()
-        } else {
-            val form = mapEstateToForm(realEstateEntity)
-            formRepository.initForm(form)
-            formRepository.setForm(form)
+    suspend fun initForm(formType: FormType) {
+        when (formType) {
+            ADD_ESTATE -> {
+                formRepository.initForm(FormRepository.DEFAULT_FORM)
+                formRepository.resetAllErrors()
+            }
+            EDIT_ESTATE -> {
+                val currentEstateResult = getCurrentEstateUseCase.invoke().first()
+
+                if (currentEstateResult is RealEstateResult.Success) {
+                    val form = mapEstateToForm(currentEstateResult.realEstate)
+                    formRepository.initForm(form)
+                    formRepository.setForm(form)
+                }
+            }
         }
     }
 

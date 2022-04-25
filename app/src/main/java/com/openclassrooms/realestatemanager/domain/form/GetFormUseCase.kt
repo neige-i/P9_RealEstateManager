@@ -21,9 +21,9 @@ class GetFormUseCase @Inject constructor(
 
         return FormInfo(
             formType = if (FormRepository.DEFAULT_FORM == initialState) {
-                FormInfo.FormType.ADD
+                FormType.ADD_ESTATE
             } else {
-                FormInfo.FormType.EDIT
+                FormType.EDIT_ESTATE
             },
             isModified = currentState != initialState,
             estateType = currentState.type

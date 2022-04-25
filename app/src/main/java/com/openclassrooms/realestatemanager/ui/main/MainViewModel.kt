@@ -8,15 +8,13 @@ import androidx.lifecycle.viewModelScope
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.ResourcesRepository
 import com.openclassrooms.realestatemanager.data.real_estate.CurrentEstateRepository
+import com.openclassrooms.realestatemanager.domain.form.FormType
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
-import com.openclassrooms.realestatemanager.domain.real_estate.GetCurrentEstateUseCase
-import com.openclassrooms.realestatemanager.domain.real_estate.RealEstateResult
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -24,7 +22,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val currentEstateRepository: CurrentEstateRepository,
-    private val getCurrentEstateUseCase: GetCurrentEstateUseCase,
     private val setFormUseCase: SetFormUseCase,
     private val resourcesRepository: ResourcesRepository,
     private val coroutineProvider: CoroutineProvider,
@@ -63,20 +60,19 @@ class MainViewModel @Inject constructor(
     val mainEventLiveData: LiveData<MainEvent> = mainEventSingleLiveEvent
 
     fun onAddMenuItemClicked() {
-        setFormUseCase.initForm()
-        mainEventSingleLiveEvent.value = MainEvent.OpenEstateForm
+        initAndOpenForm(FormType.ADD_ESTATE)
     }
 
     fun onEditMenuItemClicked() {
+        initAndOpenForm(FormType.EDIT_ESTATE)
+    }
+
+    private fun initAndOpenForm(formType: FormType) {
         viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            val currentEstateResult = getCurrentEstateUseCase().first()
+            setFormUseCase.initForm(formType)
 
-            if (currentEstateResult is RealEstateResult.Success) {
-                setFormUseCase.initForm(currentEstateResult.realEstate)
-
-                withContext(coroutineProvider.getMainDispatcher()) {
-                    mainEventSingleLiveEvent.value = MainEvent.OpenEstateForm
-                }
+            withContext(coroutineProvider.getMainDispatcher()) {
+                mainEventSingleLiveEvent.value = MainEvent.OpenEstateForm
             }
         }
     }

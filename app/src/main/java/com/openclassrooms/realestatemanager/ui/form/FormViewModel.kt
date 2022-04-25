@@ -4,10 +4,7 @@ import android.app.Application
 import androidx.lifecycle.*
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.form.ActionRepository
-import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
-import com.openclassrooms.realestatemanager.domain.form.FormInfo
-import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
-import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
+import com.openclassrooms.realestatemanager.domain.form.*
 import com.openclassrooms.realestatemanager.domain.real_estate.SaveRealEstateUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
@@ -48,7 +45,7 @@ class FormViewModel @Inject constructor(
     private fun getFormInfo(): FormInfo = getFormUseCase.getFormInfo()
 
     private fun checkExistingDraft() {
-        if (getFormInfo().formType == FormInfo.FormType.ADD && getFormInfo().isModified) {
+        if (getFormInfo().formType == FormType.ADD_ESTATE && getFormInfo().isModified) {
 
             formSingleLiveEvent.value = FormEvent.ShowDialog(
                 type = DialogType.DRAFT,
@@ -72,8 +69,8 @@ class FormViewModel @Inject constructor(
 
         val addOrEdit = application.getString(
             when (getFormInfo().formType) {
-                FormInfo.FormType.ADD -> R.string.toolbar_title_add
-                FormInfo.FormType.EDIT -> R.string.toolbar_title_edit
+                FormType.ADD_ESTATE -> R.string.toolbar_title_add
+                FormType.EDIT_ESTATE -> R.string.toolbar_title_edit
             }
         )
 
@@ -99,7 +96,7 @@ class FormViewModel @Inject constructor(
 
     private fun onFormCompleted() {
         viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            saveRealEstateUseCase(getFormInfo().formType)
+            saveRealEstateUseCase()
 
             withContext(coroutineProvider.getMainDispatcher()) {
                 setFormUseCase.reset()
@@ -126,8 +123,8 @@ class FormViewModel @Inject constructor(
                 type = DialogType.EXIT,
                 title = application.getString(R.string.exit_form_dialog_title),
                 message = when (getFormInfo().formType) {
-                    FormInfo.FormType.ADD -> application.getString(R.string.exit_add_form_dialog_message)
-                    FormInfo.FormType.EDIT -> application.getString(R.string.exit_edit_form_dialog_message)
+                    FormType.ADD_ESTATE -> application.getString(R.string.exit_add_form_dialog_message)
+                    FormType.EDIT_ESTATE -> application.getString(R.string.exit_edit_form_dialog_message)
                 },
                 positiveButtonText = application.getString(R.string.exit_form_dialog_positive_button),
                 negativeButtonText = application.getString(R.string.exit_form_dialog_negative_button)
@@ -151,7 +148,7 @@ class FormViewModel @Inject constructor(
 
         when (type) {
             DialogType.EXIT -> formSingleLiveEvent.value = FormEvent.ExitActivity
-            DialogType.DRAFT -> setFormUseCase.initForm()
+            DialogType.DRAFT -> {}
         }
     }
 
