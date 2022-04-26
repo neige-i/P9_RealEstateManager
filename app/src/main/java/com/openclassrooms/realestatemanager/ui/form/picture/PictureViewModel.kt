@@ -3,9 +3,9 @@ package com.openclassrooms.realestatemanager.ui.form.picture
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
 import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
 import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase.PageToCheck
-import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
@@ -15,13 +15,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PictureViewModel @Inject constructor(
-    getFormUseCase: GetFormUseCase,
+    currentPictureRepository: CurrentPictureRepository,
     private val checkFormErrorUseCase: CheckFormErrorUseCase,
     private val setFormUseCase: SetFormUseCase,
     coroutineProvider: CoroutineProvider,
 ) : ViewModel() {
 
-    val viewStateLiveData: LiveData<PictureViewState> = getFormUseCase.getCurrentPictureFlow()
+    val viewStateLiveData: LiveData<PictureViewState> = currentPictureRepository.getPictureFlow()
         .map {
             PictureViewState(
                 uri = it.uri,
@@ -46,7 +46,7 @@ class PictureViewModel @Inject constructor(
         }
     }
 
-    fun onActivityFinished() {
+    override fun onCleared() {
         setFormUseCase.resetPicture()
     }
 }

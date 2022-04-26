@@ -1,9 +1,12 @@
 package com.openclassrooms.realestatemanager.ui.form
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.openclassrooms.realestatemanager.R
-import com.openclassrooms.realestatemanager.data.form.ActionRepository
+import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
 import com.openclassrooms.realestatemanager.domain.form.*
 import com.openclassrooms.realestatemanager.domain.real_estate.SaveRealEstateUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
@@ -16,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FormViewModel @Inject constructor(
     private val getFormUseCase: GetFormUseCase,
-    actionRepository: ActionRepository,
+    currentPictureRepository: CurrentPictureRepository,
     private val checkFormErrorUseCase: CheckFormErrorUseCase,
     private val setFormUseCase: SetFormUseCase,
     private val saveRealEstateUseCase: SaveRealEstateUseCase,
@@ -35,10 +38,13 @@ class FormViewModel @Inject constructor(
     init {
         checkExistingDraft()
 
-        formSingleLiveEvent.addSource(
-            actionRepository.getPictureOpenerFlow().asLiveData(coroutineProvider.getIoDispatcher())
-        ) {
-            formSingleLiveEvent.value = FormEvent.ShowPicture
+        viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
+            currentPictureRepository.getPictureFlow().collect {
+
+                withContext(coroutineProvider.getMainDispatcher()) {
+                    formSingleLiveEvent.value = FormEvent.ShowPicture
+                }
+            }
         }
     }
 

@@ -5,7 +5,10 @@ import android.net.Uri
 import androidx.annotation.StringRes
 import com.openclassrooms.realestatemanager.data.PointOfInterest
 import com.openclassrooms.realestatemanager.data.RealEstateType
-import com.openclassrooms.realestatemanager.data.form.*
+import com.openclassrooms.realestatemanager.data.form.CurrentPictureEntity
+import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
+import com.openclassrooms.realestatemanager.data.form.FormEntity
+import com.openclassrooms.realestatemanager.data.form.FormRepository
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateEntity
 import com.openclassrooms.realestatemanager.domain.form.FormType.ADD_ESTATE
 import com.openclassrooms.realestatemanager.domain.form.FormType.EDIT_ESTATE
@@ -18,7 +21,6 @@ class SetFormUseCase @Inject constructor(
     private val formRepository: FormRepository,
     private val getCurrentEstateUseCase: GetCurrentEstateUseCase,
     private val currentPictureRepository: CurrentPictureRepository,
-    private val actionRepository: ActionRepository,
     private val application: Application,
 ) {
 
@@ -201,16 +203,12 @@ class SetFormUseCase @Inject constructor(
     // CURRENT PICTURE
 
     fun initPicture(uri: Uri, description: String = "") {
-        if (currentPictureRepository.getCurrentPicture() == null) {
-            actionRepository.requestPictureOpening()
-        }
-
         currentPictureRepository.setPicture(
             CurrentPictureEntity(
                 uri = uri,
                 description = description,
                 descriptionError = null,
-                descriptionCursor = 0
+                descriptionCursor = description.length
             )
         )
     }
