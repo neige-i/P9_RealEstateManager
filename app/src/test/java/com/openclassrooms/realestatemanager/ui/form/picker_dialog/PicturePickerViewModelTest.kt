@@ -1,6 +1,5 @@
 package com.openclassrooms.realestatemanager.ui.form.picker_dialog
 
-import com.openclassrooms.realestatemanager.data.form.ActionRepository
 import com.openclassrooms.realestatemanager.data.form.ImagePicker
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
