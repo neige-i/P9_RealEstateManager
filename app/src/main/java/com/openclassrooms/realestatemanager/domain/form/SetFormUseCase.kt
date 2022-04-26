@@ -5,10 +5,7 @@ import android.net.Uri
 import androidx.annotation.StringRes
 import com.openclassrooms.realestatemanager.data.PointOfInterest
 import com.openclassrooms.realestatemanager.data.RealEstateType
-import com.openclassrooms.realestatemanager.data.form.ActionRepository
-import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
-import com.openclassrooms.realestatemanager.data.form.FormEntity
-import com.openclassrooms.realestatemanager.data.form.FormRepository
+import com.openclassrooms.realestatemanager.data.form.*
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateEntity
 import com.openclassrooms.realestatemanager.domain.form.FormType.ADD_ESTATE
 import com.openclassrooms.realestatemanager.domain.form.FormType.EDIT_ESTATE
@@ -28,15 +25,27 @@ class SetFormUseCase @Inject constructor(
     suspend fun initForm(formType: FormType) {
         when (formType) {
             ADD_ESTATE -> {
-                formRepository.initForm(FormRepository.DEFAULT_FORM)
-                formRepository.resetAllErrors()
+                formRepository.setInitialState(FormRepository.DEFAULT_FORM)
+                formRepository.setForm(
+                    formRepository.getForm().copy(
+                        typeError = null,
+                        pictureListError = null,
+                        streetNameError = null,
+                        cityError = null,
+                        stateError = null,
+                        zipcodeError = null,
+                        countryError = null,
+                        marketEntryDateError = null,
+                        saleDateError = null,
+                    )
+                )
             }
             EDIT_ESTATE -> {
                 val currentEstateResult = getCurrentEstateUseCase.invoke().first()
 
                 if (currentEstateResult is RealEstateResult.Success) {
                     val form = mapEstateToForm(currentEstateResult.realEstate)
-                    formRepository.initForm(form)
+                    formRepository.setInitialState(form)
                     formRepository.setForm(form)
                 }
             }
@@ -89,54 +98,74 @@ class SetFormUseCase @Inject constructor(
     )
 
     fun reset() {
-        formRepository.resetForm()
+        formRepository.resetAll()
     }
 
     // MAIN INFO
 
     fun updateType(type: String) {
-        formRepository.setType(type)
+        formRepository.setForm(formRepository.getForm().copy(type = type))
     }
 
     fun updatePrice(price: String, cursorPosition: Int) {
-        formRepository.setPrice(price, cursorPosition)
+        formRepository.setForm(
+            formRepository.getForm().copy(price = price, priceCursor = cursorPosition)
+        )
     }
 
     fun updateArea(area: String, cursorPosition: Int) {
-        formRepository.setArea(area, cursorPosition)
+        formRepository.setForm(
+            formRepository.getForm().copy(area = area, areaCursor = cursorPosition)
+        )
     }
 
     fun incTotalRoomCount() {
-        formRepository.incTotalRoom()
+        formRepository.setForm(
+            formRepository.getForm().let { it.copy(totalRoomCount = it.totalRoomCount.inc()) }
+        )
     }
 
     fun decTotalRoomCount() {
         if (areAnyRoomsLeft()) {
-            formRepository.decTotalRoom()
+            formRepository.setForm(
+                formRepository.getForm().let { it.copy(totalRoomCount = it.totalRoomCount.dec()) }
+            )
         }
     }
 
     fun incBathroomCount() {
         if (areAnyRoomsLeft()) {
-            formRepository.incBathroom()
+            formRepository.setForm(
+                formRepository.getForm().let { it.copy(bathroomCount = it.bathroomCount.inc()) }
+            )
         }
     }
 
     fun decBathroomCount() {
-        if (formRepository.getForm().bathroomCount > 0) {
-            formRepository.decBathroom()
+        val currentForm = formRepository.getForm()
+
+        if (currentForm.bathroomCount > 0) {
+            formRepository.setForm(
+                currentForm.copy(bathroomCount = currentForm.bathroomCount.dec())
+            )
         }
     }
 
     fun incBedroomCount() {
         if (areAnyRoomsLeft()) {
-            formRepository.incBedroom()
+            formRepository.setForm(
+                formRepository.getForm().let { it.copy(bedroomCount = it.bedroomCount.inc()) }
+            )
         }
     }
 
     fun decBedroomCount() {
-        if (formRepository.getForm().bedroomCount > 0) {
-            formRepository.decBedroom()
+        val currentForm = formRepository.getForm()
+
+        if (currentForm.bedroomCount > 0) {
+            formRepository.setForm(
+                currentForm.copy(bedroomCount = currentForm.bedroomCount.dec())
+            )
         }
     }
 
@@ -147,7 +176,12 @@ class SetFormUseCase @Inject constructor(
     // DETAIL INFO
 
     fun updateDescription(description: String, cursorPosition: Int) {
-        formRepository.setDescription(description, cursorPosition)
+        formRepository.setForm(
+            formRepository.getForm().copy(
+                description = description,
+                descriptionCursor = cursorPosition
+            )
+        )
     }
 
     fun updatePicturePosition(position: Int) {
@@ -155,34 +189,43 @@ class SetFormUseCase @Inject constructor(
     }
 
     fun removePictureAt(position: Int) {
-        formRepository.deletePictureAt(position)
+        modifyPictureList {
+            removeAt(position)
+        }
     }
 
     fun resetPictureError() {
-        formRepository.setPictureListError(null)
+        formRepository.setForm(formRepository.getForm().copy(pictureListError = null))
     }
 
     // CURRENT PICTURE
 
-    fun setPicture(pictureUri: Uri, pictureDescription: String) {
-        currentPictureRepository.initPicture(pictureUri, pictureDescription)
-        actionRepository.requestPictureOpening()
-    }
-
-    fun setPictureUri(uri: Uri) {
+    fun initPicture(uri: Uri, description: String = "") {
         if (currentPictureRepository.getCurrentPicture() == null) {
-            setPicture(uri, "")
-        } else {
-            currentPictureRepository.setUri(uri)
+            actionRepository.requestPictureOpening()
         }
+
+        currentPictureRepository.setPicture(
+            CurrentPictureEntity(
+                uri = uri,
+                description = description,
+                descriptionError = null,
+                descriptionCursor = 0
+            )
+        )
     }
 
     fun updatePictureDescription(description: String, cursorPosition: Int) {
-        currentPictureRepository.setDescription(description, cursorPosition)
+        currentPictureRepository.setPicture(
+            currentPictureRepository.getCurrentPicture()?.copy(
+                description = description,
+                descriptionCursor = cursorPosition
+            )
+        )
     }
 
     fun resetPicture() {
-        currentPictureRepository.reset()
+        currentPictureRepository.setPicture(null)
     }
 
     fun savePicture() {
@@ -194,66 +237,132 @@ class SetFormUseCase @Inject constructor(
             description = currentPicture.description,
         )
 
-        if (formRepository.getForm().pictureList.size == picturePosition) {
-            formRepository.addPicture(picture)
-        } else {
-            formRepository.setPictureAt(picturePosition, picture)
+        modifyPictureList {
+            if (formRepository.getForm().pictureList.size == picturePosition) {
+                add(picture)
+            } else {
+                set(picturePosition, picture)
+            }
         }
     }
 
     // ADDRESS
 
     fun updateStreetName(streetName: String, cursorPosition: Int) {
-        formRepository.setStreetName(streetName, cursorPosition)
+        formRepository.setForm(
+            formRepository.getForm().copy(
+                streetName = streetName,
+                streetNameCursor = cursorPosition
+            )
+        )
     }
 
     fun updateAdditionalAddressInfo(additionalAddressInfo: String, cursorPosition: Int) {
-        formRepository.setAdditionalAddress(additionalAddressInfo, cursorPosition)
+        formRepository.setForm(
+            formRepository.getForm().copy(
+                additionalAddressInfo = additionalAddressInfo,
+                additionalAddressInfoCursor = cursorPosition
+            )
+        )
     }
 
     fun updateCity(city: String, cursorPosition: Int) {
-        formRepository.setCity(city, cursorPosition)
+        formRepository.setForm(
+            formRepository.getForm().copy(
+                city = city,
+                cityCursor = cursorPosition
+            )
+        )
     }
 
     fun updateState(state: String, cursorPosition: Int) {
-        formRepository.setState(state.uppercase(), cursorPosition)
+        formRepository.setForm(
+            formRepository.getForm().copy(
+                state = state,
+                stateCursor = cursorPosition
+            )
+        )
     }
 
     fun updateZipcode(zipcode: String, cursorPosition: Int) {
-        formRepository.setZipcode(zipcode, cursorPosition)
+        formRepository.setForm(
+            formRepository.getForm().copy(
+                zipcode = zipcode,
+                zipcodeCursor = cursorPosition
+            )
+        )
     }
 
     fun updateCountry(country: String, cursorPosition: Int) {
-        formRepository.setCountry(country, cursorPosition)
+        formRepository.setForm(
+            formRepository.getForm().copy(
+                country = country,
+                countryCursor = cursorPosition
+            )
+        )
     }
 
     fun updatePoi(@StringRes labelId: Int, isChecked: Boolean) {
-        if (isChecked) {
-            formRepository.addPoi(labelId)
-        } else {
-            formRepository.removePoi(labelId)
+        val updatedForm = formRepository.getForm().let {
+            it.copy(
+                pointsOfInterests = applyModificationOn(it.pointsOfInterests) {
+                    if (isChecked) {
+                        add(labelId)
+                    } else {
+                        remove(labelId)
+                    }
+                }
+            )
         }
+
+        formRepository.setForm(updatedForm)
     }
 
     // SALE STATUS
 
     fun updateAgent(agentName: String) {
-        formRepository.setAgentName(agentName)
+        formRepository.setForm(
+            formRepository.getForm().copy(agentName = agentName)
+        )
     }
 
     fun updateMarketEntryDate(marketEntryDate: String) {
-        formRepository.setEntryDate(marketEntryDate)
+        formRepository.setForm(
+            formRepository.getForm().copy(marketEntryDate = marketEntryDate)
+        )
     }
 
     fun updateSaleDate(saleDate: String) {
-        formRepository.setSaleDate(saleDate)
+        formRepository.setForm(
+            formRepository.getForm().copy(saleDate = saleDate)
+        )
     }
 
     fun updateAvailability(isAvailable: Boolean) {
-        formRepository.setAvailability(isAvailable)
+        val currentForm = formRepository.getForm()
 
-        if (!isAvailable) {
-            formRepository.setSaleDate("")
-        }
+        formRepository.setForm(
+            currentForm.copy(
+                isAvailableForSale = isAvailable,
+                saleDate = if (!isAvailable) "" else currentForm.saleDate
+            )
+        )
+    }
+
+    private fun modifyPictureList(modification: MutableList<FormEntity.PictureEntity>.() -> Unit) {
+        val currentForm = formRepository.getForm()
+
+        formRepository.setForm(
+            currentForm.copy(
+                pictureList = applyModificationOn(currentForm.pictureList) { modification() }
+            )
+        )
+    }
+
+    private inline fun <T> applyModificationOn(
+        list: List<T>,
+        modification: MutableList<T>.() -> Unit
+    ): MutableList<T> {
+        return list.toMutableList().apply { modification(this) }
     }
 }

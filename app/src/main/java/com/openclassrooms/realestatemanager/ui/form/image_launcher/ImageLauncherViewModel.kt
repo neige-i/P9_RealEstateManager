@@ -39,7 +39,7 @@ class ImageLauncherViewModel @Inject constructor(
 
     fun onPhotoPicked(uri: Uri?, success: Boolean = true) {
         if (uri != null && success) {
-            setFormUseCase.setPictureUri(uri)
+            setFormUseCase.initPicture(uri = uri)
         }
     }
 }

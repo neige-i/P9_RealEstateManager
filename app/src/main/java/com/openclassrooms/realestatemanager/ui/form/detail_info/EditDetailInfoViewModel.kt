@@ -61,7 +61,7 @@ class EditDetailInfoViewModel @Inject constructor(
 
     fun onPhotoOpened(position: Int, picture: DetailInfoViewState.PhotoViewState.Picture) {
         setFormUseCase.updatePicturePosition(position)
-        setFormUseCase.setPicture(picture.uri, picture.description)
+        setFormUseCase.initPicture(picture.uri, picture.description)
     }
 
     fun onPhotoRemoved(position: Int) {

@@ -58,9 +58,9 @@ class SetFormUseCaseTest {
 
         every { mockFormRepository.getForm() } returns CURRENT_FORM
         every { mockFormRepository.getCurrentPicturePosition() } returns 1
-        justRun { mockFormRepository.initForm(any()) }
+        justRun { mockFormRepository.setInitialState(any()) }
         justRun { mockFormRepository.resetAllErrors() }
-        justRun { mockFormRepository.resetForm() }
+        justRun { mockFormRepository.resetAll() }
         justRun { mockFormRepository.setType(any()) }
         justRun { mockFormRepository.setPrice(any(), any()) }
         justRun { mockFormRepository.setArea(any(), any()) }
@@ -118,7 +118,7 @@ class SetFormUseCaseTest {
         setFormUseCase.initForm()
 
         // THEN
-        verify(exactly = 1) { mockFormRepository.initForm(FormRepository.DEFAULT_FORM) }
+        verify(exactly = 1) { mockFormRepository.setInitialState(FormRepository.DEFAULT_FORM) }
         verify(exactly = 1) { mockFormRepository.resetAllErrors() }
     }
 
@@ -128,7 +128,7 @@ class SetFormUseCaseTest {
         setFormUseCase.reset()
 
         // THEN
-        verify(exactly = 1) { mockFormRepository.resetForm() }
+        verify(exactly = 1) { mockFormRepository.resetAll() }
     }
 
     @Test
