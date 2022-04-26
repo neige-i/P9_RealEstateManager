@@ -3,10 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/list_rv"
+    android:id="@+id/estate_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-    tools:context=".ui.list.ListFragment"
-    tools:listitem="@layout/item_real_estate"
+    tools:context=".ui.list.EstatesFragment"
+    tools:listitem="@layout/item_estate"
     />

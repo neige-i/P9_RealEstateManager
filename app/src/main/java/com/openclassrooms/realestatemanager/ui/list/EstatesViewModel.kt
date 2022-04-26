@@ -16,7 +16,7 @@ import java.text.NumberFormat
 import javax.inject.Inject
 
 @HiltViewModel
-class ListViewModel @Inject constructor(
+class EstatesViewModel @Inject constructor(
     realEstateRepository: RealEstateRepository,
     private val currentEstateRepository: CurrentEstateRepository,
     resourcesRepository: ResourcesRepository,
@@ -25,16 +25,14 @@ class ListViewModel @Inject constructor(
     numberFormat: NumberFormat,
 ) : ViewModel() {
 
-    val viewState: LiveData<List<RealEstateViewState>> = combine(
+    val viewStateLiveData: LiveData<List<EstateViewState>> = combine(
         realEstateRepository.getAllRealEstates(),
         currentEstateRepository.getIdOrNull(),
         resourcesRepository.isTabletFlow(),
     ) { allEstates, currentEstateId, isTablet ->
 
         allEstates.map { realEstate ->
-            val isEstateSelected = currentEstateId == realEstate.info.realEstateId && isTablet
-
-            RealEstateViewState(
+            EstateViewState(
                 id = realEstate.info.realEstateId,
                 photoUrl = realEstate.photoList.first().uri,
                 type = application.getString(RealEstateType.valueOf(realEstate.info.type).labelId),
@@ -42,26 +40,24 @@ class ListViewModel @Inject constructor(
                 price = realEstate.info.price?.let { price ->
                     application.getString(R.string.price_in_dollars, numberFormat.format(price))
                 } ?: application.getString(R.string.undefined_price),
-                backgroundColor = if (isEstateSelected) {
-                    R.color.colorAccent
+                style = if (currentEstateId == realEstate.info.realEstateId && isTablet) {
+                    EstateViewState.Style(
+                        backgroundColor = R.color.colorAccent,
+                        priceTextColor = android.R.color.white,
+                        cityTextColor = android.R.color.black,
+                    )
                 } else {
-                    android.R.color.white
+                    EstateViewState.Style(
+                        backgroundColor = android.R.color.white,
+                        priceTextColor = R.color.colorAccent,
+                        cityTextColor = android.R.color.tab_indicator_text,
+                    )
                 },
-                priceTextColor = if (isEstateSelected) {
-                    android.R.color.white
-                } else {
-                    R.color.colorAccent
-                },
-                cityTextColor = if (isEstateSelected) {
-                    android.R.color.black
-                } else {
-                    android.R.color.tab_indicator_text
-                }
             )
         }
     }.asLiveData(coroutineProvider.getIoDispatcher())
 
-    fun onItemClicked(realEstateId: Long) {
-        currentEstateRepository.setId(realEstateId)
+    fun onEstateClicked(estateId: Long) {
+        currentEstateRepository.setId(estateId)
     }
 }

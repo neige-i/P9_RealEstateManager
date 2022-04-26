@@ -39,7 +39,7 @@ class MainViewModel @Inject constructor(
         // Set when to open the estate details
         withContext(coroutineProvider.getMainDispatcher()) {
             if (currentEstateId != null && !isTablet && backStackEntryCount == 0) {
-                mainEventSingleLiveEvent.value = MainEvent.OpenEstateDetail
+                mainSingleLiveEvent.value = MainEvent.OpenEstateDetail
             }
         }
 
@@ -56,8 +56,8 @@ class MainViewModel @Inject constructor(
         )
     }.asLiveData(coroutineProvider.getIoDispatcher())
 
-    private val mainEventSingleLiveEvent = SingleLiveEvent<MainEvent>()
-    val mainEventLiveData: LiveData<MainEvent> = mainEventSingleLiveEvent
+    private val mainSingleLiveEvent = SingleLiveEvent<MainEvent>()
+    val mainEventLiveData: LiveData<MainEvent> = mainSingleLiveEvent
 
     fun onAddMenuItemClicked() {
         initAndOpenForm(FormType.ADD_ESTATE)
@@ -72,7 +72,7 @@ class MainViewModel @Inject constructor(
             setFormUseCase.initForm(formType)
 
             withContext(coroutineProvider.getMainDispatcher()) {
-                mainEventSingleLiveEvent.value = MainEvent.OpenEstateForm
+                mainSingleLiveEvent.value = MainEvent.OpenEstateForm
             }
         }
     }

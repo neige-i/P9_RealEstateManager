@@ -8,7 +8,7 @@
     >
 
     <ImageView
-        android:id="@+id/real_estate_photo"
+        android:id="@+id/estate_photo_img"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:contentDescription="@string/real_estate_photo"
@@ -21,40 +21,40 @@
         />
 
     <TextView
-        android:id="@+id/real_estate_type"
+        android:id="@+id/estate_type_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:textColor="@android:color/black"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/real_estate_city"
-        app:layout_constraintStart_toEndOf="@id/real_estate_photo"
+        app:layout_constraintBottom_toTopOf="@id/estate_city_txt"
+        app:layout_constraintStart_toEndOf="@id/estate_photo_img"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Flat"
         />
 
     <TextView
-        android:id="@+id/real_estate_city"
+        android:id="@+id/estate_city_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        app:layout_constraintBottom_toTopOf="@id/real_estate_price"
-        app:layout_constraintStart_toEndOf="@id/real_estate_photo"
-        app:layout_constraintTop_toBottomOf="@id/real_estate_type"
+        app:layout_constraintBottom_toTopOf="@id/estate_price_txt"
+        app:layout_constraintStart_toEndOf="@id/estate_photo_img"
+        app:layout_constraintTop_toBottomOf="@id/estate_type_txt"
         tools:text="Manhattan"
         />
 
     <TextView
-        android:id="@+id/real_estate_price"
+        android:id="@+id/estate_price_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:textColor="@color/colorAccent"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/real_estate_photo"
-        app:layout_constraintTop_toBottomOf="@id/real_estate_city"
+        app:layout_constraintStart_toEndOf="@id/estate_photo_img"
+        app:layout_constraintTop_toBottomOf="@id/estate_city_txt"
         tools:text="$17,870,000"
         />
 
