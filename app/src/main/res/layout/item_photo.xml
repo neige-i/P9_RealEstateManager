@@ -15,11 +15,11 @@
         android:contentDescription="@string/media_description"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="11:13"
+        app:layout_constraintDimensionRatio="11:10"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_add_photo"
+        tools:src="@drawable/ic_photo"
         />
 
     <TextView

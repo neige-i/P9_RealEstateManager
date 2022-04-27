@@ -103,4 +103,5 @@
     <string name="market_description">Market logo</string>
     <string name="location_description">Location logo</string>
     <string name="agent_description">Agent logo</string>
+    <string name="map_description">Real estate location map</string>
 </resources>
