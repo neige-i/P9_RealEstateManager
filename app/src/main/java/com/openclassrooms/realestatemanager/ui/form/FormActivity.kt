@@ -9,6 +9,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ActivityFormBinding
+import com.openclassrooms.realestatemanager.ui.form.FormEvent.*
 import com.openclassrooms.realestatemanager.ui.form.address.EditAddressFragment
 import com.openclassrooms.realestatemanager.ui.form.detail_info.EditDetailInfoFragment
 import com.openclassrooms.realestatemanager.ui.form.image_launcher.ImageLauncherActivity
@@ -31,19 +32,19 @@ class FormActivity : ImageLauncherActivity() {
         setSupportActionBar(binding.formToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val addEditPagerAdapter = FormPagerAdapter(
+        val formPagerAdapter = FormPagerAdapter(
             fragmentActivity = this,
             fragmentList = listOf(
                 EditMainInfoFragment(),
                 EditDetailInfoFragment(),
                 EditAddressFragment(),
-                EditSaleFragment()
+                EditSaleFragment(),
             ),
         )
-        viewModel.onInitPagerAdapter(addEditPagerAdapter.itemCount)
+        viewModel.onInitPagerAdapter(formPagerAdapter.itemCount)
 
         binding.formPager.isUserInputEnabled = false
-        binding.formPager.adapter = addEditPagerAdapter
+        binding.formPager.adapter = formPagerAdapter
         binding.formPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 viewModel.onPageChanged(position)
@@ -52,26 +53,26 @@ class FormActivity : ImageLauncherActivity() {
 
         binding.formSubmitButton.setOnClickListener { viewModel.onSubmitButtonClicked() }
 
-        viewModel.viewStateLiveData.observe(this) {
-            binding.formToolbar.title = it.toolbarTitle
-            binding.formSubmitButton.text = it.submitButtonText
+        viewModel.viewStateLiveData.observe(this) { formViewState ->
+            binding.formToolbar.title = formViewState.toolbarTitle
+            binding.formSubmitButton.text = formViewState.submitButtonText
         }
 
-        viewModel.formEventLiveData.observe(this) {
-            when (it) {
-                FormEvent.ExitActivity -> finish()
-                is FormEvent.GoToPage -> binding.formPager.currentItem = it.pageToGo
-                is FormEvent.ShowDialog -> MaterialAlertDialogBuilder(this)
-                    .setTitle(it.title)
-                    .setMessage(it.message)
-                    .setPositiveButton(it.positiveButtonText) { _, _ ->
-                        viewModel.onDialogPositiveButtonClicked(it.type)
+        viewModel.formEventLiveData.observe(this) { formEvent ->
+            when (formEvent) {
+                ExitActivity -> finish()
+                is GoToPage -> binding.formPager.currentItem = formEvent.pageToGo
+                is ShowDialog -> MaterialAlertDialogBuilder(this)
+                    .setTitle(formEvent.title)
+                    .setMessage(formEvent.message)
+                    .setPositiveButton(formEvent.positiveButtonText) { _, _ ->
+                        viewModel.onDialogPositiveButtonClicked(formEvent.type)
                     }
-                    .setNegativeButton(it.negativeButtonText) { _, _ ->
-                        viewModel.onDialogNegativeButtonClicked(it.type)
+                    .setNegativeButton(formEvent.negativeButtonText) { _, _ ->
+                        viewModel.onDialogNegativeButtonClicked(formEvent.type)
                     }
                     .show()
-                FormEvent.ShowPicture -> startActivity(Intent(this, PictureActivity::class.java))
+                ShowPicture -> startActivity(Intent(this, PictureActivity::class.java))
             }
         }
     }

@@ -19,29 +19,29 @@ class EditAddressViewModel @Inject constructor(
     coroutineProvider: CoroutineProvider,
 ) : ViewModel() {
 
-    val viewStateLiveData: LiveData<AddressViewState> = getFormUseCase.getFormFlow().map {
+    val viewStateLiveData: LiveData<AddressViewState> = getFormUseCase.getFormFlow().map { form ->
         AddressViewState(
-            streetNumber = it.streetName,
-            streetNumberError = it.streetNameError,
-            streetNumberSelection = it.streetNameCursor,
-            additionalInfo = it.additionalAddressInfo,
-            additionalInfoSelection = it.additionalAddressInfoCursor,
-            city = it.city,
-            cityError = it.cityError,
-            citySelection = it.cityCursor,
-            state = it.state,
-            stateError = it.stateError,
-            stateSelection = it.stateCursor,
-            zipcode = it.zipcode,
-            zipcodeError = it.zipcodeError,
-            zipcodeSelection = it.zipcodeCursor,
-            country = it.country,
-            countryError = it.countryError,
-            countrySelection = it.countryCursor,
+            streetNumber = form.streetName,
+            streetNumberError = form.streetNameError,
+            streetNumberSelection = form.streetNameCursor,
+            additionalInfo = form.additionalAddressInfo,
+            additionalInfoSelection = form.additionalAddressInfoCursor,
+            city = form.city,
+            cityError = form.cityError,
+            citySelection = form.cityCursor,
+            state = form.state,
+            stateError = form.stateError,
+            stateSelection = form.stateCursor,
+            zipcode = form.zipcode,
+            zipcodeError = form.zipcodeError,
+            zipcodeSelection = form.zipcodeCursor,
+            country = form.country,
+            countryError = form.countryError,
+            countrySelection = form.countryCursor,
             pointOfInterestList = PointOfInterest.values().map { poi ->
                 AddressViewState.ChipViewState(
                     labelId = poi.labelId,
-                    isSelected = it.pointsOfInterests.contains(poi.labelId)
+                    isSelected = form.pointsOfInterests.contains(poi.labelId)
                 )
             }
         )

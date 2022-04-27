@@ -52,15 +52,15 @@ class EditSaleFragment : Fragment(R.layout.fragment_edit_sale) {
             binding.saleDateInputLayout.error = it.saleDateError
         }
 
-        viewModel.showDatePickerEventLiveData.observe(viewLifecycleOwner) {
+        viewModel.showDatePickerEventLiveData.observe(viewLifecycleOwner) { showDatePickerEvent ->
             val datePicker = MaterialDatePicker.Builder
                 .datePicker()
-                .setTitleText(it.title)
-                .setSelection(it.dateMillis)
+                .setTitleText(showDatePickerEvent.title)
+                .setSelection(showDatePickerEvent.dateMillis)
                 .build()
 
             datePicker.addOnPositiveButtonClickListener { dateMillis ->
-                viewModel.onDateSelected(dateMillis, it.type)
+                viewModel.onDateSelected(dateMillis, showDatePickerEvent.type)
             }
             datePicker.show(parentFragmentManager, null)
         }

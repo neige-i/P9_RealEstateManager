@@ -7,7 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
-import com.openclassrooms.realestatemanager.domain.form.*
+import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
+import com.openclassrooms.realestatemanager.domain.form.FormType
+import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
+import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.SaveRealEstateUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
@@ -48,17 +51,16 @@ class FormViewModel @Inject constructor(
         }
     }
 
-    private fun getFormInfo(): FormInfo = getFormUseCase.getFormInfo()
-
     private fun checkExistingDraft() {
-        if (getFormInfo().formType == FormType.ADD_ESTATE && getFormInfo().isModified) {
-
+        if (getFormUseCase.getFormInfo().formType == FormType.ADD_ESTATE &&
+            getFormUseCase.getFormInfo().isModified
+        ) {
             formSingleLiveEvent.value = FormEvent.ShowDialog(
-                type = DialogType.DRAFT,
+                type = DialogType.SAVE_DRAFT,
                 title = application.getString(R.string.draft_form_dialog_title),
                 message = application.getString(
                     R.string.draft_form_dialog_message,
-                    getFormInfo().estateType
+                    getFormUseCase.getFormInfo().estateType
                 ),
                 positiveButtonText = application.getString(R.string.draft_form_dialog_positive_button),
                 negativeButtonText = application.getString(R.string.draft_form_dialog_negative_button)
@@ -74,7 +76,7 @@ class FormViewModel @Inject constructor(
         currentPage = position
 
         val addOrEdit = application.getString(
-            when (getFormInfo().formType) {
+            when (getFormUseCase.getFormInfo().formType) {
                 FormType.ADD_ESTATE -> R.string.toolbar_title_add
                 FormType.EDIT_ESTATE -> R.string.toolbar_title_edit
             }
@@ -102,10 +104,10 @@ class FormViewModel @Inject constructor(
 
     private fun onFormCompleted() {
         viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            saveRealEstateUseCase()
+            saveRealEstateUseCase.invoke()
+            setFormUseCase.reset()
 
             withContext(coroutineProvider.getMainDispatcher()) {
-                setFormUseCase.reset()
                 formSingleLiveEvent.value = FormEvent.ExitActivity
             }
         }
@@ -124,11 +126,11 @@ class FormViewModel @Inject constructor(
     }
 
     private fun confirmExit() {
-        if (getFormInfo().isModified) {
+        if (getFormUseCase.getFormInfo().isModified) {
             formSingleLiveEvent.value = FormEvent.ShowDialog(
-                type = DialogType.EXIT,
+                type = DialogType.EXIT_FORM,
                 title = application.getString(R.string.exit_form_dialog_title),
-                message = when (getFormInfo().formType) {
+                message = when (getFormUseCase.getFormInfo().formType) {
                     FormType.ADD_ESTATE -> application.getString(R.string.exit_add_form_dialog_message)
                     FormType.EDIT_ESTATE -> application.getString(R.string.exit_edit_form_dialog_message)
                 },
@@ -136,16 +138,17 @@ class FormViewModel @Inject constructor(
                 negativeButtonText = application.getString(R.string.exit_form_dialog_negative_button)
             )
         } else {
+            setFormUseCase.reset()
             formSingleLiveEvent.value = FormEvent.ExitActivity
         }
     }
 
     fun onDialogPositiveButtonClicked(type: DialogType) {
         when (type) {
-            DialogType.EXIT -> if (checkFormErrorUseCase.containsNoError(pageToCheck = 0)) {
+            DialogType.EXIT_FORM -> if (checkFormErrorUseCase.containsNoError(pageToCheck = 0)) {
                 formSingleLiveEvent.value = FormEvent.ExitActivity
             }
-            DialogType.DRAFT -> {}
+            DialogType.SAVE_DRAFT -> {}
         }
     }
 
@@ -153,15 +156,15 @@ class FormViewModel @Inject constructor(
         setFormUseCase.reset()
 
         when (type) {
-            DialogType.EXIT -> formSingleLiveEvent.value = FormEvent.ExitActivity
-            DialogType.DRAFT -> {}
+            DialogType.EXIT_FORM -> formSingleLiveEvent.value = FormEvent.ExitActivity
+            DialogType.SAVE_DRAFT -> {}
         }
     }
 
     private fun isLastPageDisplayed(): Boolean = currentPage == pageCount - 1
 
     enum class DialogType {
-        EXIT,
-        DRAFT,
+        EXIT_FORM,
+        SAVE_DRAFT,
     }
 }

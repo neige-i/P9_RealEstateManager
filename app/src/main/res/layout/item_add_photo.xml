@@ -1,22 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="12dp"
-    app:cardCornerRadius="10dp"
-    app:strokeColor="?attr/colorPrimary"
-    app:strokeWidth="2dp"
     >
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/description_button_add_photo"
-        android:padding="50dp"
-        android:src="@drawable/ic_add_photo"
+        android:id="@+id/photo_delete_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="1"
+        android:contentDescription="@string/description_button_remove"
+        android:elevation="2dp"
+        android:src="@drawable/ic_cancel"
+        app:layout_constraintBottom_toTopOf="@id/photo_card"
+        app:layout_constraintEnd_toEndOf="@id/photo_card"
+        app:layout_constraintStart_toEndOf="@id/photo_card"
+        app:layout_constraintTop_toTopOf="@id/photo_card"
+        app:tint="@android:color/holo_red_dark"
         />
 
-</com.google.android.material.card.MaterialCardView>
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/photo_card"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="12dp"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="?attr/colorPrimary"
+        app:strokeWidth="2dp"
+        >
+
+        <ImageView
+            android:id="@+id/photo_img"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/description_button_add_photo"
+            tools:src="@drawable/ic_add_photo"
+            />
+
+        <TextView
+            android:id="@+id/photo_description_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="#77000000"
+            android:gravity="center"
+            android:padding="5dp"
+            android:textColor="@android:color/white"
+            tools:text="This is a description"
+            />
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -54,50 +54,55 @@ class SetFormUseCase @Inject constructor(
         }
     }
 
-    private fun mapEstateToForm(realEstate: RealEstateEntity) = FormEntity(
-        id = realEstate.info.realEstateId,
-        type = application.getString(RealEstateType.valueOf(realEstate.info.type).labelId),
-        typeError = null,
-        price = realEstate.info.price?.toString() ?: "",
-        priceCursor = 0,
-        area = realEstate.info.area?.toString() ?: "",
-        areaCursor = 0,
-        totalRoomCount = realEstate.info.totalRoomCount,
-        bathroomCount = realEstate.info.bathroomCount,
-        bedroomCount = realEstate.info.bedroomCount,
-        description = realEstate.info.description,
-        descriptionCursor = 0,
-        pictureList = realEstate.photoList.map {
-            FormEntity.PictureEntity(uri = Uri.parse(it.uri), description = it.description)
-        },
-        pictureListError = null,
-        streetName = realEstate.info.streetName,
-        streetNameError = null,
-        streetNameCursor = 0,
-        additionalAddressInfo = realEstate.info.additionalAddressInfo,
-        additionalAddressInfoCursor = 0,
-        city = realEstate.info.city,
-        cityError = null,
-        cityCursor = 0,
-        state = realEstate.info.state,
-        stateError = null,
-        stateCursor = 0,
-        zipcode = realEstate.info.zipcode,
-        zipcodeError = null,
-        zipcodeCursor = 0,
-        country = realEstate.info.country,
-        countryError = null,
-        countryCursor = 0,
-        pointsOfInterests = realEstate.poiList.map {
-            PointOfInterest.valueOf(it.poiValue).labelId
-        },
-        agentName = realEstate.agent?.username.orEmpty(),
-        marketEntryDate = realEstate.info.marketEntryDate,
-        marketEntryDateError = null,
-        saleDate = realEstate.info.saleDate ?: "",
-        saleDateError = null,
-        isAvailableForSale = realEstate.info.saleDate == null,
-    )
+    private fun mapEstateToForm(realEstate: RealEstateEntity): FormEntity {
+        val price = realEstate.info.price?.toString() ?: ""
+        val area = realEstate.info.area?.toString() ?: ""
+
+        return FormEntity(
+            id = realEstate.info.realEstateId,
+            type = application.getString(RealEstateType.valueOf(realEstate.info.type).labelId),
+            typeError = null,
+            price = price,
+            priceCursor = price.length,
+            area = area,
+            areaCursor = area.length,
+            totalRoomCount = realEstate.info.totalRoomCount,
+            bathroomCount = realEstate.info.bathroomCount,
+            bedroomCount = realEstate.info.bedroomCount,
+            description = realEstate.info.description,
+            descriptionCursor = realEstate.info.description.length,
+            pictureList = realEstate.photoList.map {
+                FormEntity.PictureEntity(uri = Uri.parse(it.uri), description = it.description)
+            },
+            pictureListError = null,
+            streetName = realEstate.info.streetName,
+            streetNameError = null,
+            streetNameCursor = realEstate.info.streetName.length,
+            additionalAddressInfo = realEstate.info.additionalAddressInfo,
+            additionalAddressInfoCursor = realEstate.info.additionalAddressInfo.length,
+            city = realEstate.info.city,
+            cityError = null,
+            cityCursor = realEstate.info.city.length,
+            state = realEstate.info.state,
+            stateError = null,
+            stateCursor = realEstate.info.state.length,
+            zipcode = realEstate.info.zipcode,
+            zipcodeError = null,
+            zipcodeCursor = realEstate.info.zipcode.length,
+            country = realEstate.info.country,
+            countryError = null,
+            countryCursor = realEstate.info.country.length,
+            pointsOfInterests = realEstate.poiList.map {
+                PointOfInterest.valueOf(it.poiValue).labelId
+            },
+            agentName = realEstate.agent?.username.orEmpty(),
+            marketEntryDate = realEstate.info.marketEntryDate,
+            marketEntryDateError = null,
+            saleDate = realEstate.info.saleDate ?: "",
+            saleDateError = null,
+            isAvailableForSale = realEstate.info.saleDate == null,
+        )
+    }
 
     fun reset() {
         formRepository.resetAll()

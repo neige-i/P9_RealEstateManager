@@ -61,8 +61,8 @@ class EditDetailInfoViewModelTest {
             description = "Beautiful penthouse",
             descriptionSelection = 2,
             photoList = listOf(
-                DetailInfoViewState.PhotoViewState.Picture(mockUri1, "Patio"),
-                DetailInfoViewState.PhotoViewState.Picture(mockUri2, "Garage"),
+                DetailInfoViewState.PhotoViewState.Photo(mockUri1, "Patio"),
+                DetailInfoViewState.PhotoViewState.Photo(mockUri2, "Garage"),
                 DetailInfoViewState.PhotoViewState.Add
             ),
         )
@@ -157,7 +157,7 @@ class EditDetailInfoViewModelTest {
         val mockUri = mockk<Uri>()
         editDetailInfoViewModel.onPhotoOpened(
             position = 5,
-            picture = DetailInfoViewState.PhotoViewState.Picture(
+            photo = DetailInfoViewState.PhotoViewState.Photo(
                 uri = mockUri,
                 description = "Bedroom"
             )

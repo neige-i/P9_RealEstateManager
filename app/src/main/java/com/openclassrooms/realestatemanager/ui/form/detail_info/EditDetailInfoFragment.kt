@@ -29,14 +29,14 @@ class EditDetailInfoFragment : Fragment(R.layout.fragment_edit_detail_info) {
             viewModel.onDescriptionChanged(text?.toString(), cursorPosition)
         }
 
-        val photoAdapter = PhotoAdapter(object : PhotoAdapter.PhotoListener {
+        val addPhotoAdapter = AddPhotoAdapter(object : AddPhotoAdapter.PhotoListener {
             override fun add(position: Int) {
                 viewModel.onPhotoAdded(position)
                 PicturePickerDialog().show(parentFragmentManager, null)
             }
 
-            override fun open(position: Int, picture: DetailInfoViewState.PhotoViewState.Picture) {
-                viewModel.onPhotoOpened(position, picture)
+            override fun open(position: Int, photo: DetailInfoViewState.PhotoViewState.Photo) {
+                viewModel.onPhotoOpened(position, photo)
             }
 
             override fun remove(position: Int) {
@@ -44,18 +44,17 @@ class EditDetailInfoFragment : Fragment(R.layout.fragment_edit_detail_info) {
             }
 
         })
-        binding.detailInfoPhotoList.adapter = photoAdapter
+        binding.detailInfoPhotoList.adapter = addPhotoAdapter
 
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
             binding.detailInfoDescriptionInput.setText(it.description)
             binding.detailInfoDescriptionInput.setSelection(it.descriptionSelection)
-            photoAdapter.submitList(it.photoList)
+            addPhotoAdapter.submitList(it.photoList)
         }
 
-        viewModel.showErrorEventLiveData.observe(viewLifecycleOwner) {
+        viewModel.showErrorEventLiveData.observe(viewLifecycleOwner) { errorMessageId ->
             val redColor = ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark)
-            Snackbar
-                .make(binding.root, it, Snackbar.LENGTH_SHORT)
+            Snackbar.make(binding.root, errorMessageId, Snackbar.LENGTH_SHORT)
                 .setBackgroundTint(redColor)
                 .show()
         }

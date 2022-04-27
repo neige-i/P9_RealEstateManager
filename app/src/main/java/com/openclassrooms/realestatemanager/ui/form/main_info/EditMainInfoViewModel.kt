@@ -16,17 +16,17 @@ class EditMainInfoViewModel @Inject constructor(
     coroutineProvider: CoroutineProvider,
 ) : ViewModel() {
 
-    val viewStateLiveData = getFormUseCase.getFormFlow().map {
+    val viewStateLiveData = getFormUseCase.getFormFlow().map { form ->
         MainInfoViewState(
-            selectedType = it.type,
-            typeError = it.typeError,
-            price = it.price,
-            priceSelection = it.priceCursor,
-            area = it.area,
-            areaSelection = it.areaCursor,
-            totalRoomCount = it.totalRoomCount.toString(),
-            bathroomCount = it.bathroomCount.toString(),
-            bedroomCount = it.bedroomCount.toString()
+            selectedType = form.type,
+            typeError = form.typeError,
+            price = form.price,
+            priceSelection = form.priceCursor,
+            area = form.area,
+            areaSelection = form.areaCursor,
+            totalRoomCount = form.totalRoomCount.toString(),
+            bathroomCount = form.bathroomCount.toString(),
+            bedroomCount = form.bedroomCount.toString()
         )
     }.asLiveData(coroutineProvider.getIoDispatcher())
 

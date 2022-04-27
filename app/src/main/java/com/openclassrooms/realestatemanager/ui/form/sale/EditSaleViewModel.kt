@@ -37,13 +37,14 @@ class EditSaleViewModel @Inject constructor(
         getFormUseCase.getFormFlow(),
         realEstateRepository.getAllAgents(),
     ) { form, agentList ->
+
         currentForm = form
 
-        val agentNameList = agentList.map { it.username }
+        val agentNames = agentList.map { it.username }
 
         SaleViewState(
-            agentEntries = agentNameList,
-            selectedAgentName = agentNameList.firstOrNull { it == form.agentName } ?: "",
+            agentEntries = agentNames,
+            selectedAgentName = agentNames.firstOrNull { it == form.agentName } ?: "",
             marketEntryDate = form.marketEntryDate,
             marketEntryDateError = form.marketEntryDateError,
             saleDate = form.saleDate,
@@ -51,6 +52,7 @@ class EditSaleViewModel @Inject constructor(
             isAvailableForSale = form.isAvailableForSale
         )
     }.asLiveData(coroutineProvider.getIoDispatcher())
+
     private val showDatePickerSingleLiveEvent = SingleLiveEvent<ShowDatePickerEvent>()
     val showDatePickerEventLiveData: LiveData<ShowDatePickerEvent> = showDatePickerSingleLiveEvent
 

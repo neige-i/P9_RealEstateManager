@@ -30,14 +30,14 @@ class PictureActivity : ImageLauncherActivity() {
             viewModel.onDescriptionChanged(text?.toString(), cursorPosition)
         }
 
-        viewModel.viewStateLiveData.observe(this) {
+        viewModel.viewStateLiveData.observe(this) { pictureViewState ->
             Glide.with(this)
-                .load(it.uri)
+                .load(pictureViewState.uri)
                 .into(binding.pictureImage)
 
-            binding.pictureDescriptionInput.setText(it.description)
-            binding.pictureDescriptionInput.setSelection(it.descriptionSelection)
-            binding.pictureDescriptionInputLayout.error = it.descriptionError
+            binding.pictureDescriptionInput.setText(pictureViewState.description)
+            binding.pictureDescriptionInput.setSelection(pictureViewState.descriptionSelection)
+            binding.pictureDescriptionInputLayout.error = pictureViewState.descriptionError
         }
 
         viewModel.exitEventLiveData.observe(this) { finish() }

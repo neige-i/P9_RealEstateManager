@@ -12,7 +12,7 @@ data class DetailInfoViewState(
 
         object Add : PhotoViewState()
 
-        data class Picture(
+        data class Photo(
             val uri: Uri,
             val description: String,
         ) : PhotoViewState()
