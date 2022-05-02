@@ -48,10 +48,13 @@ class EditMainInfoFragment : Fragment(R.layout.fragment_edit_main_info) {
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
             binding.mainInfoTypeInput.setAdapter(estateTypeArrayAdapter)
             binding.mainInfoTypeInput.setText(it.selectedType, false)
+
             binding.mainInfoPriceInput.setText(it.price)
             binding.mainInfoPriceInput.setSelection(it.priceSelection)
+
             binding.mainInfoAreaInput.setText(it.area)
             binding.mainInfoAreaInput.setSelection(it.areaSelection)
+
             binding.mainInfoTotalRoomCount.text = it.totalRoomCount
             binding.mainInfoBathroomCount.text = it.bathroomCount
             binding.mainInfoBedroomCount.text = it.bedroomCount

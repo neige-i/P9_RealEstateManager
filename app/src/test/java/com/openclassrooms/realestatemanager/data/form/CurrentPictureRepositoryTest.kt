@@ -32,7 +32,7 @@ class CurrentPictureRepositoryTest {
     @ExperimentalCoroutinesApi
     @Test
     fun `return null picture when initialize repository`() = runTest {
-        val pictureAsync = currentPictureRepository.getCurrentPictureFlow().first()
+        val pictureAsync = currentPictureRepository.getPictureFlow().first()
         val pictureSync = currentPictureRepository.getCurrentPicture()
 
         // THEN

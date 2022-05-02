@@ -5,36 +5,42 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import com.openclassrooms.realestatemanager.BuildConfig
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.PointOfInterest
+import com.openclassrooms.realestatemanager.data.ResourcesRepository
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateEntity
 import com.openclassrooms.realestatemanager.domain.real_estate.GetCurrentEstateUseCase
-import com.openclassrooms.realestatemanager.domain.real_estate.RealEstateResult
+import com.openclassrooms.realestatemanager.domain.real_estate.RealEstateResult.*
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+import java.net.URLEncoder
+import java.text.NumberFormat
 import javax.inject.Inject
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     getCurrentEstateUseCase: GetCurrentEstateUseCase,
+    resourcesRepository: ResourcesRepository,
     coroutineProvider: CoroutineProvider,
     application: Application,
+    private val numberFormat: NumberFormat
 ) : ViewModel() {
 
-    val viewState: LiveData<DetailViewState> = getCurrentEstateUseCase.invoke().map {
-        when (it) {
-            is RealEstateResult.Success -> getInfoViewState(
-                realEstate = it.realEstate,
-                application = application
-            )
-            is RealEstateResult.Failure -> DetailViewState.Empty(
+    val viewStateLiveData: LiveData<DetailViewState> = combine(
+        getCurrentEstateUseCase.invoke(),
+        resourcesRepository.isTabletFlow(),
+    ) { realEstateResult, isTablet ->
+        when (realEstateResult) {
+            is Success -> getInfoViewState(realEstateResult.realEstate, isTablet, application)
+            is Failure -> DetailViewState.Empty(
                 noSelectionLabelText = application.getString(
                     R.string.unknown_real_estate_selected,
-                    it.estateId
+                    realEstateResult.estateId
                 )
             )
-            RealEstateResult.Idle -> DetailViewState.Empty(
+            Idle -> DetailViewState.Empty(
                 noSelectionLabelText = application.getString(R.string.no_real_estate_selected)
             )
         }
@@ -42,8 +48,9 @@ class DetailViewModel @Inject constructor(
 
     private fun getInfoViewState(
         realEstate: RealEstateEntity,
+        isTablet: Boolean,
         application: Application
-    ): DetailViewState.Info {
+    ): DetailViewState.WithInfo {
         val availableForSale = realEstate.info.saleDate == null
 
         val additionalAddressText = if (realEstate.info.additionalAddressInfo.isNotEmpty()) {
@@ -51,8 +58,17 @@ class DetailViewModel @Inject constructor(
         } else {
             ""
         }
+        val urlEncodedAddress = URLEncoder.encode(
+            "${realEstate.info.streetName}, ${realEstate.info.city}, ${realEstate.info.country}",
+            "UTF-8"
+        )
 
-        return DetailViewState.Info(
+        return DetailViewState.WithInfo(
+            type = realEstate.info.type,
+            price = realEstate.info.price?.let { price ->
+                application.getString(R.string.price_in_dollars, numberFormat.format(price))
+            } ?: application.getString(R.string.undefined_price),
+            areTypeAndPriceVisible = !isTablet,
             saleText = application.getString(
                 if (availableForSale) R.string.for_sale else R.string.sold
             ),
@@ -61,13 +77,12 @@ class DetailViewModel @Inject constructor(
             } else {
                 android.R.color.holo_red_dark
             },
-            photoList = realEstate.photoList
-                .map {
-                    DetailViewState.Info.Photo(
-                        url = it.uri,
-                        description = it.description
-                    )
-                },
+            photoList = realEstate.photoList.map {
+                DetailViewState.WithInfo.Photo(
+                    url = it.uri,
+                    description = it.description
+                )
+            },
             description = realEstate.info.description
                 .ifEmpty {
                     application.getString(R.string.not_available)
@@ -83,6 +98,10 @@ class DetailViewModel @Inject constructor(
                     "${realEstate.info.state} ${realEstate.info.zipcode}\n" +
                     realEstate.info.country,
             poiList = realEstate.poiList.map { PointOfInterest.valueOf(it.poiValue).labelId },
+            mapUrl = "https://maps.googleapis.com/maps/api/staticmap?" +
+                    "&size=400x400" +
+                    "&markers=$urlEncodedAddress" +
+                    "&key=${BuildConfig.STATIC_MAPS_API_KEY}",
             market_dates = if (availableForSale) {
                 application.getString(R.string.since_date, realEstate.info.marketEntryDate)
             } else {
@@ -96,7 +115,7 @@ class DetailViewModel @Inject constructor(
         )
     }
 
-    fun onMediaClicked(photo: DetailViewState.Info.Photo) {
+    fun onPhotoClicked(photo: DetailViewState.WithInfo.Photo) {
         Log.d("Neige", "onMediaClicked() called with: photo = $photo")
     }
 }

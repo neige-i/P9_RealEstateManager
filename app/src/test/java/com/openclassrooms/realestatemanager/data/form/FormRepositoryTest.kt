@@ -74,7 +74,7 @@ class FormRepositoryTest {
     @Test
     fun `change initial state when initialize form`() {
         // WHEN
-        formRepository.initForm(TEST_FORM)
+        formRepository.setInitialState(TEST_FORM)
         val initialState = formRepository.getInitialState()
 
         // THEN
@@ -94,11 +94,11 @@ class FormRepositoryTest {
     @Test
     fun `return default form when reset`() {
         // GIVEN
-        formRepository.initForm(TEST_FORM)
+        formRepository.setInitialState(TEST_FORM)
         formRepository.setForm(TEST_FORM)
 
         // WHEN
-        formRepository.resetForm()
+        formRepository.resetAll()
         val initialState = formRepository.getInitialState()
         val currentForm = formRepository.getForm()
 

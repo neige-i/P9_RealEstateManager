@@ -10,7 +10,6 @@ import com.openclassrooms.realestatemanager.data.room.EstateAgentCrossRef
 import com.openclassrooms.realestatemanager.data.room.EstateEntity
 import com.openclassrooms.realestatemanager.data.room.EstatePoiCrossRef
 import com.openclassrooms.realestatemanager.data.room.PhotoEntity
-import com.openclassrooms.realestatemanager.domain.form.FormInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -20,7 +19,7 @@ class SaveRealEstateUseCase @Inject constructor(
     @ApplicationContext private val applicationContext: Context,
 ) {
 
-    suspend operator fun invoke(formType: FormInfo.FormType) {
+    suspend operator fun invoke() {
         val form = formRepository.getForm()
 
         val realEstateToSave = EstateEntity(
@@ -42,9 +41,10 @@ class SaveRealEstateUseCase @Inject constructor(
             saleDate = form.saleDate.ifEmpty { null },
         )
 
-        when (formType) {
-            FormInfo.FormType.ADD -> addData(newEstate = realEstateToSave, form = form)
-            FormInfo.FormType.EDIT -> editData(editedEstate = realEstateToSave, form = form)
+        if (form.id == 0L) {
+            addData(newEstate = realEstateToSave, form = form)
+        } else {
+            editData(editedEstate = realEstateToSave, form = form)
         }
     }
 

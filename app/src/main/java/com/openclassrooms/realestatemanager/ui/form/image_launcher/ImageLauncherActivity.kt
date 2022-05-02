@@ -1,5 +1,6 @@
 package com.openclassrooms.realestatemanager.ui.form.image_launcher
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,7 +24,8 @@ abstract class ImageLauncherActivity : AppCompatActivity() {
         val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) {
             viewModel.onPhotoPicked(uri = cameraPictureUri, success = it)
         }
-        val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) {
+        val galleryLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
+            contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             viewModel.onPhotoPicked(uri = it)
         }
 
@@ -33,7 +35,7 @@ abstract class ImageLauncherActivity : AppCompatActivity() {
                     cameraPictureUri = getCameraPictureUri()
                     cameraLauncher.launch(cameraPictureUri)
                 }
-                ImageLauncherEvent.OpenGallery -> galleryLauncher.launch("image/*")
+                ImageLauncherEvent.OpenGallery -> galleryLauncher.launch(arrayOf("image/*"))
             }
         }
     }

@@ -16,7 +16,8 @@ class ChipAdapter : ListAdapter<Int, ChipAdapter.ChipViewHolder>(ChipDiffUtil())
         holder.bind(getItem(position))
     }
 
-    class ChipViewHolder(val binding: ItemChipBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ChipViewHolder(private val binding: ItemChipBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(labelId: Int) {
             binding.root.setText(labelId)

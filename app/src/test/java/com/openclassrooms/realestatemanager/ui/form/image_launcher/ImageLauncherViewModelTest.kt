@@ -2,7 +2,6 @@ package com.openclassrooms.realestatemanager.ui.form.image_launcher
 
 import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.openclassrooms.realestatemanager.data.form.ActionRepository
 import com.openclassrooms.realestatemanager.data.form.ImagePicker
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider

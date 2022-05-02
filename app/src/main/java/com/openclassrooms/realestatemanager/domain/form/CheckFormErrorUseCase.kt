@@ -37,7 +37,7 @@ class CheckFormErrorUseCase @Inject constructor(
             null
         }
 
-        formRepository.setTypeError(typeError)
+        formRepository.setForm(form.copy(typeError = typeError))
 
         return typeError == null
     }
@@ -49,7 +49,7 @@ class CheckFormErrorUseCase @Inject constructor(
             null
         }
 
-        formRepository.setPictureListError(pictureListError)
+        formRepository.setForm(form.copy(pictureListError = pictureListError))
 
         return pictureListError == null
     }
@@ -64,7 +64,7 @@ class CheckFormErrorUseCase @Inject constructor(
             null
         }
 
-        currentPictureRepository.setDescriptionError(descriptionError)
+        currentPictureRepository.setPicture(picture.copy(descriptionError = descriptionError))
 
         return descriptionError == null
     }
@@ -100,11 +100,15 @@ class CheckFormErrorUseCase @Inject constructor(
             else -> null
         }
 
-        formRepository.setStreetNameError(streetNameError)
-        formRepository.setCityError(cityError)
-        formRepository.setStateError(stateError)
-        formRepository.setZipcodeError(zipcodeError)
-        formRepository.setCountryError(countryError)
+        formRepository.setForm(
+            form.copy(
+                streetNameError = streetNameError,
+                cityError = cityError,
+                stateError = stateError,
+                zipcodeError = zipcodeError,
+                countryError = countryError,
+            )
+        )
 
         return streetNameError == null && cityError == null && stateError == null &&
                 zipcodeError == null && countryError == null
@@ -131,8 +135,12 @@ class CheckFormErrorUseCase @Inject constructor(
             else -> null
         }
 
-        formRepository.setEntryDateError(marketEntryDateError)
-        formRepository.setSaleDateError(saleDateError)
+        formRepository.setForm(
+            form.copy(
+                marketEntryDateError = marketEntryDateError,
+                saleDateError = saleDateError,
+            )
+        )
 
         return marketEntryDateError == null && saleDateError == null
     }

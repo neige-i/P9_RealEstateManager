@@ -30,14 +30,14 @@ class PictureActivity : ImageLauncherActivity() {
             viewModel.onDescriptionChanged(text?.toString(), cursorPosition)
         }
 
-        viewModel.viewStateLiveData.observe(this) {
+        viewModel.viewStateLiveData.observe(this) { pictureViewState ->
             Glide.with(this)
-                .load(it.uri)
+                .load(pictureViewState.uri)
                 .into(binding.pictureImage)
 
-            binding.pictureDescriptionInput.setText(it.description)
-            binding.pictureDescriptionInput.setSelection(it.descriptionSelection)
-            binding.pictureDescriptionInputLayout.error = it.descriptionError
+            binding.pictureDescriptionInput.setText(pictureViewState.description)
+            binding.pictureDescriptionInput.setSelection(pictureViewState.descriptionSelection)
+            binding.pictureDescriptionInputLayout.error = pictureViewState.descriptionError
         }
 
         viewModel.exitEventLiveData.observe(this) { finish() }
@@ -62,14 +62,5 @@ class PictureActivity : ImageLauncherActivity() {
             true
         }
         else -> false
-    }
-
-    // Override finish() instead of onDestroy() to reset the repository's picture
-    // The parent activity observes the repository's picture and starts this activity if not null
-    // So the picture must be null BEFORE returning back to the parent activity
-    // But onDestroy() is called AFTER the parent activity is resumed
-    override fun finish() {
-        super.finish()
-        viewModel.onActivityFinished()
     }
 }

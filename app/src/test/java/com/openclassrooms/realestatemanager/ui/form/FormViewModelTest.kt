@@ -3,7 +3,6 @@ package com.openclassrooms.realestatemanager.ui.form
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.openclassrooms.realestatemanager.R
-import com.openclassrooms.realestatemanager.data.form.ActionRepository
 import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
 import com.openclassrooms.realestatemanager.domain.form.FormInfo
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
@@ -127,7 +126,7 @@ class FormViewModelTest {
         // THEN
         assertEquals(
             FormEvent.ShowDialog(
-                type = FormViewModel.DialogType.DRAFT,
+                type = FormViewModel.DialogType.SAVE_DRAFT,
                 title = "Draft",
                 message = "Started: Manor",
                 positiveButtonText = "Resume draft",
@@ -288,7 +287,7 @@ class FormViewModelTest {
         // THEN
         assertEquals(
             FormEvent.ShowDialog(
-                type = FormViewModel.DialogType.EXIT,
+                type = FormViewModel.DialogType.EXIT_FORM,
                 title = "Exit",
                 message = "Keep?",
                 positiveButtonText = "Yes",
@@ -313,7 +312,7 @@ class FormViewModelTest {
         // THEN
         assertEquals(
             FormEvent.ShowDialog(
-                type = FormViewModel.DialogType.EXIT,
+                type = FormViewModel.DialogType.EXIT_FORM,
                 title = "Exit",
                 message = "Save?",
                 positiveButtonText = "Yes",
@@ -348,7 +347,7 @@ class FormViewModelTest {
         // THEN
         assertEquals(
             FormEvent.ShowDialog(
-                type = FormViewModel.DialogType.EXIT,
+                type = FormViewModel.DialogType.EXIT_FORM,
                 title = "Exit",
                 message = "Keep?",
                 positiveButtonText = "Yes",
@@ -372,7 +371,7 @@ class FormViewModelTest {
         // THEN
         assertEquals(
             FormEvent.ShowDialog(
-                type = FormViewModel.DialogType.EXIT,
+                type = FormViewModel.DialogType.EXIT_FORM,
                 title = "Exit",
                 message = "Save?",
                 positiveButtonText = "Yes",
@@ -400,7 +399,7 @@ class FormViewModelTest {
     @Test
     fun `exit when click on EXIT dialog positive button with no errors on 1st page`() {
         // WHEN
-        formViewModel.onDialogPositiveButtonClicked(FormViewModel.DialogType.EXIT)
+        formViewModel.onDialogPositiveButtonClicked(FormViewModel.DialogType.EXIT_FORM)
         val formEvent = getValueForTesting(formViewModel.formEventLiveData)
 
         // THEN
@@ -415,7 +414,7 @@ class FormViewModelTest {
         every { mockCheckFormUseCase.containsNoError(0) } returns false
 
         // WHEN
-        formViewModel.onDialogPositiveButtonClicked(FormViewModel.DialogType.EXIT)
+        formViewModel.onDialogPositiveButtonClicked(FormViewModel.DialogType.EXIT_FORM)
 
         // THEN
         verify { mockCheckFormUseCase.containsNoError(0) }
@@ -424,7 +423,7 @@ class FormViewModelTest {
     @Test
     fun `reset form & exit when click on EXIT dialog negative button`() {
         // WHEN
-        formViewModel.onDialogNegativeButtonClicked(FormViewModel.DialogType.EXIT)
+        formViewModel.onDialogNegativeButtonClicked(FormViewModel.DialogType.EXIT_FORM)
         val formEvent = getValueForTesting(formViewModel.formEventLiveData)
 
         // THEN
@@ -436,7 +435,7 @@ class FormViewModelTest {
     @Test
     fun `reset then init form when click on DRAFT dialog negative button`() {
         // WHEN
-        formViewModel.onDialogNegativeButtonClicked(FormViewModel.DialogType.DRAFT)
+        formViewModel.onDialogNegativeButtonClicked(FormViewModel.DialogType.SAVE_DRAFT)
 
         // THEN
         verifySequence {

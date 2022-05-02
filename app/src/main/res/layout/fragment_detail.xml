@@ -16,7 +16,7 @@
         >
 
         <TextView
-            android:id="@+id/detail_availability_lbl"
+            android:id="@+id/detail_availability_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_corners"
@@ -29,27 +29,52 @@
             />
 
         <TextView
-            android:id="@+id/detail_media_lbl"
+            android:id="@+id/detail_type_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/media"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            tools:text="Duplex"
+            />
+
+        <TextView
+            android:id="@+id/detail_price_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detail_type_txt"
+            tools:text="$17,870,000"
+            />
+
+        <TextView
+            android:id="@+id/detail_media_lbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="@string/media"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detail_price_txt"
+            app:layout_goneMarginTop="0dp"
             />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/detail_media_list"
+            android:id="@+id/detail_photo_list"
             android:layout_width="0dp"
-            android:layout_height="170dp"
+            android:layout_height="150dp"
             android:layout_marginTop="5dp"
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/detail_availability_lbl"
-            tools:listitem="@layout/item_media"
+            app:layout_constraintTop_toBottomOf="@id/detail_media_lbl"
+            tools:listitem="@layout/item_photo"
             />
 
         <TextView
@@ -61,7 +86,7 @@
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/detail_media_list"
+            app:layout_constraintTop_toBottomOf="@id/detail_photo_list"
             />
 
         <TextView
@@ -248,13 +273,28 @@
             tools:text="740 Park Avenue\nApt 6/7A\nNewYork\nNY 10021\nUnitedStates"
             />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/detail_poi_list"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
+        <ImageView
+            android:id="@+id/detail_map_img"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_marginStart="50dp"
+            android:contentDescription="@string/map_description"
+            app:layout_constraintBottom_toBottomOf="@id/detail_bed_txt"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toEndOf="@id/detail_location_txt"
             app:layout_constraintTop_toTopOf="@id/detail_surface_img"
+            tools:src="@drawable/ic_photo"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/detail_poi_list"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/detail_map_img"
+            app:layout_constraintTop_toTopOf="@id/detail_map_img"
+            tools:itemCount="4"
             tools:listitem="@layout/item_chip"
             />
 
@@ -325,8 +365,8 @@
 
         <TextView
             android:id="@+id/detail_no_selection_lbl"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:background="@android:color/white"
             android:gravity="center"
             android:padding="30dp"

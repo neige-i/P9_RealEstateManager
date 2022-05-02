@@ -49,7 +49,7 @@ class GetFormUseCaseTest {
         every { mockFormRepository.getFormFlow() } returns flowOf(CURRENT_FORM)
         every { mockFormRepository.getForm() } returns CURRENT_FORM
         every { mockFormRepository.getInitialState() } returns FormRepository.DEFAULT_FORM
-        every { mockCurrentPictureRepository.getCurrentPictureFlow() } returns flowOf(TEST_PICTURE)
+        every { mockCurrentPictureRepository.getPictureFlow() } returns flowOf(TEST_PICTURE)
 
         getFormUseCase = GetFormUseCase(mockFormRepository, mockCurrentPictureRepository)
     }
@@ -164,6 +164,6 @@ class GetFormUseCaseTest {
         // THEN
         assertEquals(TEST_PICTURE, picture)
 
-        verify(exactly = 1) { mockCurrentPictureRepository.getCurrentPictureFlow() }
+        verify(exactly = 1) { mockCurrentPictureRepository.getPictureFlow() }
     }
 }

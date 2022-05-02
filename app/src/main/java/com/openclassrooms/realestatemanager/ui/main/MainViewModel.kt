@@ -6,73 +6,86 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.openclassrooms.realestatemanager.R
+import com.openclassrooms.realestatemanager.data.ResourcesRepository
 import com.openclassrooms.realestatemanager.data.real_estate.CurrentEstateRepository
+import com.openclassrooms.realestatemanager.domain.form.FormType
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
-import com.openclassrooms.realestatemanager.domain.real_estate.GetCurrentEstateUseCase
-import com.openclassrooms.realestatemanager.domain.real_estate.RealEstateResult
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    currentEstateRepository: CurrentEstateRepository,
-    private val getCurrentEstateUseCase: GetCurrentEstateUseCase,
+    private val currentEstateRepository: CurrentEstateRepository,
     private val setFormUseCase: SetFormUseCase,
+    private val resourcesRepository: ResourcesRepository,
     private val coroutineProvider: CoroutineProvider,
     private val application: Application,
 ) : ViewModel() {
 
-    private val isMenuItemReadyMutableSharedFlow = MutableSharedFlow<Boolean>(replay = 1)
+    private val backStackEntryCountMutableStateFlow = MutableStateFlow(0)
 
     val viewStateLiveData: LiveData<MainViewState> = combine(
-        currentEstateRepository.getId(),
-        isMenuItemReadyMutableSharedFlow,
-    ) { _, _ ->
+        currentEstateRepository.getIdOrNull(),
+        backStackEntryCountMutableStateFlow,
+        resourcesRepository.isTabletFlow(),
+    ) { currentEstateId, backStackEntryCount, isTablet ->
+
+        // Set when to open the estate details
+        withContext(coroutineProvider.getMainDispatcher()) {
+            if (currentEstateId != null && !isTablet && backStackEntryCount == 0) {
+                mainSingleLiveEvent.value = MainEvent.OpenEstateDetail
+            }
+        }
+
+        val isDetailInPortrait = !isTablet && backStackEntryCount == 1
+
         MainViewState(
-            isEditMenuItemVisible = application.resources.getBoolean(R.bool.is_tablet)
+            toolbarTitle = if (isDetailInPortrait) {
+                application.getString(R.string.toolbar_title_detail)
+            } else {
+                application.getString(R.string.app_name)
+            },
+            navigationIconId = if (isDetailInPortrait) R.drawable.ic_arrow_back else null,
+            isEditMenuItemVisible = currentEstateId != null,
         )
     }.asLiveData(coroutineProvider.getIoDispatcher())
 
-    private val mainEventSingleLiveEvent = SingleLiveEvent<MainEvent>()
-    val mainEventLiveData: LiveData<MainEvent> = mainEventSingleLiveEvent
-
-    init {
-        mainEventSingleLiveEvent.addSource(
-            currentEstateRepository.getId().asLiveData(coroutineProvider.getIoDispatcher())
-        ) {
-            if (!application.resources.getBoolean(R.bool.is_tablet)) {
-                mainEventSingleLiveEvent.value = MainEvent.GoToDetailActivity
-            }
-        }
-    }
-
-    fun onOptionsMenuCreated() {
-        isMenuItemReadyMutableSharedFlow.tryEmit(true)
-    }
+    private val mainSingleLiveEvent = SingleLiveEvent<MainEvent>()
+    val mainEventLiveData: LiveData<MainEvent> = mainSingleLiveEvent
 
     fun onAddMenuItemClicked() {
-        setFormUseCase.initForm()
-        mainEventSingleLiveEvent.value = MainEvent.GoToFormActivity
+        initAndOpenForm(FormType.ADD_ESTATE)
     }
 
     fun onEditMenuItemClicked() {
+        initAndOpenForm(FormType.EDIT_ESTATE)
+    }
+
+    private fun initAndOpenForm(formType: FormType) {
         viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            val currentEstateResult = getCurrentEstateUseCase().first()
+            setFormUseCase.initForm(formType)
 
-            if (currentEstateResult is RealEstateResult.Success) {
-                setFormUseCase.initForm(currentEstateResult.realEstate)
-
-                withContext(coroutineProvider.getMainDispatcher()) {
-                    mainEventSingleLiveEvent.value = MainEvent.GoToFormActivity
-                }
+            withContext(coroutineProvider.getMainDispatcher()) {
+                mainSingleLiveEvent.value = MainEvent.OpenEstateForm
             }
         }
+    }
+
+    fun onBackStackChanged(backStackEntryCount: Int) {
+        // Reset current estate ID, if go back to list view from detail view in portrait orientation
+        if (backStackEntryCountMutableStateFlow.value == 1 && backStackEntryCount == 0) {
+            currentEstateRepository.setId(null)
+        }
+        backStackEntryCountMutableStateFlow.value = backStackEntryCount
+    }
+
+    fun onActivityResumed() {
+        resourcesRepository.refreshOrientation()
     }
 }

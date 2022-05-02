@@ -10,7 +10,10 @@ sealed class DetailViewState(
         val noSelectionLabelText: String,
     ) : DetailViewState(isNoSelectionLabelVisible = true)
 
-    data class Info(
+    data class WithInfo(
+        val type: String,
+        val price: String,
+        val areTypeAndPriceVisible: Boolean,
         val saleText: String,
         @ColorRes val saleBackgroundColor: Int,
         val photoList: List<Photo>,
@@ -21,6 +24,7 @@ sealed class DetailViewState(
         val bedroomCount: String,
         val address: String,
         val poiList: List<Int>,
+        val mapUrl: String,
         val market_dates: String,
         val agentName: String,
     ) : DetailViewState(isNoSelectionLabelVisible = false) {
