@@ -28,7 +28,6 @@ class EditSaleViewModel @Inject constructor(
     private val setFormUseCase: SetFormUseCase,
     private val defaultClock: Clock,
     private val defaultZoneId: ZoneId,
-    private val utilsRepository: UtilsRepository,
     coroutineProvider: CoroutineProvider,
     private val application: Application,
 ) : ViewModel() {
@@ -45,9 +44,10 @@ class EditSaleViewModel @Inject constructor(
         SaleViewState(
             agentEntries = agentNames,
             selectedAgentName = agentNames.firstOrNull { it == form.agentName } ?: "",
-            marketEntryDate = form.marketEntryDate,
+            marketEntryDate = form.marketEntryDate?.format(UtilsRepository.DATE_FORMATTER)
+                .orEmpty(),
             marketEntryDateError = form.marketEntryDateError,
-            saleDate = form.saleDate,
+            saleDate = form.saleDate?.format(UtilsRepository.DATE_FORMATTER).orEmpty(),
             saleDateError = form.saleDateError,
             isAvailableForSale = form.isAvailableForSale
         )
@@ -66,7 +66,7 @@ class EditSaleViewModel @Inject constructor(
         setDatePickerInfo(
             datePickerType = DatePickerType.ENTRY_DATE,
             titleId = R.string.picker_title_market_entry,
-            dateString = currentForm.marketEntryDate
+            date = currentForm.marketEntryDate
         )
     }
 
@@ -74,37 +74,33 @@ class EditSaleViewModel @Inject constructor(
         setDatePickerInfo(
             datePickerType = DatePickerType.SALE_DATE,
             titleId = R.string.picker_title_sale,
-            dateString = currentForm.saleDate
+            date = currentForm.saleDate
         )
     }
 
     private fun setDatePickerInfo(
         datePickerType: DatePickerType,
         @StringRes titleId: Int,
-        dateString: String
+        date: LocalDate?,
     ) {
-        val pickerDate = if (dateString.isNotEmpty()) {
-            utilsRepository.stringToDate(dateString)
-        } else {
-            LocalDate.now(defaultClock)
-        }
-
         showDatePickerSingleLiveEvent.value = ShowDatePickerEvent(
             type = datePickerType,
             title = application.getString(titleId),
-            dateMillis = pickerDate.atStartOfDay(defaultZoneId).toInstant().toEpochMilli()
+            dateMillis = (date ?: LocalDate.now(defaultClock))
+                .atStartOfDay(defaultZoneId)
+                .toInstant()
+                .toEpochMilli()
         )
     }
 
     fun onDateSelected(dateMillis: Long, type: DatePickerType) {
-        val selectedDateString = Instant.ofEpochMilli(dateMillis)
+        val selectedDate = Instant.ofEpochMilli(dateMillis)
             .atZone(defaultZoneId)
             .toLocalDate()
-            .format(UtilsRepository.DATE_FORMATTER)
 
         when (type) {
-            DatePickerType.ENTRY_DATE -> setFormUseCase.updateMarketEntryDate(selectedDateString)
-            DatePickerType.SALE_DATE -> setFormUseCase.updateSaleDate(selectedDateString)
+            DatePickerType.ENTRY_DATE -> setFormUseCase.updateMarketEntryDate(selectedDate)
+            DatePickerType.SALE_DATE -> setFormUseCase.updateSaleDate(selectedDate)
         }
     }
 

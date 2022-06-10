@@ -92,7 +92,6 @@ class CheckFormErrorUseCaseTest {
         checkFormErrorUseCase = CheckFormErrorUseCase(
             mockFormRepository,
             mockCurrentPictureRepository,
-            mockUtilsRepository,
             mockContext
         )
     }

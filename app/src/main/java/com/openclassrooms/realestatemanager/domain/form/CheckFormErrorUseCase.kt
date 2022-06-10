@@ -12,7 +12,6 @@ import javax.inject.Inject
 class CheckFormErrorUseCase @Inject constructor(
     private val formRepository: FormRepository,
     private val currentPictureRepository: CurrentPictureRepository,
-    private val utilsRepository: UtilsRepository,
     @ApplicationContext private val appContext: Context,
 ) {
 
@@ -115,22 +114,18 @@ class CheckFormErrorUseCase @Inject constructor(
     }
 
     private fun containsNoSaleError(form: FormEntity): Boolean {
-        val marketEntryDateString = form.marketEntryDate
-        val saleDateString = form.saleDate
-
-        val isDateOrderInconsistent = marketEntryDateString.isNotEmpty() &&
-                saleDateString.isNotEmpty() &&
-                utilsRepository.stringToDate(marketEntryDateString)
-                    .isAfter(utilsRepository.stringToDate(saleDateString))
+        val isDateOrderInconsistent = form.marketEntryDate != null &&
+                form.saleDate != null &&
+                form.marketEntryDate.isAfter(form.saleDate)
 
         val marketEntryDateError = when {
-            marketEntryDateString.isEmpty() -> appContext.getString(R.string.error_mandatory_field)
+            form.marketEntryDate == null -> appContext.getString(R.string.error_mandatory_field)
             isDateOrderInconsistent -> appContext.getString(R.string.error_inconsistent_date_order)
             else -> null
         }
 
         val saleDateError = when {
-            !form.isAvailableForSale && saleDateString.isEmpty() -> appContext.getString(R.string.error_mandatory_field)
+            !form.isAvailableForSale && form.saleDate == null -> appContext.getString(R.string.error_mandatory_field)
             isDateOrderInconsistent -> appContext.getString(R.string.error_inconsistent_date_order)
             else -> null
         }

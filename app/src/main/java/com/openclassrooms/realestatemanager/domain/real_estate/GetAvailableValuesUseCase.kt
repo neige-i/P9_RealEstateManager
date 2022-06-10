@@ -6,7 +6,6 @@ import com.openclassrooms.realestatemanager.data.filter.FilterRepository
 import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateEntity
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateRepository
-import com.openclassrooms.realestatemanager.ui.util.toLocalDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
@@ -42,13 +41,9 @@ class GetAvailableValuesUseCase @Inject constructor(
         return if (mod == 0f) maxValue else maxValue + step - mod
     }
 
-    fun getMinEntryDate(): Flow<LocalDate?> = getEstateBound(Bound.MIN) { realEstate ->
-        realEstate.info.marketEntryDate.toLocalDate()
-    }
+    fun getMinEntryDate(): Flow<LocalDate?> = getEstateBound(Bound.MIN) { realEstate -> realEstate.info.marketEntryDate }
 
-    fun getMaxSaleDate(): Flow<LocalDate?> = getEstateBound(Bound.MAX) { realEstate ->
-        realEstate.info.saleDate?.toLocalDate()
-    }
+    fun getMaxSaleDate(): Flow<LocalDate?> = getEstateBound(Bound.MAX) { realEstate -> realEstate.info.saleDate }
 
     private fun <T : Comparable<T>> getEstateBound(
         bound: Bound,

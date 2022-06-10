@@ -1,7 +1,6 @@
 package com.openclassrooms.realestatemanager.domain.filter
 
 import android.util.Range
-import com.openclassrooms.realestatemanager.data.UtilsRepository
 import com.openclassrooms.realestatemanager.data.filter.FilterRepository
 import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateEntity
@@ -13,7 +12,6 @@ import javax.inject.Inject
 class GetFilteredEstatesUseCase @Inject constructor(
     private val filterRepository: FilterRepository,
     private val realEstateRepository: RealEstateRepository,
-    private val utilsRepository: UtilsRepository,
 ) {
 
     operator fun invoke(): Flow<List<RealEstateEntity>> = combine(
@@ -35,8 +33,8 @@ class GetFilteredEstatesUseCase @Inject constructor(
                 }
             is FilterValue.Price -> realEstate.info.price in Range(filterValue.min, filterValue.max)
             is FilterValue.Date -> {
-                val entryDate = utilsRepository.stringToDate(realEstate.info.marketEntryDate)
-                val saleDate = realEstate.info.saleDate?.let { utilsRepository.stringToDate(it) }
+                val entryDate = realEstate.info.marketEntryDate
+                val saleDate = realEstate.info.saleDate
 
                 val applyFilter = if (filterValue.availableEstates) {
                     saleDate == null

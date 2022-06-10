@@ -32,8 +32,8 @@ class SaveRealEstateUseCase @Inject constructor(
             state = form.state,
             zipcode = form.zipcode,
             country = form.country,
-            marketEntryDate = form.marketEntryDate,
-            saleDate = form.saleDate.ifEmpty { null },
+            marketEntryDate = form.marketEntryDate!!,
+            saleDate = form.saleDate,
         )
 
         if (form.id == 0L) {

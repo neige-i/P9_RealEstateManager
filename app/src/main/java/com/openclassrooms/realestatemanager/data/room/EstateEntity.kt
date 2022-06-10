@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.openclassrooms.realestatemanager.data.RealEstateType
+import java.time.LocalDate
 
 @Entity
 data class EstateEntity(
@@ -21,6 +22,6 @@ data class EstateEntity(
     val state: String,
     val zipcode: String,
     val country: String,
-    @ColumnInfo(name = "market_entry_date") val marketEntryDate: String,
-    @ColumnInfo(name = "sale_date") val saleDate: String?,
+    @ColumnInfo(name = "market_entry_date") val marketEntryDate: LocalDate,
+    @ColumnInfo(name = "sale_date") val saleDate: LocalDate?,
 )

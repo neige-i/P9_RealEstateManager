@@ -118,7 +118,6 @@ class EditSaleViewModelTest {
             mockGetAgentListUseCase,
             clockMarch1st2022,
             fixedZoneId,
-            mockUtilsRepository,
             mockCoroutineProvider,
             mockApplication,
         )

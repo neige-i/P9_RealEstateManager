@@ -6,6 +6,7 @@ import androidx.lifecycle.asLiveData
 import com.openclassrooms.realestatemanager.BuildConfig
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.ResourcesRepository
+import com.openclassrooms.realestatemanager.data.UtilsRepository
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateEntity
 import com.openclassrooms.realestatemanager.domain.real_estate.GetCurrentEstateUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.RealEstateResult.*
@@ -111,12 +112,15 @@ class DetailViewModel @Inject constructor(
             marketDates = if (realEstate.info.saleDate == null) {
                 LocalText.ResWithArgs(
                     stringId = R.string.since_date,
-                    args = listOf(realEstate.info.marketEntryDate)
+                    args = listOf(realEstate.info.marketEntryDate.format(UtilsRepository.DATE_FORMATTER))
                 )
             } else {
                 LocalText.ResWithArgs(
                     stringId = R.string.from_sold_date,
-                    args = listOf(realEstate.info.marketEntryDate, realEstate.info.saleDate)
+                    args = listOf(
+                        realEstate.info.marketEntryDate.format(UtilsRepository.DATE_FORMATTER),
+                        realEstate.info.saleDate.format(UtilsRepository.DATE_FORMATTER),
+                    )
                 )
             },
             agentName = if (realEstate.agent != null) {

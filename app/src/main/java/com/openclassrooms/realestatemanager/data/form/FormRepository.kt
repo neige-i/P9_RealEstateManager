@@ -44,9 +44,9 @@ class FormRepository @Inject constructor() {
             countryCursor = 0,
             pointsOfInterests = emptyList(),
             agentName = "",
-            marketEntryDate = "",
+            marketEntryDate = null,
             marketEntryDateError = null,
-            saleDate = "",
+            saleDate = null,
             saleDateError = null,
             isAvailableForSale = true
         )

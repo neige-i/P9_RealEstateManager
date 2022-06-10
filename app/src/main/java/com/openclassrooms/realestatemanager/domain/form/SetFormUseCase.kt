@@ -13,6 +13,7 @@ import com.openclassrooms.realestatemanager.domain.form.FormType.EDIT_ESTATE
 import com.openclassrooms.realestatemanager.domain.real_estate.GetCurrentEstateUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.RealEstateResult
 import kotlinx.coroutines.flow.first
+import java.time.LocalDate
 import javax.inject.Inject
 
 class SetFormUseCase @Inject constructor(
@@ -93,7 +94,7 @@ class SetFormUseCase @Inject constructor(
             agentName = realEstate.agent?.username.orEmpty(),
             marketEntryDate = realEstate.info.marketEntryDate,
             marketEntryDateError = null,
-            saleDate = realEstate.info.saleDate ?: "",
+            saleDate = realEstate.info.saleDate,
             saleDateError = null,
             isAvailableForSale = realEstate.info.saleDate == null,
         )
@@ -324,13 +325,13 @@ class SetFormUseCase @Inject constructor(
         )
     }
 
-    fun updateMarketEntryDate(marketEntryDate: String) {
+    fun updateMarketEntryDate(marketEntryDate: LocalDate) {
         formRepository.setForm(
             formRepository.getForm().copy(marketEntryDate = marketEntryDate)
         )
     }
 
-    fun updateSaleDate(saleDate: String) {
+    fun updateSaleDate(saleDate: LocalDate) {
         formRepository.setForm(
             formRepository.getForm().copy(saleDate = saleDate)
         )
@@ -342,7 +343,7 @@ class SetFormUseCase @Inject constructor(
         formRepository.setForm(
             currentForm.copy(
                 isAvailableForSale = isAvailable,
-                saleDate = if (!isAvailable) "" else currentForm.saleDate
+                saleDate = if (!isAvailable) null else currentForm.saleDate
             )
         )
     }
