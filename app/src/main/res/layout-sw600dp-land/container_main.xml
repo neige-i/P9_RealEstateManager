@@ -10,7 +10,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/left_content"
-        android:name="com.openclassrooms.realestatemanager.ui.list.EstatesFragment"
+        android:name="com.openclassrooms.realestatemanager.ui.list.ListFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

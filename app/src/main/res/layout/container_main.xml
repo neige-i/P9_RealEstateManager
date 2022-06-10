@@ -15,7 +15,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:name="com.openclassrooms.realestatemanager.ui.list.EstatesFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
@@ -23,7 +22,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/unique_content"
-        android:name="com.openclassrooms.realestatemanager.ui.list.EstatesFragment"
+        android:name="com.openclassrooms.realestatemanager.ui.list.ListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_list"

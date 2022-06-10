@@ -11,17 +11,15 @@ import com.openclassrooms.realestatemanager.ui.util.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class EstatesFragment : Fragment(R.layout.fragment_list) {
+class ListFragment : Fragment(R.layout.fragment_list) {
 
     private val binding by viewBinding { FragmentListBinding.bind(it) }
-    private val viewModel by viewModels<EstatesViewModel>()
+    private val viewModel by viewModels<ListViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val estateAdapter = EstateAdapter { selectedEstateId ->
-            viewModel.onEstateClicked(selectedEstateId)
-        }
+        val estateAdapter = EstateAdapter()
         binding.estateList.apply {
             adapter = estateAdapter
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
