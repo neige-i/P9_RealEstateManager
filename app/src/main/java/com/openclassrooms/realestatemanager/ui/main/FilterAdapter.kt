@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.openclassrooms.realestatemanager.databinding.ItemChipBinding
 import com.openclassrooms.realestatemanager.ui.main.MainViewState.ChipViewState
+import com.openclassrooms.realestatemanager.ui.util.toCharSequence
 
 class FilterAdapter :
     ListAdapter<ChipViewState, FilterAdapter.FilterViewHolder>(FilterDiffUtil()) {
@@ -32,7 +33,7 @@ class FilterAdapter :
 
             val chipStyle = chip.style
 
-            binding.root.text = chipStyle.text
+            binding.root.text = chipStyle.text.toCharSequence(binding.root.context)
 
             binding.root.setChipBackgroundColorResource(chipStyle.backgroundColor)
             binding.root.isCloseIconVisible = chipStyle.isCloseIconVisible

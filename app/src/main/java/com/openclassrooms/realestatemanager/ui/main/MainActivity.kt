@@ -4,18 +4,18 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding
 import com.openclassrooms.realestatemanager.ui.detail.DetailFragment
-import com.openclassrooms.realestatemanager.ui.filter.date.DateFilterDialog
 import com.openclassrooms.realestatemanager.ui.filter.checklist.CheckListFilterDialog
+import com.openclassrooms.realestatemanager.ui.filter.date.DateFilterDialog
 import com.openclassrooms.realestatemanager.ui.filter.slider.SliderFilterDialog
 import com.openclassrooms.realestatemanager.ui.form.FormActivity
 import com.openclassrooms.realestatemanager.ui.main.MainEvent.*
+import com.openclassrooms.realestatemanager.ui.util.setNavigationIcon
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -63,16 +63,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         viewModel.viewStateLiveData.observe(this) { mainViewState ->
-            filterBinding.filterToolbar.title = mainViewState.toolbarTitle
-            filterBinding.filterToolbar.navigationIcon =
-                if (mainViewState.navigationIconId != null) {
-                    ContextCompat.getDrawable(this, mainViewState.navigationIconId)
-                } else {
-                    null
-                }
+            val viewStateToolbar = mainViewState.toolbar
+
+            filterBinding.filterToolbar.apply {
+                setTitle(viewStateToolbar.title)
+                setNavigationIcon(viewStateToolbar.navIcon)
+            }
+
             editMenuItem?.isVisible = mainViewState.isEditMenuItemVisible
 
-            filterBinding.filterList.isVisible = mainViewState.isFiltering
+            filterBinding.filterList.isVisible = viewStateToolbar.isFiltering
             filterAdapter.submitList(mainViewState.chips)
         }
 
