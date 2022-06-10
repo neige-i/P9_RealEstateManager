@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             when (mainEvent) {
                 is OpenEstateDetail -> supportFragmentManager.commit {
                     setReorderingAllowed(true)
-                    replace<DetailFragment>(R.id.main_content)
+                    replace<DetailFragment>(R.id.unique_content)
                     addToBackStack(null)
                 }
                 is OpenEstateForm -> startActivity(Intent(this, FormActivity::class.java))

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Layouts must agree on the root element's ID for all configurations.
+    Also, the "unique_content" ID is used for fragment transactions.
+
+    But, without the parent FrameLayout, the root element's ID would be "unique_content"
+    and this ID must also be given to the "sw600dp-land" layout.
+    The problem is the "sw600dp-land" layout is not involved with fragment transactions and
+    unwanted duplicates view will be visible.
+
+    The purpose of the parent ViewGroup is only to give a unique ID which will be used
+    for fragment transactions.
+-->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:name="com.openclassrooms.realestatemanager.ui.list.EstatesFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+    >
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/unique_content"
+        android:name="com.openclassrooms.realestatemanager.ui.list.EstatesFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_list"
+        />
+</FrameLayout>
