@@ -11,7 +11,8 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.FragmentDetailBinding
 import com.openclassrooms.realestatemanager.ui.detail.DetailViewState.Empty
-import com.openclassrooms.realestatemanager.ui.detail.DetailViewState.WithInfo
+import com.openclassrooms.realestatemanager.ui.detail.DetailViewState.Info
+import com.openclassrooms.realestatemanager.ui.util.toCharSequence
 import com.openclassrooms.realestatemanager.ui.util.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,51 +26,54 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
         val viewModel: DetailViewModel by viewModels()
 
-        val photoAdapter = PhotoAdapter { selectedPhoto -> viewModel.onPhotoClicked(selectedPhoto) }
+        val photoAdapter = PhotoAdapter()
         binding.detailPhotoList.adapter = photoAdapter
 
         val chipAdapter = ChipAdapter()
         binding.detailPoiList.adapter = chipAdapter
         binding.detailPoiList.layoutManager = FlexboxLayoutManager(requireContext())
 
-        viewModel.viewStateLiveData.observe(viewLifecycleOwner) { detailViewState ->
-            binding.detailNoSelectionLbl.isVisible = detailViewState.isNoSelectionLabelVisible
+        viewModel.viewStateLiveData.observe(viewLifecycleOwner) { detail ->
+            binding.detailNoSelectionLbl.isVisible = detail.isNoSelectionLabelVisible
 
-            when (detailViewState) {
+            when (detail) {
                 is Empty -> {
-                    binding.detailNoSelectionLbl.text = detailViewState.noSelectionLabelText
+                    binding.detailNoSelectionLbl.text =
+                        detail.noSelectionLabelText.toCharSequence(requireContext())
                 }
-                is WithInfo -> {
-                    binding.detailTypeTxt.text = detailViewState.type
-                    binding.detailTypeTxt.isVisible = detailViewState.areTypeAndPriceVisible
-                    binding.detailPriceTxt.text = detailViewState.price
-                    binding.detailPriceTxt.isVisible = detailViewState.areTypeAndPriceVisible
+                is Info -> {
+                    binding.detailTypeTxt.setText(detail.type)
+                    binding.detailTypeTxt.isVisible = detail.areTypeAndPriceVisible
+                    binding.detailPriceTxt.text = detail.price.toCharSequence(requireContext())
+                    binding.detailPriceTxt.isVisible = detail.areTypeAndPriceVisible
 
-                    binding.detailAvailabilityTxt.text = detailViewState.saleText
+                    binding.detailAvailabilityTxt.setText(detail.saleText)
                     binding.detailAvailabilityTxt.backgroundTintList =
                         ContextCompat.getColorStateList(
                             requireContext(),
-                            detailViewState.saleBackgroundColor
+                            detail.saleBackgroundColor
                         )
 
-                    binding.detailDescriptionTxt.text = detailViewState.description
+                    binding.detailDescriptionTxt.text =
+                        detail.description.toCharSequence(requireContext())
 
-                    photoAdapter.submitList(detailViewState.photoList)
+                    photoAdapter.submitList(detail.photoList)
 
-                    binding.detailSurfaceTxt.text = detailViewState.surface
-                    binding.detailRoomTxt.text = detailViewState.roomCount
-                    binding.detailBathTxt.text = detailViewState.bathroomCount
-                    binding.detailBedTxt.text = detailViewState.bedroomCount
+                    binding.detailSurfaceTxt.text = detail.surface.toCharSequence(requireContext())
+                    binding.detailRoomTxt.text = detail.roomCount
+                    binding.detailBathTxt.text = detail.bathroomCount
+                    binding.detailBedTxt.text = detail.bedroomCount
 
-                    binding.detailLocationTxt.text = detailViewState.address
-                    chipAdapter.submitList(detailViewState.poiList)
+                    binding.detailLocationTxt.text = detail.address
+                    chipAdapter.submitList(detail.poiList)
                     Glide.with(binding.root)
-                        .load(detailViewState.mapUrl)
+                        .load(detail.mapUrl)
                         .into(binding.detailMapImg)
 
-                    binding.detailMarketTxt.text = detailViewState.market_dates
+                    binding.detailMarketTxt.text =
+                        detail.marketDates.toCharSequence(requireContext())
 
-                    binding.detailAgentTxt.text = detailViewState.agentName
+                    binding.detailAgentTxt.text = detail.agentName.toCharSequence(requireContext())
                 }
             }
         }
