@@ -2,8 +2,8 @@ package com.openclassrooms.realestatemanager.data.room
 
 import androidx.room.Entity
 
-@Entity(primaryKeys = ["realEstateId", "username"])
+@Entity(primaryKeys = ["estateId", "username"])
 data class EstateAgentCrossRef(
-    val realEstateId: Long,
+    val estateId: Long,
     val username: String,
 )

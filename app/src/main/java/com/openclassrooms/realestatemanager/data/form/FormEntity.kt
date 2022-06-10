@@ -1,10 +1,12 @@
 package com.openclassrooms.realestatemanager.data.form
 
 import android.net.Uri
+import com.openclassrooms.realestatemanager.data.RealEstateType
+import com.openclassrooms.realestatemanager.data.PointOfInterest
 
 data class FormEntity(
     val id: Long,
-    val type: String,
+    val estateType: RealEstateType?,
     val typeError: String?,
     val price: String,
     val priceCursor: Int,
@@ -34,7 +36,7 @@ data class FormEntity(
     val country: String,
     val countryError: String?,
     val countryCursor: Int,
-    val pointsOfInterests: List<Int>,
+    val pointsOfInterests: List<PointOfInterest>,
     val agentName: String,
     val marketEntryDate: String,
     val marketEntryDateError: String?,

@@ -31,7 +31,7 @@ class CheckFormErrorUseCase @Inject constructor(
     }
 
     private fun containsNoMainError(form: FormEntity): Boolean {
-        val typeError = if (form.type.isEmpty()) {
+        val typeError = if (form.estateType == null) {
             appContext.getString(R.string.error_mandatory_field)
         } else {
             null

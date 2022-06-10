@@ -13,6 +13,7 @@ import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.SaveRealEstateUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
+import com.openclassrooms.realestatemanager.ui.util.LocalText
 import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -57,10 +58,10 @@ class FormViewModel @Inject constructor(
         ) {
             formSingleLiveEvent.value = FormEvent.ShowDialog(
                 type = DialogType.SAVE_DRAFT,
-                title = application.getString(R.string.draft_form_dialog_title),
-                message = application.getString(
-                    R.string.draft_form_dialog_message,
-                    getFormUseCase.getFormInfo().estateType
+                title = R.string.draft_form_dialog_title,
+                message = LocalText.ResWithRes(
+                    stringId = R.string.draft_form_dialog_message,
+                    resArgs = listOf(getFormUseCase.getFormInfo().estateType!!.labelId),
                 ),
                 positiveButtonText = application.getString(R.string.draft_form_dialog_positive_button),
                 negativeButtonText = application.getString(R.string.draft_form_dialog_negative_button)
@@ -129,11 +130,13 @@ class FormViewModel @Inject constructor(
         if (getFormUseCase.getFormInfo().isModified) {
             formSingleLiveEvent.value = FormEvent.ShowDialog(
                 type = DialogType.EXIT_FORM,
-                title = application.getString(R.string.exit_form_dialog_title),
-                message = when (getFormUseCase.getFormInfo().formType) {
-                    FormType.ADD_ESTATE -> application.getString(R.string.exit_add_form_dialog_message)
-                    FormType.EDIT_ESTATE -> application.getString(R.string.exit_edit_form_dialog_message)
-                },
+                title = R.string.exit_form_dialog_title,
+                message = LocalText.Res(
+                    stringId = when (getFormUseCase.getFormInfo().formType) {
+                        FormType.ADD_ESTATE -> R.string.exit_add_form_dialog_message
+                        FormType.EDIT_ESTATE -> R.string.exit_edit_form_dialog_message
+                    }
+                ),
                 positiveButtonText = application.getString(R.string.exit_form_dialog_positive_button),
                 negativeButtonText = application.getString(R.string.exit_form_dialog_negative_button)
             )

@@ -37,7 +37,7 @@ class CheckFormErrorUseCaseTest {
         private const val DATE_FEB_20 = "20/02/2022"
         private const val DATE_FEB_21 = "21/02/2022"
         private val VALID_FORM = FormRepository.DEFAULT_FORM.copy(
-            type = "Maniac Mansion",
+            estateType = "Maniac Mansion",
             pictureList = listOf(FormEntity.PictureEntity(uri = mockk(), description = "Lounge")),
             streetName = "740 Park Avenue",
             city = "New York",
@@ -133,7 +133,7 @@ class CheckFormErrorUseCaseTest {
     @Test
     fun `return false when check 1st page with empty type`() {
         // GIVEN
-        val invalidForm = VALID_FORM.copy(type = "")
+        val invalidForm = VALID_FORM.copy(estateType = "")
         every { mockFormRepository.getForm() } returns invalidForm
 
         // WHEN

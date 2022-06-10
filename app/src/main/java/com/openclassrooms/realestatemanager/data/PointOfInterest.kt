@@ -21,10 +21,4 @@ enum class PointOfInterest(@StringRes val labelId: Int) : Localized {
     override val stringId: Int = labelId
 
     override fun fromStringId(@StringRes stringId: Int): Localized = values().first { it.labelId == this.stringId }
-
-    companion object {
-        fun fromLabelId(@StringRes labelId: Int): PointOfInterest {
-            return values().first { it.labelId == labelId }
-        }
-    }
 }

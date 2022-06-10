@@ -40,7 +40,7 @@ class EditMainInfoViewModelTest {
     companion object {
         // region IN
         private val NOMINAL_FORM = FormRepository.DEFAULT_FORM.copy(
-            type = "Flat",
+            estateType = "Flat",
             typeError = null,
             price = "123790.99",
             priceCursor = 4,

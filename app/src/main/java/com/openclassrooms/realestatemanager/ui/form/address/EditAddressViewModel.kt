@@ -41,7 +41,7 @@ class EditAddressViewModel @Inject constructor(
             pointOfInterestList = PointOfInterest.values().map { poi ->
                 AddressViewState.ChipViewState(
                     labelId = poi.labelId,
-                    isSelected = form.pointsOfInterests.contains(poi.labelId)
+                    isSelected = form.pointsOfInterests.contains(poi)
                 )
             }
         )
@@ -72,6 +72,9 @@ class EditAddressViewModel @Inject constructor(
     }
 
     fun onPoiChecked(@StringRes labelId: Int, isChecked: Boolean) {
-        setFormUseCase.updatePoi(labelId, isChecked)
+        val checkedPoi = PointOfInterest.values().first { poi ->
+            poi.labelId == labelId
+        }
+        setFormUseCase.updatePoi(checkedPoi, isChecked)
     }
 }

@@ -9,6 +9,7 @@ import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.RealEstateType
 import com.openclassrooms.realestatemanager.databinding.FragmentEditMainInfoBinding
 import com.openclassrooms.realestatemanager.ui.util.onAfterTextChanged
+import com.openclassrooms.realestatemanager.ui.util.toCharSequence
 import com.openclassrooms.realestatemanager.ui.util.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -47,7 +48,10 @@ class EditMainInfoFragment : Fragment(R.layout.fragment_edit_main_info) {
 
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
             binding.mainInfoTypeInput.setAdapter(estateTypeArrayAdapter)
-            binding.mainInfoTypeInput.setText(it.selectedType, false)
+            binding.mainInfoTypeInput.setText(
+                it.selectedType.toCharSequence(requireContext()),
+                false
+            )
 
             binding.mainInfoPriceInput.setText(it.price)
             binding.mainInfoPriceInput.setSelection(it.priceSelection)

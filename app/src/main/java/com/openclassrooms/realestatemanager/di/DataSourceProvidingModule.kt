@@ -45,7 +45,7 @@ object DataSourceProvidingModule {
                     val roomDao = poiDaoProvider.get()
 
                     PointOfInterest.values().forEach {
-                        roomDao.insertPoi(PoiEntity(poiValue = it.name))
+                        roomDao.insertPoi(PoiEntity(poiValue = it))
                     }
 
                     roomDao.insertAgent(AgentEntity(username = "Agent K"))

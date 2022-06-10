@@ -25,7 +25,7 @@ class SetFormUseCaseTest {
         // region IN
         private val MOCK_URI = mockk<Uri>()
         private val CURRENT_FORM = FormRepository.DEFAULT_FORM.copy(
-            type = "Flat",
+            estateType = "Flat",
             price = "99000.99",
             area = "42",
             totalRoomCount = 7,
@@ -468,7 +468,7 @@ class SetFormUseCaseTest {
     @Test
     fun `add poi when update with being checked`() {
         // WHEN
-        setFormUseCase.updatePoi(labelId = 5, isChecked = true)
+        setFormUseCase.updatePoi(poi = 5, isChecked = true)
 
         // THEN
         verify(exactly = 1) { mockFormRepository.addPoi(5) }
@@ -477,7 +477,7 @@ class SetFormUseCaseTest {
     @Test
     fun `remove poi when update with being unchecked`() {
         // WHEN
-        setFormUseCase.updatePoi(labelId = 8, isChecked = false)
+        setFormUseCase.updatePoi(poi = 8, isChecked = false)
 
         // THEN
         verify(exactly = 1) { mockFormRepository.removePoi(8) }

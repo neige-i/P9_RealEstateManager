@@ -1,7 +1,10 @@
 package com.openclassrooms.realestatemanager.ui.form.main_info
 
+import androidx.annotation.StringRes
+import com.openclassrooms.realestatemanager.ui.util.LocalText
+
 data class MainInfoViewState(
-    val selectedType: String,
+    @StringRes val selectedType: LocalText,
     val typeError: String?,
     val price: String,
     val priceSelection: Int,

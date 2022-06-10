@@ -1,5 +1,8 @@
 package com.openclassrooms.realestatemanager.ui.form
 
+import androidx.annotation.StringRes
+import com.openclassrooms.realestatemanager.ui.util.LocalText
+
 sealed class FormEvent {
 
     object ExitActivity : FormEvent()
@@ -10,8 +13,8 @@ sealed class FormEvent {
 
     data class ShowDialog(
         val type: FormViewModel.DialogType,
-        val title: String,
-        val message: String,
+        @StringRes val title: Int,
+        val message: LocalText,
         val positiveButtonText: String,
         val negativeButtonText: String,
     ) : FormEvent()

@@ -16,6 +16,7 @@ import com.openclassrooms.realestatemanager.ui.form.image_launcher.ImageLauncher
 import com.openclassrooms.realestatemanager.ui.form.main_info.EditMainInfoFragment
 import com.openclassrooms.realestatemanager.ui.form.picture.PictureActivity
 import com.openclassrooms.realestatemanager.ui.form.sale.EditSaleFragment
+import com.openclassrooms.realestatemanager.ui.util.toCharSequence
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -64,7 +65,7 @@ class FormActivity : ImageLauncherActivity() {
                 is GoToPage -> binding.formPager.currentItem = formEvent.pageToGo
                 is ShowDialog -> MaterialAlertDialogBuilder(this)
                     .setTitle(formEvent.title)
-                    .setMessage(formEvent.message)
+                    .setMessage(formEvent.message.toCharSequence(this))
                     .setPositiveButton(formEvent.positiveButtonText) { _, _ ->
                         viewModel.onDialogPositiveButtonClicked(formEvent.type)
                     }

@@ -32,7 +32,7 @@ class GetFormUseCaseTest {
 
     companion object {
         // region IN
-        private val CURRENT_FORM = FormRepository.DEFAULT_FORM.copy(type = "Big house")
+        private val CURRENT_FORM = FormRepository.DEFAULT_FORM.copy(estateType = "Big house")
         private val TEST_PICTURE = CurrentPictureEntity(
             uri = mockk(),
             description = "Lounge",
@@ -115,7 +115,7 @@ class GetFormUseCaseTest {
     fun `return modified EDIT form info when collect value`() {
         // GIVEN
         every { mockFormRepository.getInitialState() } returns CURRENT_FORM
-        every { mockFormRepository.getForm() } returns CURRENT_FORM.copy(type = "Very big house")
+        every { mockFormRepository.getForm() } returns CURRENT_FORM.copy(estateType = "Very big house")
 
         // WHEN
         val formInfo = getFormUseCase.getFormInfo()

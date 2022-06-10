@@ -2,8 +2,6 @@ package com.openclassrooms.realestatemanager.domain.real_estate
 
 import android.util.Range
 import com.openclassrooms.realestatemanager.data.Localized
-import com.openclassrooms.realestatemanager.data.PointOfInterest
-import com.openclassrooms.realestatemanager.data.RealEstateType
 import com.openclassrooms.realestatemanager.data.filter.FilterRepository
 import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateEntity
@@ -70,10 +68,10 @@ class GetAvailableValuesUseCase @Inject constructor(
             .let { allEstates ->
                 when (checkListFilter) {
                     FilterType.EstateType -> allEstates.map { realEstate ->
-                        RealEstateType.valueOf(realEstate.info.type)
+                        realEstate.info.type
                     }
                     FilterType.PointOfInterest -> allEstates.flatMap { realEstate ->
-                        realEstate.poiList.map { poi -> PointOfInterest.valueOf(poi.poiValue) }
+                        realEstate.poiList.map { poi -> poi.poiValue }
                     }
                 }
             }

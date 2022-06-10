@@ -1,8 +1,5 @@
 package com.openclassrooms.realestatemanager.domain.real_estate
 
-import android.content.Context
-import com.openclassrooms.realestatemanager.data.PointOfInterest
-import com.openclassrooms.realestatemanager.data.RealEstateType
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateRepository
@@ -10,21 +7,19 @@ import com.openclassrooms.realestatemanager.data.room.EstateAgentCrossRef
 import com.openclassrooms.realestatemanager.data.room.EstateEntity
 import com.openclassrooms.realestatemanager.data.room.EstatePoiCrossRef
 import com.openclassrooms.realestatemanager.data.room.PhotoEntity
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class SaveRealEstateUseCase @Inject constructor(
     private val formRepository: FormRepository,
     private val realEstateRepository: RealEstateRepository,
-    @ApplicationContext private val applicationContext: Context,
 ) {
 
     suspend operator fun invoke() {
         val form = formRepository.getForm()
 
         val realEstateToSave = EstateEntity(
-            realEstateId = form.id,
-            type = RealEstateType.fromLocaleString(form.type, applicationContext).name,
+            estateId = form.id,
+            type = form.estateType!!,
             price = form.price.toDoubleOrNull(),
             area = form.area.toIntOrNull(),
             totalRoomCount = form.totalRoomCount,
@@ -60,18 +55,18 @@ class SaveRealEstateUseCase @Inject constructor(
                 )
             )
         }
-        form.pointsOfInterests.forEach {
+        form.pointsOfInterests.forEach { poi ->
             realEstateRepository.addEstatePoiRef(
                 EstatePoiCrossRef(
-                    realEstateId = newlyCreatedEstateId,
-                    poiValue = PointOfInterest.fromLabelId(it).name
+                    estateId = newlyCreatedEstateId,
+                    poiValue = poi,
                 )
             )
         }
         if (form.agentName.isNotEmpty()) {
             realEstateRepository.addEstateAgentRef(
                 EstateAgentCrossRef(
-                    realEstateId = newlyCreatedEstateId,
+                    estateId = newlyCreatedEstateId,
                     username = form.agentName
                 )
             )
@@ -82,12 +77,12 @@ class SaveRealEstateUseCase @Inject constructor(
         realEstateRepository.setEstate(editedEstate)
 
         val estateAgentCrossRef = EstateAgentCrossRef(
-            realEstateId = editedEstate.realEstateId,
+            estateId = editedEstate.estateId,
             username = form.agentName
         )
 
         if (form.agentName.isNotEmpty()) {
-            if (realEstateRepository.isEstateTakenCareByAgent(editedEstate.realEstateId)) {
+            if (realEstateRepository.isEstateTakenCareByAgent(editedEstate.estateId)) {
                 realEstateRepository.setEstateAgentRef(estateAgentCrossRef)
             } else {
                 realEstateRepository.addEstateAgentRef(estateAgentCrossRef)

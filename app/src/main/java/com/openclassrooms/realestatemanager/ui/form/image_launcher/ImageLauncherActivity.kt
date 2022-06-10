@@ -25,7 +25,7 @@ abstract class ImageLauncherActivity : AppCompatActivity() {
             viewModel.onPhotoPicked(uri = cameraPictureUri, success = it)
         }
         val galleryLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
-            contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//            contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             viewModel.onPhotoPicked(uri = it)
         }
 

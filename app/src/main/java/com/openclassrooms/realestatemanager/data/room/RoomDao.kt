@@ -17,7 +17,7 @@ interface RoomDao {
     fun getAllRealEstates(): Flow<List<RealEstateEntity>>
 
     @Transaction
-    @Query("SELECT * FROM EstateEntity WHERE realEstateId = :estateId")
+    @Query("SELECT * FROM EstateEntity WHERE estateId = :estateId")
     fun getRealEstateById(estateId: Long): Flow<RealEstateEntity?>
 
     // ----------
@@ -47,7 +47,7 @@ interface RoomDao {
     @Query("SELECT * FROM AgentEntity")
     fun getAllAgents(): Flow<List<AgentEntity>>
 
-    @Query("SELECT EXISTS(SELECT * FROM EstateAgentCrossRef WHERE realEstateId = :estateId)")
+    @Query("SELECT EXISTS(SELECT * FROM EstateAgentCrossRef WHERE estateId = :estateId)")
     fun estateWithAgent(estateId: Long): Boolean
 
     @Insert

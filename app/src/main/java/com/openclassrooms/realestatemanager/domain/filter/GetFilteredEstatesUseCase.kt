@@ -25,16 +25,13 @@ class GetFilteredEstatesUseCase @Inject constructor(
 
     private fun isCorrect(realEstate: RealEstateEntity, filterValues: Collection<FilterValue>): Boolean = filterValues.all { filterValue ->
         when (filterValue) {
-            is FilterValue.EstateType -> filterValue.selectedItems
-                .map { it.name }
-                .contains(realEstate.info.type)
+            is FilterValue.EstateType -> filterValue.selectedItems.contains(realEstate.info.type)
             is FilterValue.PhotoCount -> realEstate.photoList.size in filterValue.min..filterValue.max
             is FilterValue.Poi -> filterValue.selectedItems
-                .map { poi -> poi.name }
-                .any { poiName ->
+                .any { poi ->
                     realEstate.poiList
                         .map { poiEntity -> poiEntity.poiValue }
-                        .contains(poiName)
+                        .contains(poi)
                 }
             is FilterValue.Price -> realEstate.info.price in Range(filterValue.min, filterValue.max)
             is FilterValue.Date -> {

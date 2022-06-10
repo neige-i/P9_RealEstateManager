@@ -1,8 +1,6 @@
 package com.openclassrooms.realestatemanager.domain.form
 
-import android.app.Application
 import android.net.Uri
-import androidx.annotation.StringRes
 import com.openclassrooms.realestatemanager.data.PointOfInterest
 import com.openclassrooms.realestatemanager.data.RealEstateType
 import com.openclassrooms.realestatemanager.data.form.CurrentPictureEntity
@@ -21,7 +19,6 @@ class SetFormUseCase @Inject constructor(
     private val formRepository: FormRepository,
     private val getCurrentEstateUseCase: GetCurrentEstateUseCase,
     private val currentPictureRepository: CurrentPictureRepository,
-    private val application: Application,
 ) {
 
     suspend fun initForm(formType: FormType) {
@@ -59,8 +56,8 @@ class SetFormUseCase @Inject constructor(
         val area = realEstate.info.area?.toString() ?: ""
 
         return FormEntity(
-            id = realEstate.info.realEstateId,
-            type = application.getString(RealEstateType.valueOf(realEstate.info.type).labelId),
+            id = realEstate.info.estateId,
+            estateType = realEstate.info.type,
             typeError = null,
             price = price,
             priceCursor = price.length,
@@ -92,9 +89,7 @@ class SetFormUseCase @Inject constructor(
             country = realEstate.info.country,
             countryError = null,
             countryCursor = realEstate.info.country.length,
-            pointsOfInterests = realEstate.poiList.map {
-                PointOfInterest.valueOf(it.poiValue).labelId
-            },
+            pointsOfInterests = realEstate.poiList.map { it.poiValue },
             agentName = realEstate.agent?.username.orEmpty(),
             marketEntryDate = realEstate.info.marketEntryDate,
             marketEntryDateError = null,
@@ -110,8 +105,8 @@ class SetFormUseCase @Inject constructor(
 
     // MAIN INFO
 
-    fun updateType(type: String) {
-        formRepository.setForm(formRepository.getForm().copy(type = type))
+    fun updateType(estateType: RealEstateType) {
+        formRepository.setForm(formRepository.getForm().copy(estateType = estateType))
     }
 
     fun updatePrice(price: String, cursorPosition: Int) {
@@ -305,14 +300,14 @@ class SetFormUseCase @Inject constructor(
         )
     }
 
-    fun updatePoi(@StringRes labelId: Int, isChecked: Boolean) {
+    fun updatePoi(poi: PointOfInterest, isChecked: Boolean) {
         val updatedForm = formRepository.getForm().let {
             it.copy(
                 pointsOfInterests = applyModificationOn(it.pointsOfInterests) {
                     if (isChecked) {
-                        add(labelId)
+                        add(poi)
                     } else {
-                        remove(labelId)
+                        remove(poi)
                     }
                 }
             )

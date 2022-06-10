@@ -3,11 +3,12 @@ package com.openclassrooms.realestatemanager.data.room
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.openclassrooms.realestatemanager.data.RealEstateType
 
 @Entity
 data class EstateEntity(
-    @PrimaryKey(autoGenerate = true) val realEstateId: Long = 0,
-    val type: String,
+    @PrimaryKey(autoGenerate = true) val estateId: Long = 0,
+    val type: RealEstateType,
     val price: Double?,
     val area: Int?,
     @ColumnInfo(name = "total_room_count") val totalRoomCount: Int,

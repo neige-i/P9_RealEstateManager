@@ -12,7 +12,7 @@ class FormRepository @Inject constructor() {
     companion object {
         val DEFAULT_FORM = FormEntity(
             id = 0,
-            type = "",
+            estateType = null,
             typeError = null,
             price = "",
             priceCursor = 0,
