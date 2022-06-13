@@ -8,14 +8,19 @@ data class MainViewState(
     @DrawableRes val navigationIconId: Int?,
     val isEditMenuItemVisible: Boolean,
     val isFiltering: Boolean,
-    val filterList: List<FilterViewState>,
+    val chips: List<ChipViewState>,
 ) {
 
-    data class FilterViewState(
-        val text: String,
-        @ColorRes val backgroundColor: Int,
-        val isCloseIconVisible: Boolean,
+    data class ChipViewState(
+        val style: Style,
         val onFilterClicked: () -> Unit,
         val onCloseIconClicked: () -> Unit,
-    )
+    ) {
+
+        data class Style(
+            val text: String,
+            @ColorRes val backgroundColor: Int,
+            val isCloseIconVisible: Boolean,
+        )
+    }
 }

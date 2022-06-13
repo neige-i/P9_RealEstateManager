@@ -1,26 +1,37 @@
 package com.openclassrooms.realestatemanager.ui.filter
 
 import android.app.Dialog
+import android.os.Bundle
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.openclassrooms.realestatemanager.R
+import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import com.openclassrooms.realestatemanager.databinding.DialogSaleStatusFilterBinding
 import com.openclassrooms.realestatemanager.ui.filter.DateFilterViewModel.DatePickerType
 import com.openclassrooms.realestatemanager.ui.util.viewBinding
 
-class DateFilterDialog : FilterDialog() {
+class DateFilterDialog private constructor() : FilterDialog() {
+
+    companion object {
+        const val KEY_FILTER_VALUE = "KEY_FILTER_VALUE"
+
+        fun newInstance(availableDatesFilter: FilterValue.AvailableDates?) = DateFilterDialog().apply {
+            arguments = Bundle().apply {
+                putSerializable(KEY_FILTER_VALUE, availableDatesFilter)
+            }
+        }
+    }
 
     private val binding by viewBinding(DialogSaleStatusFilterBinding::inflate)
 
     override fun getFilterDialog(): Dialog {
         val viewModel = ViewModelProvider(this).get(DateFilterViewModel::class.java)
 
-        binding.filterSaleRadioGrp.setOnCheckedChangeListener { _, checkedId ->
-            viewModel.onSaleStatusSelected(checkedId)
-        }
+        binding.filterAvailableEstatesRadioBtn.setOnCheckedChangeListener { _, _ -> viewModel.onSaleStatusSelected(true) }
+        binding.filterSoldEstatesRadioBtn.setOnCheckedChangeListener { _, _ -> viewModel.onSaleStatusSelected(false) }
 
         binding.filterStartDateInput.setOnClickListener {
             viewModel.onDateInputClicked(DatePickerType.START)

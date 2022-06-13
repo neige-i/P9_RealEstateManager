@@ -73,25 +73,25 @@ class MainActivity : AppCompatActivity() {
             editMenuItem?.isVisible = mainViewState.isEditMenuItemVisible
 
             filterBinding.filterList.isVisible = mainViewState.isFiltering
-            filterAdapter.submitList(mainViewState.filterList)
+            filterAdapter.submitList(mainViewState.chips)
         }
 
         viewModel.mainEventLiveData.observe(this) { mainEvent ->
             when (mainEvent) {
-                OpenEstateDetail -> supportFragmentManager.commit {
+                is OpenEstateDetail -> supportFragmentManager.commit {
                     setReorderingAllowed(true)
                     replace<DetailFragment>(R.id.main_content)
                     addToBackStack(null)
                 }
-                OpenEstateForm -> startActivity(Intent(this, FormActivity::class.java))
-                ShowSliderFilterDialog -> {
-                    RangeFilterDialog().show(supportFragmentManager, null)
+                is OpenEstateForm -> startActivity(Intent(this, FormActivity::class.java))
+                is ShowSliderFilterDialog -> {
+                    RangeFilterDialog.newInstance(mainEvent.filterType, mainEvent.minMaxFilterValue).show(supportFragmentManager, null)
                 }
-                ShowCheckableFilterDialog -> {
-                    MultiChoiceFilterDialog().show(supportFragmentManager, null)
+                is ShowCheckableFilterDialog -> {
+                    MultiChoiceFilterDialog.newInstance(mainEvent.filterType, mainEvent.choicesFilterValue).show(supportFragmentManager, null)
                 }
-                ShowCalendarFilterDialog -> {
-                    DateFilterDialog().show(supportFragmentManager, null)
+                is ShowCalendarFilterDialog -> {
+                    DateFilterDialog.newInstance(mainEvent.availableDatesFilterValue).show(supportFragmentManager, null)
                 }
             }
         }

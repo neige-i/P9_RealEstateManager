@@ -28,7 +28,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val filterRepository: FilterRepository,
+    filterRepository: FilterRepository,
     setFilterUseCase: SetFilterUseCase,
     private val currentEstateRepository: CurrentEstateRepository,
     private val setFormUseCase: SetFormUseCase,
@@ -45,8 +45,8 @@ class MainViewModel @Inject constructor(
         backStackEntryCountMutableStateFlow,
         isFilteringMutableStateFlow,
         resourcesRepository.isTabletFlow(),
-        filterRepository.getAppliedFiltersFlow(),
-    ) { currentEstateId, backStackEntryCount, isFiltering, isTablet, appliedFilters ->
+        filterRepository.getAllFiltersFlow(),
+    ) { currentEstateId, backStackEntryCount, isFiltering, isTablet, allFilters ->
 
         // Set when to open the estate details
         withContext(coroutineProvider.getMainDispatcher()) {
@@ -66,49 +66,27 @@ class MainViewModel @Inject constructor(
             navigationIconId = if (isDetailInPortrait) R.drawable.ic_arrow_back else null,
             isEditMenuItemVisible = currentEstateId != null,
             isFiltering = isFiltering && !isDetailInPortrait,
-            filterList = appliedFilters.map { (filterType, filterValue) ->
-                MainViewState.FilterViewState(
-                    text = if (filterValue == null) {
-                        application.getString(filterType.labelId)
+            chips = allFilters.map { (filterType, filterValue) ->
+
+                MainViewState.ChipViewState(
+                    style = if (filterValue != null) {
+                        MainViewState.ChipViewState.Style(
+                            text = getSelectedChipLabel(filterValue),
+                            backgroundColor = R.color.colorAccent,
+                            isCloseIconVisible = true,
+                        )
                     } else {
-                        when (filterValue) {
-                            is FilterValue.IntMinMax -> getFilterLabel(
-                                filterType = filterType,
-                                from = filterValue.value.lower,
-                                to = filterValue.value.upper,
-                            )
-                            is FilterValue.DoubleMinMax -> getFilterLabel(
-                                filterType = filterType,
-                                from = filterValue.value.lower,
-                                to = filterValue.value.upper,
-                            )
-                            is FilterValue.DateMinMax -> getFilterLabel(filterValue)
-                            is FilterValue.TypeChoice -> getFilterLabel(
-                                filterValue.value.map { application.getString(it.labelId) }
-                            )
-                            is FilterValue.PoiChoice -> getFilterLabel(
-                                filterValue.value.map { application.getString(it.labelId) }
-                            )
-                        }
+                        MainViewState.ChipViewState.Style(
+                            text = getDefaultChipLabel(filterType),
+                            backgroundColor = R.color.lightGray,
+                            isCloseIconVisible = false,
+                        )
                     },
-                    backgroundColor = if (filterValue != null) {
-                        R.color.colorAccent
-                    } else {
-                        R.color.lightGray
-                    },
-                    isCloseIconVisible = filterValue != null,
                     onFilterClicked = {
-                        filterRepository.setCurrentFilter(filterType)
                         mainSingleLiveEvent.value = when (filterType) {
-                            PRICE, SURFACE, PHOTO_COUNT -> {
-                                MainEvent.ShowSliderFilterDialog
-                            }
-                            TYPE, POINT_OF_INTEREST -> {
-                                MainEvent.ShowCheckableFilterDialog
-                            }
-                            SALE_STATUS -> {
-                                MainEvent.ShowCalendarFilterDialog
-                            }
+                            is Slider -> MainEvent.ShowSliderFilterDialog(filterType, filterValue as FilterValue.MinMax<*>?)
+                            is CheckList -> MainEvent.ShowCheckableFilterDialog(filterType, filterValue as FilterValue.Choices?)
+                            is SaleStatus -> MainEvent.ShowCalendarFilterDialog(filterValue as FilterValue.AvailableDates?)
                         }
                     },
                     onCloseIconClicked = { setFilterUseCase.reset(filterType) },
@@ -117,40 +95,66 @@ class MainViewModel @Inject constructor(
         )
     }.asLiveData(coroutineProvider.getIoDispatcher())
 
-    private fun getFilterLabel(filterType: FilterType, from: Number, to: Number): String {
+    private fun getDefaultChipLabel(filterType: FilterType): String {
         return application.getString(
             when (filterType) {
-                TYPE -> TODO()
-                PRICE -> R.string.filter_price_range_short
-                SURFACE -> R.string.filter_surface_range_short
-                PHOTO_COUNT -> R.string.filter_photo_count_range_short
-                POINT_OF_INTEREST -> TODO()
-                SALE_STATUS -> TODO()
-            },
-            from.toInt(),
-            to.toInt(),
+                EstateType -> R.string.hint_type
+                PointOfInterest -> R.string.label_points_of_interest
+                SaleStatus -> R.string.filter_sale_status
+                PhotoCount -> R.string.filter_photo
+                Price -> R.string.hint_price
+                Surface -> R.string.hint_area
+            }
         )
     }
 
-    private fun getFilterLabel(selectedItems: List<String>): String {
-        val MAX_ITEM_COUNT = 3
+    private fun getSelectedChipLabel(filterValue: FilterValue): String {
+        return when (filterValue) {
+            is FilterValue.MinMax<*> -> getMinMaxFilterLabel(filterValue)
+            is FilterValue.Choices -> getChoicesFilterLabel(filterValue)
+            is FilterValue.AvailableDates -> getSaleStatusFilterLabel(filterValue)
+        }
+    }
 
-        val stringBuilder = StringBuilder(selectedItems.take(MAX_ITEM_COUNT).joinToString())
+    private fun getMinMaxFilterLabel(minMaxFilter: FilterValue.MinMax<*>): String {
+        return application.getString(
+            when (minMaxFilter) {
+                is FilterValue.PhotoCount -> R.string.filter_photo_count_range_short
+                is FilterValue.Price -> R.string.filter_price_range_short
+                is FilterValue.Surface -> R.string.filter_surface_range_short
+            },
+            minMaxFilter.min.toInt(),
+            minMaxFilter.max.toInt(),
+        )
+    }
 
-        val remainItems = selectedItems.size - MAX_ITEM_COUNT
-        if (remainItems > 0) {
-            stringBuilder.append(" (+$remainItems)")
+    private fun getChoicesFilterLabel(choicesFilter: FilterValue.Choices): String {
+        val selectedItems = when (choicesFilter) {
+            is FilterValue.EstateType -> choicesFilter.selectedEstateTypes.map { it.labelId }
+            is FilterValue.Poi -> choicesFilter.selectedPois.map { it.labelId }
+        }
+
+        val displayedItems = selectedItems
+            .take(3) // Only display the first 3 items
+            .map { stringRes -> application.getString(stringRes) }
+
+        val itemCountOverflow = selectedItems.size - displayedItems.size
+
+        val stringBuilder = StringBuilder(displayedItems.joinToString())
+
+        if (itemCountOverflow > 0) {
+            stringBuilder.append(" (+$itemCountOverflow)")
         }
 
         return stringBuilder.toString()
     }
 
-    private fun getFilterLabel(dateFilterValue: FilterValue.DateMinMax): String {
-        val min = dateFilterValue.min?.format(UtilsRepository.SHORT_DATE_FORMATTER)
-        val max = dateFilterValue.max?.format(UtilsRepository.SHORT_DATE_FORMATTER)
+    private fun getSaleStatusFilterLabel(availableDatesFilter: FilterValue.AvailableDates): String {
+        val min = availableDatesFilter.from?.format(UtilsRepository.SHORT_DATE_FORMATTER)
+        val max = availableDatesFilter.until?.format(UtilsRepository.SHORT_DATE_FORMATTER)
 
 
-        return if (dateFilterValue.availableEstates) {
+        return if (availableDatesFilter.availableEstates) {
             if (min != null) {
                 if (max != null) {
                     application.getString(R.string.filter_available_between, min, max)

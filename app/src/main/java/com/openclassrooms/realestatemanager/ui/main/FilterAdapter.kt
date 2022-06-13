@@ -6,10 +6,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.openclassrooms.realestatemanager.databinding.ItemChipBinding
-import com.openclassrooms.realestatemanager.ui.main.MainViewState.FilterViewState
+import com.openclassrooms.realestatemanager.ui.main.MainViewState.ChipViewState
 
 class FilterAdapter :
-    ListAdapter<FilterViewState, FilterAdapter.FilterViewHolder>(FilterDiffUtil()) {
+    ListAdapter<ChipViewState, FilterAdapter.FilterViewHolder>(FilterDiffUtil()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = FilterViewHolder(
         ItemChipBinding.inflate(
@@ -27,28 +27,30 @@ class FilterAdapter :
     class FilterViewHolder(private val binding: ItemChipBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(filterViewState: FilterViewState) {
+        fun bind(chip: ChipViewState) {
             binding.root.isCheckable = false
 
-            binding.root.text = filterViewState.text
+            val chipStyle = chip.style
 
-            binding.root.setChipBackgroundColorResource(filterViewState.backgroundColor)
-            binding.root.isCloseIconVisible = filterViewState.isCloseIconVisible
+            binding.root.text = chipStyle.text
 
-            binding.root.setOnClickListener { filterViewState.onFilterClicked() }
-            binding.root.setOnCloseIconClickListener { filterViewState.onCloseIconClicked() }
+            binding.root.setChipBackgroundColorResource(chipStyle.backgroundColor)
+            binding.root.isCloseIconVisible = chipStyle.isCloseIconVisible
+
+            binding.root.setOnClickListener { chip.onFilterClicked() }
+            binding.root.setOnCloseIconClickListener { chip.onCloseIconClicked() }
         }
     }
 
-    class FilterDiffUtil : DiffUtil.ItemCallback<FilterViewState>() {
+    class FilterDiffUtil : DiffUtil.ItemCallback<ChipViewState>() {
 
-        override fun areItemsTheSame(oldItem: FilterViewState, newItem: FilterViewState): Boolean {
-            return oldItem.text == newItem.text
+        override fun areItemsTheSame(oldItem: ChipViewState, newItem: ChipViewState): Boolean {
+            return oldItem.style.text == newItem.style.text
         }
 
         override fun areContentsTheSame(
-            oldItem: FilterViewState,
-            newItem: FilterViewState
+            oldItem: ChipViewState,
+            newItem: ChipViewState
         ): Boolean {
             return oldItem == newItem
         }

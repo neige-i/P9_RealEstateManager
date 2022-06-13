@@ -1,136 +1,96 @@
 package com.openclassrooms.realestatemanager.ui.filter
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import com.openclassrooms.realestatemanager.R
-import com.openclassrooms.realestatemanager.data.PointOfInterest
-import com.openclassrooms.realestatemanager.data.RealEstateType
 import com.openclassrooms.realestatemanager.data.filter.FilterType
-import com.openclassrooms.realestatemanager.domain.filter.FilterInfo
-import com.openclassrooms.realestatemanager.domain.filter.GetFilterUseCase
+import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import com.openclassrooms.realestatemanager.domain.filter.SetFilterUseCase
+import com.openclassrooms.realestatemanager.domain.real_estate.GetAvailableValuesUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
+import com.openclassrooms.realestatemanager.ui.util.update
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MultiChoiceFilterViewModel @Inject constructor(
-    getFilterUseCase: GetFilterUseCase,
+    getAvailableValuesUseCase: GetAvailableValuesUseCase,
     private val setFilterUseCase: SetFilterUseCase,
     private val coroutineProvider: CoroutineProvider,
     private val application: Application,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val multiChoiceFilterInfoLiveData: LiveData<FilterInfo.MultiChoice<*>> =
-        getFilterUseCase()
-            .map { filterInfo -> filterInfo as FilterInfo.MultiChoice<*> }
-            .asLiveData(coroutineProvider.getIoDispatcher())
-    private val currentCheckedItemsMediatorLiveData = MediatorLiveData<List<String>>().apply {
-        addSource(multiChoiceFilterInfoLiveData) {
-            value = when (it) {
-                is FilterInfo.MultiChoice.Type -> it.selection.map { application.getString(it.labelId) }
-                is FilterInfo.MultiChoice.Poi -> it.selection.map { application.getString(it.labelId) }
-            }
-        }
+    private val checkListType = savedStateHandle.get<FilterType.CheckList>(MultiChoiceFilterDialog.KEY_FILTER_TYPE)
+        ?: throw IllegalStateException("The filter type must be passed as an argument to the Fragment")
+
+    private val checkedItemsMutableLiveData = MutableLiveData<MutableList<String>>()
+
+    private val allItemsFlow: Flow<List<String>> = when (checkListType) {
+        is FilterType.EstateType -> getAvailableValuesUseCase.getTypeList().map { it.map { application.getString(it.labelId) } }
+        is FilterType.PointOfInterest -> getAvailableValuesUseCase.getPoiList().map { it.map { application.getString(it.labelId) } }
     }
 
     private val viewStateMediatorLiveData = MediatorLiveData<MultiChoiceViewState>()
     val viewState: LiveData<MultiChoiceViewState> = viewStateMediatorLiveData
 
     init {
-        viewStateMediatorLiveData.addSource(multiChoiceFilterInfoLiveData) { multiChoiceFilterInfo ->
-            combineViewState(multiChoiceFilterInfo, currentCheckedItemsMediatorLiveData.value)
+        // Init checklist's selected items
+
+        val choicesFilterValue = savedStateHandle.get<FilterValue.Choices?>(MultiChoiceFilterDialog.KEY_FILTER_VALUE)
+        checkedItemsMutableLiveData.value = when (choicesFilterValue) {
+            is FilterValue.EstateType -> choicesFilterValue.selectedEstateTypes.map { application.getString(it.labelId) }
+            is FilterValue.Poi -> choicesFilterValue.selectedPois.map { application.getString(it.labelId) }
+            null -> emptyList()
+        }.toMutableList()
+
+        // Setup view state's data sources
+
+        val allItemsLiveData = allItemsFlow.asLiveData(coroutineProvider.getIoDispatcher())
+
+        viewStateMediatorLiveData.addSource(checkedItemsMutableLiveData) { checkedItems ->
+            combineViewState(checkedItems, allItemsLiveData.value)
         }
-        viewStateMediatorLiveData.addSource(currentCheckedItemsMediatorLiveData) { currentCheckedItems ->
-            combineViewState(multiChoiceFilterInfoLiveData.value, currentCheckedItems)
+        viewStateMediatorLiveData.addSource(allItemsLiveData) { allItems ->
+            combineViewState(checkedItemsMutableLiveData.value, allItems)
         }
     }
 
-    private fun combineViewState(
-        multiChoiceFilterInfo: FilterInfo.MultiChoice<*>?,
-        currentCheckedItems: List<String>?,
-    ) {
-        if (multiChoiceFilterInfo == null || currentCheckedItems == null) {
+    private fun combineViewState(checkedItems: List<String>?, allItems: List<String>?) {
+        if (checkedItems == null || allItems == null) {
             return
         }
 
-        val allTypes = RealEstateType.values()
-        val allPois = PointOfInterest.values()
+        val checkBoxes = allItems.map { checkedItems.contains(it) }
 
         viewStateMediatorLiveData.value = MultiChoiceViewState(
-            dialogTitle = application.getString(
-                when (multiChoiceFilterInfo.type) {
-                    FilterType.TYPE -> R.string.filter_type_dialog_title
-                    FilterType.PRICE -> TODO()
-                    FilterType.SURFACE -> TODO()
-                    FilterType.PHOTO_COUNT -> TODO()
-                    FilterType.POINT_OF_INTEREST -> R.string.filter_poi_dialog_title
-                    FilterType.SALE_STATUS -> TODO()
-                }
-            ),
-            labels = when (multiChoiceFilterInfo) {
-                is FilterInfo.MultiChoice.Type -> {
-                    allTypes.map { application.getString(it.labelId) }
-                }
-                is FilterInfo.MultiChoice.Poi -> {
-                    allPois.map { application.getString(it.labelId) }
-                }
+            dialogTitle = when (checkListType) {
+                is FilterType.EstateType -> R.string.filter_type_dialog_title
+                is FilterType.PointOfInterest -> R.string.filter_poi_dialog_title
             },
-            checkedItems = when (multiChoiceFilterInfo) {
-                is FilterInfo.MultiChoice.Type -> {
-                    allTypes.map { currentCheckedItems.contains(application.getString(it.labelId)) }
-                }
-                is FilterInfo.MultiChoice.Poi -> {
-                    allPois.map { currentCheckedItems.contains(application.getString(it.labelId)) }
-                }
-            },
+            labels = allItems,
+            checkedItems = checkBoxes,
         )
     }
 
-    fun onItemClicked(index: Int, isChecked: Boolean) {
-        val whichMultiChoice = multiChoiceFilterInfoLiveData.value ?: return
-        val currentCheckedItems = currentCheckedItemsMediatorLiveData.value?.toMutableList()
-            ?: return
-
-        val clickedItem = application.getString(
-            when (whichMultiChoice) {
-                is FilterInfo.MultiChoice.Type -> RealEstateType.values()[index].labelId
-                is FilterInfo.MultiChoice.Poi -> PointOfInterest.values()[index].labelId
-            }
-        )
-        if (isChecked) {
-            currentCheckedItems.add(clickedItem)
-        } else {
-            currentCheckedItems.remove(clickedItem)
+    fun onItemClicked(label: String, isChecked: Boolean) {
+        checkedItemsMutableLiveData.update { currentCheckedItems ->
+            currentCheckedItems?.apply {
+                if (isChecked) add(label) else remove(label)
+            } ?: mutableListOf()
         }
-
-        currentCheckedItemsMediatorLiveData.value = currentCheckedItems
     }
 
     fun onPositiveButtonClicked() {
-        val whichMultiChoice = multiChoiceFilterInfoLiveData.value ?: return
-        val currentCheckedItems = currentCheckedItemsMediatorLiveData.value ?: return
-
-        val newSelection = currentCheckedItems.map { item ->
-            when (whichMultiChoice) {
-                is FilterInfo.MultiChoice.Type -> RealEstateType.fromLocaleString(item, application)
-                is FilterInfo.MultiChoice.Poi -> PointOfInterest.values()
-                    .first { application.getString(it.labelId) == item }
-            }
-        }
-
         viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            when (whichMultiChoice) {
-                is FilterInfo.MultiChoice.Type -> setFilterUseCase.applyEstateTypes(newSelection as List<RealEstateType>)
-                is FilterInfo.MultiChoice.Poi -> setFilterUseCase.applyPoi(newSelection as List<PointOfInterest>)
-            }
+            setFilterUseCase.applyFilter(checkListType, checkedItemsMutableLiveData.value)
         }
     }
 
     fun onNeutralButtonClicked() {
-        currentCheckedItemsMediatorLiveData.value = emptyList()
+        checkedItemsMutableLiveData.value = mutableListOf()
     }
 }

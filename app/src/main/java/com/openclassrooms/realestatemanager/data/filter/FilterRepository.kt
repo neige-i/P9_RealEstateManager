@@ -2,6 +2,8 @@ package com.openclassrooms.realestatemanager.data.filter
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,30 +18,28 @@ class FilterRepository @Inject constructor() {
 
     private val currentFilterTypeMutableSharedFlow = MutableSharedFlow<FilterType>(replay = 1)
 
-    // CAUTION: do NOT use StateFlow with mutable collection
-    private val appliedFiltersMutableSharedFlow =
-        MutableSharedFlow<MutableMap<FilterType, FilterValue?>>(replay = 1).apply {
-            tryEmit(
-                FilterType.values()
-                    .associateWith { null } // By default, no filter is applied
-                    .toMutableMap()
-            )
-        }
+    // CAUTION: do NOT use MUTABLE collections with StateFlow
+    private val allFiltersMutableStateFlow = MutableStateFlow<Map<FilterType, FilterValue?>>(
+        // By default, no filter is applied
+        mapOf(
+            FilterType.EstateType to null,
+            FilterType.Price to null,
+            FilterType.Surface to null,
+            FilterType.PhotoCount to null,
+            FilterType.PointOfInterest to null,
+            FilterType.SaleStatus to null,
+        )
+    )
 
     fun getCurrentFilterFlow(): Flow<FilterType> = currentFilterTypeMutableSharedFlow
 
-    fun setCurrentFilter(filterType: FilterType) {
-        currentFilterTypeMutableSharedFlow.tryEmit(filterType)
-    }
-
-    fun getAppliedFiltersFlow(): Flow<Map<FilterType, FilterValue?>> =
-        appliedFiltersMutableSharedFlow
+    fun getAllFiltersFlow(): Flow<Map<FilterType, FilterValue?>> = allFiltersMutableStateFlow
 
     fun applyFilter(filterToSet: FilterType, filterToApply: FilterValue?) {
-        appliedFiltersMutableSharedFlow.tryEmit(
-            appliedFiltersMutableSharedFlow.replayCache.first().apply {
-                set(filterToSet, filterToApply)
+        allFiltersMutableStateFlow.update { allFilters ->
+            allFilters.toMutableMap().apply {
+                put(filterToSet, filterToApply)
             }
-        )
+        }
     }
 }

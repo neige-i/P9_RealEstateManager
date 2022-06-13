@@ -1,14 +1,29 @@
 package com.openclassrooms.realestatemanager.ui.filter
 
 import android.app.Dialog
+import android.os.Bundle
 import android.util.Range
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.openclassrooms.realestatemanager.R
+import com.openclassrooms.realestatemanager.data.filter.FilterType
+import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import com.openclassrooms.realestatemanager.databinding.DialogSliderBinding
 import com.openclassrooms.realestatemanager.ui.util.viewBinding
 
-class RangeFilterDialog : FilterDialog() {
+class RangeFilterDialog private constructor() : FilterDialog() {
+
+    companion object {
+        const val KEY_FILTER_TYPE = "KEY_FILTER_TYPE"
+        const val KEY_FILTER_VALUE = "KEY_FILTER_VALUE"
+
+        fun newInstance(sliderFilter: FilterType.Slider, minMaxFilter: FilterValue.MinMax<*>?) = RangeFilterDialog().apply {
+            arguments = Bundle().apply {
+                putSerializable(KEY_FILTER_TYPE, sliderFilter)
+                putSerializable(KEY_FILTER_VALUE, minMaxFilter)
+            }
+        }
+    }
 
     private val binding by viewBinding(DialogSliderBinding::inflate)
 
@@ -34,17 +49,22 @@ class RangeFilterDialog : FilterDialog() {
                 }
             }
 
-        viewModel.viewState.observe(this) { range ->
-            dialog.setTitle(range.dialogTitle)
+        viewModel.viewState.observe(this) { rangeDialog ->
+            val dialogStyle = rangeDialog.style
 
-            binding.dialogRangeTxt.text = range.label
+            dialog.setTitle(dialogStyle.title)
 
-            binding.dialogRangeSlider.valueFrom = range.from
-            binding.dialogRangeSlider.valueTo = range.to
+            binding.dialogRangeTxt.text = dialogStyle.label
 
-            binding.dialogRangeSlider.values = listOf(range.min, range.max)
+            binding.dialogRangeSlider.valueFrom = rangeDialog.bounds.lower
+            binding.dialogRangeSlider.valueTo = rangeDialog.bounds.upper
 
-            binding.dialogRangeSlider.stepSize = range.step
+            binding.dialogRangeSlider.values = listOf(
+                rangeDialog.selection.lower,
+                rangeDialog.selection.upper
+            )
+
+            binding.dialogRangeSlider.stepSize = dialogStyle.step
         }
 
         return dialog

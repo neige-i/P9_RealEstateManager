@@ -1,20 +1,18 @@
 package com.openclassrooms.realestatemanager.ui.filter
 
-import androidx.annotation.IdRes
 import androidx.lifecycle.*
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.UtilsRepository
-import com.openclassrooms.realestatemanager.domain.filter.FilterInfo
-import com.openclassrooms.realestatemanager.domain.filter.GetFilterUseCase
+import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import com.openclassrooms.realestatemanager.domain.filter.SetFilterUseCase
+import com.openclassrooms.realestatemanager.domain.real_estate.GetAvailableValuesUseCase
 import com.openclassrooms.realestatemanager.ui.filter.DateFilterViewModel.DatePickerType.END
 import com.openclassrooms.realestatemanager.ui.filter.DateFilterViewModel.DatePickerType.START
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
+import com.openclassrooms.realestatemanager.ui.util.update
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.combine
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -22,75 +20,80 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DateFilterViewModel @Inject constructor(
-    getFilterUseCase: GetFilterUseCase,
+    getAvailableValuesUseCase: GetAvailableValuesUseCase,
     private val setFilterUseCase: SetFilterUseCase,
-    private val coroutineProvider: CoroutineProvider,
+    coroutineProvider: CoroutineProvider,
     private val defaultZoneId: ZoneId,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val openDatePickerMutableLiveData = MutableLiveData<DatePickerType?>()
-    private val datesFilterInfoMutableLiveData = MutableLiveData<FilterInfo.Dates>().apply {
-        viewModelScope.launch {
-            val datesFilterInfo = getFilterUseCase().first() as FilterInfo.Dates
-
-            withContext(coroutineProvider.getMainDispatcher()) {
-                value = datesFilterInfo
-            }
-        }
-    }
+    private val availableDatesMutableLiveData = savedStateHandle.getLiveData<FilterValue.AvailableDates?>(DateFilterDialog.KEY_FILTER_VALUE)
 
     // Use distinctUntilChanged() to avoid infinite loop due to RadioButton checking:
     // The RadioButton is checked while observing the view state but,
     // the view state is also updated when a RadioButton is checked
-    val viewState =
-        Transformations.map(datesFilterInfoMutableLiveData.distinctUntilChanged()) { datesFilter ->
-            val startDateText = datesFilter.min?.format(UtilsRepository.DATE_FORMATTER).orEmpty()
-            val endDateText = datesFilter.max?.format(UtilsRepository.DATE_FORMATTER).orEmpty()
+    val viewState = Transformations.map(availableDatesMutableLiveData.distinctUntilChanged()) { availableDates ->
 
-            DateFilterViewState(
-                selectedRadioBtn = when (datesFilter.availableEstates) {
-                    true -> R.id.filter_available_estates_radio_btn
-                    false -> R.id.filter_sold_estates_radio_btn
-                    null -> -1
-                },
-                isDateInputVisible = datesFilter.availableEstates != null,
-                isStartDateEndIconVisible = startDateText.isNotEmpty(),
-                startDateInputText = startDateText,
-                isEndDateEndIconVisible = endDateText.isNotEmpty(),
-                endDateInputText = endDateText,
-            )
-        }
+        val startDateText = availableDates?.from?.format(UtilsRepository.DATE_FORMATTER).orEmpty()
+        val endDateText = availableDates?.until?.format(UtilsRepository.DATE_FORMATTER).orEmpty()
 
+        DateFilterViewState(
+            selectedRadioBtn = when (availableDates?.availableEstates) {
+                true -> R.id.filter_available_estates_radio_btn
+                false -> R.id.filter_sold_estates_radio_btn
+                null -> -1
+            },
+            isDateInputVisible = availableDates?.availableEstates != null,
+            isStartDateEndIconVisible = startDateText.isNotEmpty(),
+            startDateInputText = startDateText,
+            isEndDateEndIconVisible = endDateText.isNotEmpty(),
+            endDateInputText = endDateText,
+        )
+    }
+
+    private val datePickerPingMutableLiveData = MutableLiveData<DatePickerType?>()
     private val showDatePickerSingleLiveEvent = SingleLiveEvent<ShowDatePickerEvent>()
     val showDatePickerEvent: LiveData<ShowDatePickerEvent> = showDatePickerSingleLiveEvent
 
     init {
-        showDatePickerSingleLiveEvent.addSource(datesFilterInfoMutableLiveData) { datesFilterInfo ->
-            combineLiveEvent(datesFilterInfo, openDatePickerMutableLiveData.value)
+        val dateLimitLiveData = combine(
+            getAvailableValuesUseCase.getMinEntryDate(),
+            getAvailableValuesUseCase.getMaxSaleDate(),
+        ) { minEntryDate, maxSaleDate ->
+            DateLimit(
+                min = minEntryDate,
+                max = maxSaleDate,
+            )
+        }.asLiveData(coroutineProvider.getIoDispatcher())
+
+        showDatePickerSingleLiveEvent.addSource(availableDatesMutableLiveData) { availableDates ->
+            combineLiveEvent(availableDates, dateLimitLiveData.value, datePickerPingMutableLiveData.value)
         }
-        showDatePickerSingleLiveEvent.addSource(openDatePickerMutableLiveData) { openDatePicker ->
-            combineLiveEvent(datesFilterInfoMutableLiveData.value, openDatePicker)
+        showDatePickerSingleLiveEvent.addSource(dateLimitLiveData) { dateLimit ->
+            combineLiveEvent(availableDatesMutableLiveData.value, dateLimit, datePickerPingMutableLiveData.value)
+        }
+        showDatePickerSingleLiveEvent.addSource(datePickerPingMutableLiveData) { datePickerPing ->
+            combineLiveEvent(availableDatesMutableLiveData.value, dateLimitLiveData.value, datePickerPing)
         }
     }
 
-    private fun combineLiveEvent(
-        datesFilterInfo: FilterInfo.Dates?,
-        openDatePicker: DatePickerType?,
-    ) {
-        if (datesFilterInfo == null || openDatePicker == null) {
+    private fun combineLiveEvent(availableDates: FilterValue.AvailableDates?, dateLimit: DateLimit?, datePickerPing: DatePickerType?) {
+        if (dateLimit == null || datePickerPing == null) {
             return
         }
 
-        openDatePickerMutableLiveData.value = null // Reset ping
+        datePickerPingMutableLiveData.value = null // Reset ping
 
-        val min = datesFilterInfo.min?.toMillis()
-        val max = datesFilterInfo.max?.toMillis()
-        val minLimit = datesFilterInfo.minDateLimit?.toMillis()
-        val maxLimit = datesFilterInfo.maxDateLimit?.toMillis()
+        val min = availableDates?.from?.toMillis()
+        val max = availableDates?.until?.toMillis()
+        val minLimit = dateLimit.min?.toMillis()
+        val maxLimit = dateLimit.max?.toMillis()
 
-        val onDateValidated = { millis: Long? -> updateDate(millis?.toDate(), openDatePicker) }
+        val onDateValidated = { millis: Long? ->
+            updateDate(newDate = millis?.toDate(), datePickerType = datePickerPing)
+        }
 
-        showDatePickerSingleLiveEvent.value = when (openDatePicker) {
+        showDatePickerSingleLiveEvent.value = when (datePickerPing) {
             START -> ShowDatePickerEvent(
                 selectedDate = min,
                 minConstraint = minLimit,
@@ -106,20 +109,19 @@ class DateFilterViewModel @Inject constructor(
         }
     }
 
-    fun onSaleStatusSelected(@IdRes checkedId: Int) {
-        datesFilterInfoMutableLiveData.update {
-            it.copy(
-                availableEstates = when (checkedId) {
-                    R.id.filter_available_estates_radio_btn -> true
-                    R.id.filter_sold_estates_radio_btn -> false
-                    else -> null
-                }
-            )
+    fun onSaleStatusSelected(isAvailable: Boolean) {
+        availableDatesMutableLiveData.update { availableDates ->
+            availableDates?.copy(availableEstates = isAvailable)
+                ?: FilterValue.AvailableDates(
+                    availableEstates = isAvailable,
+                    from = null,
+                    until = null,
+                )
         }
     }
 
     fun onDateInputClicked(datePickerType: DatePickerType) {
-        openDatePickerMutableLiveData.value = datePickerType
+        datePickerPingMutableLiveData.value = datePickerType
     }
 
     fun onDateInputCleared(datePickerType: DatePickerType) {
@@ -127,39 +129,30 @@ class DateFilterViewModel @Inject constructor(
     }
 
     private fun updateDate(newDate: LocalDate?, datePickerType: DatePickerType) {
-        datesFilterInfoMutableLiveData.update {
+        availableDatesMutableLiveData.update { availableDates ->
             when (datePickerType) {
-                START -> it.copy(min = newDate)
-                END -> it.copy(max = newDate)
+                START -> availableDates?.copy(from = newDate)
+                END -> availableDates?.copy(until = newDate)
             }
         }
     }
 
     fun onPositiveButtonClicked() {
-        val currentDatesFilter = datesFilterInfoMutableLiveData.value ?: return
-
-        viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            setFilterUseCase.applyDates(currentDatesFilter)
-        }
+        setFilterUseCase.applyFilter(availableDatesMutableLiveData.value)
     }
 
     fun onNeutralButtonClicked() {
-        datesFilterInfoMutableLiveData.update {
-            it.copy(
-                min = null,
-                max = null,
-                availableEstates = null,
-            )
-        }
+        availableDatesMutableLiveData.value = null
     }
 
     private fun LocalDate.toMillis(): Long = atStartOfDay(defaultZoneId).toInstant().toEpochMilli()
 
     private fun Long.toDate() = Instant.ofEpochMilli(this).atZone(defaultZoneId).toLocalDate()
 
-    private inline fun <T> MutableLiveData<T>.update(function: (T) -> T) {
-        value?.let { value = function(it) }
-    }
+    data class DateLimit(
+        val min: LocalDate?,
+        val max: LocalDate?,
+    )
 
     enum class DatePickerType {
         START,

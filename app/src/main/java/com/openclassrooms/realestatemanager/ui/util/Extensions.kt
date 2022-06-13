@@ -3,6 +3,9 @@ package com.openclassrooms.realestatemanager.ui.util
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.TextView
+import androidx.lifecycle.MutableLiveData
+import com.openclassrooms.realestatemanager.data.UtilsRepository
+import java.time.LocalDate
 
 inline fun TextView.onAfterTextChanged(
     crossinline listener: (
@@ -24,4 +27,10 @@ inline fun TextView.onAfterTextChanged(
     }
 }.apply {
     addTextChangedListener(this)
+}
+
+fun String.toLocalDate(): LocalDate = LocalDate.parse(this, UtilsRepository.DATE_FORMATTER)
+
+inline fun <T> MutableLiveData<T>.update(function: (T?) -> T) {
+    value.let { value = function(it) }
 }
