@@ -25,24 +25,27 @@ abstract class ImageLauncherActivity : AppCompatActivity() {
             viewModel.onPhotoPicked(uri = cameraPictureUri, success = it)
         }
         val galleryLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
-//            contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            viewModel.onPhotoPicked(uri = it)
+            it?.let { galleryImageUri ->
+                contentResolver.takePersistableUriPermission(
+                    galleryImageUri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                viewModel.onPhotoPicked(uri = galleryImageUri)
+            }
         }
 
         viewModel.imageLauncherEventLiveData.observe(this) {
             when (it) {
                 ImageLauncherEvent.OpenCamera -> {
-                    cameraPictureUri = getCameraPictureUri()
+                    cameraPictureUri = FileProvider.getUriForFile(
+                        this,
+                        BuildConfig.APPLICATION_ID + ".provider",
+                        File.createTempFile("tmp_camera_pic_", ".jpg")
+                    )
                     cameraLauncher.launch(cameraPictureUri)
                 }
                 ImageLauncherEvent.OpenGallery -> galleryLauncher.launch(arrayOf("image/*"))
             }
         }
     }
-
-    private fun getCameraPictureUri(): Uri = FileProvider.getUriForFile(
-        this,
-        BuildConfig.APPLICATION_ID + ".provider",
-        File.createTempFile("tmp_camera_pic_", ".jpg")
-    )
 }
