@@ -1,6 +1,5 @@
 package com.openclassrooms.realestatemanager.domain.filter
 
-import android.app.Application
 import android.util.Range
 import com.openclassrooms.realestatemanager.data.PointOfInterest
 import com.openclassrooms.realestatemanager.data.RealEstateType
@@ -11,7 +10,6 @@ import javax.inject.Inject
 
 class SetFilterUseCase @Inject constructor(
     private val filterRepository: FilterRepository,
-    private val application: Application,
 ) {
 
     fun applyFilter(sliderType: FilterType.Slider, selection: Range<Float>?, bounds: Range<Float>) {
@@ -28,13 +26,13 @@ class SetFilterUseCase @Inject constructor(
         filterRepository.applyFilter(filterToSet = sliderType, filterToApply = minMaxValue)
     }
 
-    fun applyFilter(checkListType: FilterType.CheckList, selection: List<String>?) {
+    fun applyFilter(checkListType: FilterType.CheckList, selection: MutableList<Int>?) {
         val choicesValue = if (selection.isNullOrEmpty()) {
             null // Reset filter
         } else {
             when (checkListType) {
-                FilterType.EstateType -> FilterValue.EstateType(selection.map { RealEstateType.fromLocaleString(it, application) })
-                FilterType.PointOfInterest -> FilterValue.Poi(selection.map { PointOfInterest.fromLocaleString(it, application) })
+                FilterType.EstateType -> FilterValue.EstateType(selection.map { RealEstateType.values().first { estateType -> estateType.labelId == it } })
+                FilterType.PointOfInterest -> FilterValue.Poi(selection.map { PointOfInterest.values().first { poi -> poi.labelId == it } })
             }
         }
 

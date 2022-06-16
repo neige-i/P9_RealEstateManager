@@ -4,6 +4,12 @@ import androidx.annotation.StringRes
 
 data class MultiChoiceViewState(
     @StringRes val dialogTitle: Int,
-    val labels: List<String>,
-    val checkedItems: List<Boolean>,
-)
+    val checkItems: List<CheckItem>,
+) {
+
+    data class CheckItem(
+        @StringRes val label: Int,
+        val isChecked: Boolean,
+        val onClicked: (isChecked: Boolean) -> Unit,
+    )
+}
