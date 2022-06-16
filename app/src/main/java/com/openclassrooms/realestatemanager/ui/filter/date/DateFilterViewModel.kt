@@ -1,4 +1,4 @@
-package com.openclassrooms.realestatemanager.ui.filter
+package com.openclassrooms.realestatemanager.ui.filter.date
 
 import androidx.lifecycle.*
 import com.openclassrooms.realestatemanager.R
@@ -7,8 +7,9 @@ import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import com.openclassrooms.realestatemanager.domain.filter.SetFilterUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.GetAvailableValuesUseCase
-import com.openclassrooms.realestatemanager.ui.filter.DateFilterViewModel.DatePickerType.END
-import com.openclassrooms.realestatemanager.ui.filter.DateFilterViewModel.DatePickerType.START
+import com.openclassrooms.realestatemanager.ui.filter.FilterViewModel
+import com.openclassrooms.realestatemanager.ui.filter.date.DateFilterViewModel.DatePickerType.END
+import com.openclassrooms.realestatemanager.ui.filter.date.DateFilterViewModel.DatePickerType.START
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
 import com.openclassrooms.realestatemanager.ui.util.update
@@ -38,7 +39,7 @@ class DateFilterViewModel @Inject constructor(
         val startDateText = availableDates?.from?.format(UtilsRepository.DATE_FORMATTER).orEmpty()
         val endDateText = availableDates?.until?.format(UtilsRepository.DATE_FORMATTER).orEmpty()
 
-        DateFilterViewState(
+        DateViewState(
             dialogTitle = R.string.filter_sale_dialog_title,
             selectedRadioBtn = when (availableDates?.availableEstates) {
                 true -> R.id.filter_available_estates_radio_btn
@@ -55,7 +56,7 @@ class DateFilterViewModel @Inject constructor(
 
     private val datePickerPingMutableLiveData = MutableLiveData<DatePickerType?>()
     private val showDatePickerSingleLiveEvent = SingleLiveEvent<ShowDatePickerEvent>()
-    val showDatePickerEvent: LiveData<ShowDatePickerEvent> = showDatePickerSingleLiveEvent
+    val viewEvent: LiveData<ShowDatePickerEvent> = showDatePickerSingleLiveEvent
 
     init {
         val dateLimitLiveData = combine(

@@ -1,4 +1,4 @@
-package com.openclassrooms.realestatemanager.ui.filter
+package com.openclassrooms.realestatemanager.ui.filter.date
 
 import android.os.Parcelable
 import com.google.android.material.datepicker.CalendarConstraints

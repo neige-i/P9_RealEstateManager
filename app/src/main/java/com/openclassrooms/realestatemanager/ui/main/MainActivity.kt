@@ -11,9 +11,9 @@ import androidx.fragment.app.replace
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding
 import com.openclassrooms.realestatemanager.ui.detail.DetailFragment
-import com.openclassrooms.realestatemanager.ui.filter.DateFilterDialog
-import com.openclassrooms.realestatemanager.ui.filter.MultiChoiceFilterDialog
-import com.openclassrooms.realestatemanager.ui.filter.RangeFilterDialog
+import com.openclassrooms.realestatemanager.ui.filter.date.DateFilterDialog
+import com.openclassrooms.realestatemanager.ui.filter.checklist.CheckListFilterDialog
+import com.openclassrooms.realestatemanager.ui.filter.slider.SliderFilterDialog
 import com.openclassrooms.realestatemanager.ui.form.FormActivity
 import com.openclassrooms.realestatemanager.ui.main.MainEvent.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -84,13 +84,13 @@ class MainActivity : AppCompatActivity() {
                     addToBackStack(null)
                 }
                 is OpenEstateForm -> startActivity(Intent(this, FormActivity::class.java))
-                is ShowSliderFilterDialog -> {
-                    RangeFilterDialog.newInstance(mainEvent.filterType, mainEvent.filterValue).show(supportFragmentManager, null)
+                is ShowSliderFilterSettings -> {
+                    SliderFilterDialog.newInstance(mainEvent.filterType, mainEvent.filterValue).show(supportFragmentManager, null)
                 }
-                is ShowCheckableFilterDialog -> {
-                    MultiChoiceFilterDialog.newInstance(mainEvent.filterType, mainEvent.filterValue).show(supportFragmentManager, null)
+                is ShowCheckListFilterSettings -> {
+                    CheckListFilterDialog.newInstance(mainEvent.filterType, mainEvent.filterValue).show(supportFragmentManager, null)
                 }
-                is ShowCalendarFilterDialog -> {
+                is ShowDateFilterSettings -> {
                     DateFilterDialog.newInstance(mainEvent.filterType, mainEvent.filterValue).show(supportFragmentManager, null)
                 }
             }

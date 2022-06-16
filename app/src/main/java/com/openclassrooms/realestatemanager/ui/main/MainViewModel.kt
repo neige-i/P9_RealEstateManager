@@ -84,9 +84,9 @@ class MainViewModel @Inject constructor(
                     },
                     onFilterClicked = {
                         mainSingleLiveEvent.value = when (filterType) {
-                            is Slider -> MainEvent.ShowSliderFilterDialog(filterType, filterValue)
-                            is CheckList -> MainEvent.ShowCheckableFilterDialog(filterType, filterValue)
-                            is SaleStatus -> MainEvent.ShowCalendarFilterDialog(filterType, filterValue)
+                            is Slider -> MainEvent.ShowSliderFilterSettings(filterType, filterValue)
+                            is CheckList -> MainEvent.ShowCheckListFilterSettings(filterType, filterValue)
+                            is SaleStatus -> MainEvent.ShowDateFilterSettings(filterType, filterValue)
                         }
                     },
                     onCloseIconClicked = { setFilterUseCase.reset(filterType) },

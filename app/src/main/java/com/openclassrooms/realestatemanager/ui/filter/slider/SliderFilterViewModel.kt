@@ -1,4 +1,4 @@
-package com.openclassrooms.realestatemanager.ui.filter
+package com.openclassrooms.realestatemanager.ui.filter.slider
 
 import android.app.Application
 import android.util.Range
@@ -9,6 +9,7 @@ import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import com.openclassrooms.realestatemanager.domain.filter.SetFilterUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.GetAvailableValuesUseCase
+import com.openclassrooms.realestatemanager.ui.filter.FilterViewModel
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RangeFilterViewModel @Inject constructor(
+class SliderFilterViewModel @Inject constructor(
     getAvailableValuesUseCase: GetAvailableValuesUseCase,
     private val setFilterUseCase: SetFilterUseCase,
     private val coroutineProvider: CoroutineProvider,
@@ -29,13 +30,13 @@ class RangeFilterViewModel @Inject constructor(
 
     private val sliderBoundsFlow: Flow<Range<Float>> = getAvailableValuesUseCase.getRangeBounds(filterType)
 
-    private val viewStateMediatorLiveData = MediatorLiveData<RangeDialogViewState>()
-    val viewState: LiveData<RangeDialogViewState> = viewStateMediatorLiveData
+    private val viewStateMediatorLiveData = MediatorLiveData<SliderViewState>()
+    val viewState: LiveData<SliderViewState> = viewStateMediatorLiveData
 
     init {
         // Init slider's selection
 
-        sliderSelectionMutableLiveData.value = filterValue?.let { Range(it.min.toFloat(), it.max.toFloat()) }
+        sliderSelectionMutableLiveData.value = filterValue?.let { it -> Range(it.min.toFloat(), it.max.toFloat()) }
 
         // Setup view state's data sources
 
@@ -56,20 +57,20 @@ class RangeFilterViewModel @Inject constructor(
 
         val selectionRange: Range<Float> = sliderSelection ?: sliderBounds
 
-        viewStateMediatorLiveData.value = RangeDialogViewState(
+        viewStateMediatorLiveData.value = SliderViewState(
             style = when (filterType) {
-                is FilterType.PhotoCount -> RangeDialogViewState.Style(
-                    title = R.string.filter_photo_dialog_title,
+                is FilterType.PhotoCount -> SliderViewState.Style(
+                    dialogTitle = R.string.filter_photo_dialog_title,
                     label = application.getString(R.string.filter_photo_count_range, selectionRange.lower.toInt(), selectionRange.upper.toInt()),
                     step = FilterRepository.PHOTO_COUNT_RANGE_STEP,
                 )
-                is FilterType.Price -> RangeDialogViewState.Style(
-                    title = R.string.filter_price_dialog_title,
+                is FilterType.Price -> SliderViewState.Style(
+                    dialogTitle = R.string.filter_price_dialog_title,
                     label = application.getString(R.string.filter_price_range, selectionRange.lower.toInt(), selectionRange.upper.toInt()),
                     step = FilterRepository.PRICE_RANGE_STEP,
                 )
-                is FilterType.Surface -> RangeDialogViewState.Style(
-                    title = R.string.filter_surface_dialog_title,
+                is FilterType.Surface -> SliderViewState.Style(
+                    dialogTitle = R.string.filter_surface_dialog_title,
                     label = application.getString(R.string.filter_surface_range, selectionRange.lower.toInt(), selectionRange.upper.toInt()),
                     step = FilterRepository.SURFACE_RANGE_STEP,
                 )

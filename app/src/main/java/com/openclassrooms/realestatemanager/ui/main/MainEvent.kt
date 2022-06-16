@@ -6,7 +6,7 @@ import com.openclassrooms.realestatemanager.data.filter.FilterValue
 sealed class MainEvent {
     object OpenEstateDetail : MainEvent()
     object OpenEstateForm : MainEvent()
-    data class ShowSliderFilterDialog(val filterType: FilterType, val filterValue: FilterValue?) : MainEvent()
-    data class ShowCheckableFilterDialog(val filterType: FilterType, val filterValue: FilterValue?) : MainEvent()
-    data class ShowCalendarFilterDialog(val filterType: FilterType, val filterValue: FilterValue?) : MainEvent()
+    data class ShowSliderFilterSettings(val filterType: FilterType, val filterValue: FilterValue?) : MainEvent()
+    data class ShowCheckListFilterSettings(val filterType: FilterType, val filterValue: FilterValue?) : MainEvent()
+    data class ShowDateFilterSettings(val filterType: FilterType, val filterValue: FilterValue?) : MainEvent()
 }

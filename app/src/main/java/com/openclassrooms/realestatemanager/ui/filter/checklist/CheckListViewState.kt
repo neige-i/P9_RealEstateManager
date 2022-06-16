@@ -1,10 +1,10 @@
-package com.openclassrooms.realestatemanager.ui.filter
+package com.openclassrooms.realestatemanager.ui.filter.checklist
 
 import androidx.annotation.StringRes
 
-data class MultiChoiceViewState(
+data class CheckListViewState(
     @StringRes val dialogTitle: Int,
-    val checkItems: List<CheckItem>,
+    val items: List<CheckItem>,
 ) {
 
     data class CheckItem(
