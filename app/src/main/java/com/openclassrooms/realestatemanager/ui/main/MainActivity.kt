@@ -85,13 +85,13 @@ class MainActivity : AppCompatActivity() {
                 }
                 is OpenEstateForm -> startActivity(Intent(this, FormActivity::class.java))
                 is ShowSliderFilterDialog -> {
-                    RangeFilterDialog.newInstance(mainEvent.filterType, mainEvent.minMaxFilterValue).show(supportFragmentManager, null)
+                    RangeFilterDialog.newInstance(mainEvent.filterType, mainEvent.filterValue).show(supportFragmentManager, null)
                 }
                 is ShowCheckableFilterDialog -> {
-                    MultiChoiceFilterDialog.newInstance(mainEvent.filterType, mainEvent.choicesFilterValue).show(supportFragmentManager, null)
+                    MultiChoiceFilterDialog.newInstance(mainEvent.filterType, mainEvent.filterValue).show(supportFragmentManager, null)
                 }
                 is ShowCalendarFilterDialog -> {
-                    DateFilterDialog.newInstance(mainEvent.availableDatesFilterValue).show(supportFragmentManager, null)
+                    DateFilterDialog.newInstance(mainEvent.filterType, mainEvent.filterValue).show(supportFragmentManager, null)
                 }
             }
         }

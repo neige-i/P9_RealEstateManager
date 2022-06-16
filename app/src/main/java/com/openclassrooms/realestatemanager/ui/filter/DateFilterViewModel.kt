@@ -3,6 +3,7 @@ package com.openclassrooms.realestatemanager.ui.filter
 import androidx.lifecycle.*
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.UtilsRepository
+import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import com.openclassrooms.realestatemanager.domain.filter.SetFilterUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.GetAvailableValuesUseCase
@@ -25,9 +26,9 @@ class DateFilterViewModel @Inject constructor(
     coroutineProvider: CoroutineProvider,
     private val defaultZoneId: ZoneId,
     savedStateHandle: SavedStateHandle,
-) : ViewModel() {
+) : FilterViewModel<FilterType.SaleStatus, FilterValue.AvailableDates>(savedStateHandle) {
 
-    private val availableDatesMutableLiveData = savedStateHandle.getLiveData<FilterValue.AvailableDates?>(DateFilterDialog.KEY_FILTER_VALUE)
+    private val availableDatesMutableLiveData: MutableLiveData<FilterValue.AvailableDates?> = MutableLiveData(filterValue)
 
     // Use distinctUntilChanged() to avoid infinite loop due to RadioButton checking:
     // The RadioButton is checked while observing the view state but,
@@ -38,6 +39,7 @@ class DateFilterViewModel @Inject constructor(
         val endDateText = availableDates?.until?.format(UtilsRepository.DATE_FORMATTER).orEmpty()
 
         DateFilterViewState(
+            dialogTitle = R.string.filter_sale_dialog_title,
             selectedRadioBtn = when (availableDates?.availableEstates) {
                 true -> R.id.filter_available_estates_radio_btn
                 false -> R.id.filter_sold_estates_radio_btn
@@ -137,11 +139,11 @@ class DateFilterViewModel @Inject constructor(
         }
     }
 
-    fun onPositiveButtonClicked() {
+    override fun onPositiveButtonClicked() {
         setFilterUseCase.applyFilter(availableDatesMutableLiveData.value)
     }
 
-    fun onNeutralButtonClicked() {
+    override fun onNeutralButtonClicked() {
         availableDatesMutableLiveData.value = null
     }
 

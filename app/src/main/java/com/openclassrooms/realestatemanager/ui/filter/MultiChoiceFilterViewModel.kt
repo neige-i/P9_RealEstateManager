@@ -12,23 +12,19 @@ import com.openclassrooms.realestatemanager.ui.util.update
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MultiChoiceFilterViewModel @Inject constructor(
     getAvailableValuesUseCase: GetAvailableValuesUseCase,
     private val setFilterUseCase: SetFilterUseCase,
-    private val coroutineProvider: CoroutineProvider,
+    coroutineProvider: CoroutineProvider,
     savedStateHandle: SavedStateHandle,
-) : ViewModel() {
-
-    private val checkListType = savedStateHandle.get<FilterType.CheckList>(MultiChoiceFilterDialog.KEY_FILTER_TYPE)
-        ?: throw IllegalStateException("The filter type must be passed as an argument to the Fragment")
+) : FilterViewModel<FilterType.CheckList, FilterValue.Choices>(savedStateHandle) {
 
     private val checkedItemsMutableLiveData = MutableLiveData<MutableList<Int>>()
 
-    private val allItemsFlow: Flow<List<Int>> = when (checkListType) {
+    private val allItemsFlow: Flow<List<Int>> = when (filterType) {
         is FilterType.EstateType -> getAvailableValuesUseCase.getTypeList().map { it.map { it.labelId } }
         is FilterType.PointOfInterest -> getAvailableValuesUseCase.getPoiList().map { it.map { it.labelId } }
     }
@@ -39,10 +35,9 @@ class MultiChoiceFilterViewModel @Inject constructor(
     init {
         // Init checklist's selected items
 
-        val choicesFilterValue = savedStateHandle.get<FilterValue.Choices?>(MultiChoiceFilterDialog.KEY_FILTER_VALUE)
-        checkedItemsMutableLiveData.value = when (choicesFilterValue) {
-            is FilterValue.EstateType -> choicesFilterValue.selectedEstateTypes.map { it.labelId }
-            is FilterValue.Poi -> choicesFilterValue.selectedPois.map { it.labelId }
+        checkedItemsMutableLiveData.value = when (filterValue) {
+            is FilterValue.EstateType -> filterValue.selectedEstateTypes.map { it.labelId }
+            is FilterValue.Poi -> filterValue.selectedPois.map { it.labelId }
             null -> emptyList()
         }.toMutableList()
 
@@ -64,7 +59,7 @@ class MultiChoiceFilterViewModel @Inject constructor(
         }
 
         viewStateMediatorLiveData.value = MultiChoiceViewState(
-            dialogTitle = when (checkListType) {
+            dialogTitle = when (filterType) {
                 is FilterType.EstateType -> R.string.filter_type_dialog_title
                 is FilterType.PointOfInterest -> R.string.filter_poi_dialog_title
             },
@@ -86,13 +81,11 @@ class MultiChoiceFilterViewModel @Inject constructor(
         }
     }
 
-    fun onPositiveButtonClicked() {
-        viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            setFilterUseCase.applyFilter(checkListType, checkedItemsMutableLiveData.value)
-        }
+    override fun onPositiveButtonClicked() {
+        setFilterUseCase.applyFilter(filterType, checkedItemsMutableLiveData.value)
     }
 
-    fun onNeutralButtonClicked() {
+    override fun onNeutralButtonClicked() {
         checkedItemsMutableLiveData.value = mutableListOf()
     }
 }

@@ -23,14 +23,11 @@ class RangeFilterViewModel @Inject constructor(
     private val coroutineProvider: CoroutineProvider,
     private val application: Application,
     savedStateHandle: SavedStateHandle,
-) : ViewModel() {
-
-    private val sliderType = savedStateHandle.get<FilterType.Slider>(RangeFilterDialog.KEY_FILTER_TYPE)
-        ?: throw IllegalStateException("The filter type must be passed as an argument to the Fragment")
+) : FilterViewModel<FilterType.Slider, FilterValue.MinMax<*>>(savedStateHandle) {
 
     private val sliderSelectionMutableLiveData = MutableLiveData<Range<Float>?>()
 
-    private val sliderBoundsFlow: Flow<Range<Float>> = getAvailableValuesUseCase.getRangeBounds(sliderType)
+    private val sliderBoundsFlow: Flow<Range<Float>> = getAvailableValuesUseCase.getRangeBounds(filterType)
 
     private val viewStateMediatorLiveData = MediatorLiveData<RangeDialogViewState>()
     val viewState: LiveData<RangeDialogViewState> = viewStateMediatorLiveData
@@ -38,8 +35,7 @@ class RangeFilterViewModel @Inject constructor(
     init {
         // Init slider's selection
 
-        val minMaxFilterValue = savedStateHandle.get<FilterValue.MinMax<*>?>(RangeFilterDialog.KEY_FILTER_VALUE)
-        sliderSelectionMutableLiveData.value = minMaxFilterValue?.let { Range(it.min.toFloat(), it.max.toFloat()) }
+        sliderSelectionMutableLiveData.value = filterValue?.let { Range(it.min.toFloat(), it.max.toFloat()) }
 
         // Setup view state's data sources
 
@@ -61,7 +57,7 @@ class RangeFilterViewModel @Inject constructor(
         val selectionRange: Range<Float> = sliderSelection ?: sliderBounds
 
         viewStateMediatorLiveData.value = RangeDialogViewState(
-            style = when (sliderType) {
+            style = when (filterType) {
                 is FilterType.PhotoCount -> RangeDialogViewState.Style(
                     title = R.string.filter_photo_dialog_title,
                     label = application.getString(R.string.filter_photo_count_range, selectionRange.lower.toInt(), selectionRange.upper.toInt()),
@@ -87,13 +83,13 @@ class RangeFilterViewModel @Inject constructor(
         sliderSelectionMutableLiveData.value = currentRange
     }
 
-    fun onPositiveButtonClicked() {
+    override fun onPositiveButtonClicked() {
         viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            setFilterUseCase.applyFilter(sliderType, sliderSelectionMutableLiveData.value, sliderBoundsFlow.first())
+            setFilterUseCase.applyFilter(filterType, sliderSelectionMutableLiveData.value, sliderBoundsFlow.first())
         }
     }
 
-    fun onNeutralButtonClicked() {
+    override fun onNeutralButtonClicked() {
         sliderSelectionMutableLiveData.value = null
     }
 }
