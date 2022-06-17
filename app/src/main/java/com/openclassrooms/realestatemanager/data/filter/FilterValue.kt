@@ -9,9 +9,9 @@ import java.time.LocalDate
 // Make it serializable to allow passing it as a Bundle argument
 sealed class FilterValue : Serializable {
 
-    sealed class MinMax<T : Number> : FilterValue() {
-        abstract val min: T
-        abstract val max: T
+    sealed class MinMax : FilterValue() {
+        abstract val min: Number
+        abstract val max: Number
     }
 
     sealed class Choices : FilterValue() {
@@ -23,19 +23,19 @@ sealed class FilterValue : Serializable {
     data class Price(
         override val min: Double,
         override val max: Double,
-    ) : MinMax<Double>()
+    ) : MinMax()
 
     data class Surface(
         override val min: Int,
         override val max: Int,
-    ) : MinMax<Int>()
+    ) : MinMax()
 
     data class PhotoCount(
         override val min: Int,
         override val max: Int,
-    ) : MinMax<Int>()
+    ) : MinMax()
 
-    data class AvailableDates(
+    data class Date(
         val availableEstates: Boolean,
         val from: LocalDate?,
         val until: LocalDate?,

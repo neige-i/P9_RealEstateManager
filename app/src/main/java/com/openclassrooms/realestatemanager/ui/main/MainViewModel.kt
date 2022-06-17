@@ -110,13 +110,13 @@ class MainViewModel @Inject constructor(
 
     private fun getSelectedChipLabel(filterValue: FilterValue): String {
         return when (filterValue) {
-            is FilterValue.MinMax<*> -> getMinMaxFilterLabel(filterValue)
+            is FilterValue.MinMax -> getMinMaxFilterLabel(filterValue)
             is FilterValue.Choices -> getChoicesFilterLabel(filterValue)
-            is FilterValue.AvailableDates -> getSaleStatusFilterLabel(filterValue)
+            is FilterValue.Date -> getSaleStatusFilterLabel(filterValue)
         }
     }
 
-    private fun getMinMaxFilterLabel(minMaxFilter: FilterValue.MinMax<*>): String {
+    private fun getMinMaxFilterLabel(minMaxFilter: FilterValue.MinMax): String {
         return application.getString(
             when (minMaxFilter) {
                 is FilterValue.PhotoCount -> R.string.filter_photo_count_range_short
@@ -146,12 +146,12 @@ class MainViewModel @Inject constructor(
         return stringBuilder.toString()
     }
 
-    private fun getSaleStatusFilterLabel(availableDatesFilter: FilterValue.AvailableDates): String {
-        val min = availableDatesFilter.from?.format(UtilsRepository.SHORT_DATE_FORMATTER)
-        val max = availableDatesFilter.until?.format(UtilsRepository.SHORT_DATE_FORMATTER)
+    private fun getSaleStatusFilterLabel(dateFilter: FilterValue.Date): String {
+        val min = dateFilter.from?.format(UtilsRepository.SHORT_DATE_FORMATTER)
+        val max = dateFilter.until?.format(UtilsRepository.SHORT_DATE_FORMATTER)
 
 
-        return if (availableDatesFilter.availableEstates) {
+        return if (dateFilter.availableEstates) {
             if (min != null) {
                 if (max != null) {
                     application.getString(R.string.filter_available_between, min, max)

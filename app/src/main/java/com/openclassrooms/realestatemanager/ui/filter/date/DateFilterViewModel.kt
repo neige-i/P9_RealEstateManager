@@ -27,14 +27,14 @@ class DateFilterViewModel @Inject constructor(
     coroutineProvider: CoroutineProvider,
     private val defaultZoneId: ZoneId,
     savedStateHandle: SavedStateHandle,
-) : FilterViewModel<FilterType.SaleStatus, FilterValue.AvailableDates>(savedStateHandle) {
+) : FilterViewModel<FilterType.SaleStatus, FilterValue.Date>(savedStateHandle) {
 
-    private val availableDatesMutableLiveData: MutableLiveData<FilterValue.AvailableDates?> = MutableLiveData(filterValue)
+    private val dateMutableLiveData: MutableLiveData<FilterValue.Date?> = MutableLiveData(filterValue)
 
     // Use distinctUntilChanged() to avoid infinite loop due to RadioButton checking:
     // The RadioButton is checked while observing the view state but,
     // the view state is also updated when a RadioButton is checked
-    val viewState = Transformations.map(availableDatesMutableLiveData.distinctUntilChanged()) { availableDates ->
+    val viewState = Transformations.map(dateMutableLiveData.distinctUntilChanged()) { availableDates ->
 
         val startDateText = availableDates?.from?.format(UtilsRepository.DATE_FORMATTER).orEmpty()
         val endDateText = availableDates?.until?.format(UtilsRepository.DATE_FORMATTER).orEmpty()
@@ -69,26 +69,26 @@ class DateFilterViewModel @Inject constructor(
             )
         }.asLiveData(coroutineProvider.getIoDispatcher())
 
-        showDatePickerSingleLiveEvent.addSource(availableDatesMutableLiveData) { availableDates ->
+        showDatePickerSingleLiveEvent.addSource(dateMutableLiveData) { availableDates ->
             combineLiveEvent(availableDates, dateLimitLiveData.value, datePickerPingMutableLiveData.value)
         }
         showDatePickerSingleLiveEvent.addSource(dateLimitLiveData) { dateLimit ->
-            combineLiveEvent(availableDatesMutableLiveData.value, dateLimit, datePickerPingMutableLiveData.value)
+            combineLiveEvent(dateMutableLiveData.value, dateLimit, datePickerPingMutableLiveData.value)
         }
         showDatePickerSingleLiveEvent.addSource(datePickerPingMutableLiveData) { datePickerPing ->
-            combineLiveEvent(availableDatesMutableLiveData.value, dateLimitLiveData.value, datePickerPing)
+            combineLiveEvent(dateMutableLiveData.value, dateLimitLiveData.value, datePickerPing)
         }
     }
 
-    private fun combineLiveEvent(availableDates: FilterValue.AvailableDates?, dateLimit: DateLimit?, datePickerPing: DatePickerType?) {
+    private fun combineLiveEvent(date: FilterValue.Date?, dateLimit: DateLimit?, datePickerPing: DatePickerType?) {
         if (dateLimit == null || datePickerPing == null) {
             return
         }
 
         datePickerPingMutableLiveData.value = null // Reset ping
 
-        val min = availableDates?.from?.toMillis()
-        val max = availableDates?.until?.toMillis()
+        val min = date?.from?.toMillis()
+        val max = date?.until?.toMillis()
         val minLimit = dateLimit.min?.toMillis()
         val maxLimit = dateLimit.max?.toMillis()
 
@@ -113,9 +113,9 @@ class DateFilterViewModel @Inject constructor(
     }
 
     fun onSaleStatusSelected(isAvailable: Boolean) {
-        availableDatesMutableLiveData.update { availableDates ->
+        dateMutableLiveData.update { availableDates ->
             availableDates?.copy(availableEstates = isAvailable)
-                ?: FilterValue.AvailableDates(
+                ?: FilterValue.Date(
                     availableEstates = isAvailable,
                     from = null,
                     until = null,
@@ -132,7 +132,7 @@ class DateFilterViewModel @Inject constructor(
     }
 
     private fun updateDate(newDate: LocalDate?, datePickerType: DatePickerType) {
-        availableDatesMutableLiveData.update { availableDates ->
+        dateMutableLiveData.update { availableDates ->
             when (datePickerType) {
                 START -> availableDates?.copy(from = newDate)
                 END -> availableDates?.copy(until = newDate)
@@ -141,11 +141,11 @@ class DateFilterViewModel @Inject constructor(
     }
 
     override fun onPositiveButtonClicked() {
-        setFilterUseCase.applyFilter(availableDatesMutableLiveData.value)
+        setFilterUseCase.applyFilter(dateMutableLiveData.value)
     }
 
     override fun onNeutralButtonClicked() {
-        availableDatesMutableLiveData.value = null
+        dateMutableLiveData.value = null
     }
 
     private fun LocalDate.toMillis(): Long = atStartOfDay(defaultZoneId).toInstant().toEpochMilli()

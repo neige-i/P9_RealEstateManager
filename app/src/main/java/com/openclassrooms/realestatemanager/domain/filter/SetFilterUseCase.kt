@@ -40,8 +40,8 @@ class SetFilterUseCase @Inject constructor(
         filterRepository.applyFilter(filterToSet = checkListType, filterToApply = choicesValue)
     }
 
-    fun applyFilter(availableDates: FilterValue.AvailableDates?) {
-        filterRepository.applyFilter(filterToSet = FilterType.SaleStatus, filterToApply = availableDates)
+    fun applyFilter(date: FilterValue.Date?) {
+        filterRepository.applyFilter(filterToSet = FilterType.SaleStatus, filterToApply = date)
     }
 
     fun reset(filterType: FilterType) {

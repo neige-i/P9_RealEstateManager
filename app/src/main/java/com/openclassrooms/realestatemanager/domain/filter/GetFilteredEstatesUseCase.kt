@@ -37,7 +37,7 @@ class GetFilteredEstatesUseCase @Inject constructor(
                         .contains(poiName)
                 }
             is FilterValue.Price -> realEstate.info.price in Range(filterValue.min, filterValue.max)
-            is FilterValue.AvailableDates -> {
+            is FilterValue.Date -> {
                 val entryDate = utilsRepository.stringToDate(realEstate.info.marketEntryDate)
                 val saleDate = realEstate.info.saleDate?.let { utilsRepository.stringToDate(it) }
 

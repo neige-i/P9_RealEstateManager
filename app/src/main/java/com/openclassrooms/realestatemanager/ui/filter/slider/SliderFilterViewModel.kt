@@ -24,7 +24,7 @@ class SliderFilterViewModel @Inject constructor(
     private val coroutineProvider: CoroutineProvider,
     private val application: Application,
     savedStateHandle: SavedStateHandle,
-) : FilterViewModel<FilterType.Slider, FilterValue.MinMax<*>>(savedStateHandle) {
+) : FilterViewModel<FilterType.Slider, FilterValue.MinMax>(savedStateHandle) {
 
     private val sliderSelectionMutableLiveData = MutableLiveData<Range<Float>?>()
 
