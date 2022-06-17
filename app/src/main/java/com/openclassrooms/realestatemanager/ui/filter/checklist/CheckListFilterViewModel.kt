@@ -2,6 +2,7 @@ package com.openclassrooms.realestatemanager.ui.filter.checklist
 
 import androidx.lifecycle.*
 import com.openclassrooms.realestatemanager.R
+import com.openclassrooms.realestatemanager.data.Localized
 import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import com.openclassrooms.realestatemanager.domain.filter.SetFilterUseCase
@@ -10,7 +11,6 @@ import com.openclassrooms.realestatemanager.ui.filter.FilterViewModel
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.util.update
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,7 +21,7 @@ class CheckListFilterViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : FilterViewModel<FilterType.CheckList, FilterValue.Choices>(savedStateHandle) {
 
-    private val checkedItemsMutableLiveData = MutableLiveData<MutableList<Int>>()
+    private val checkedItemsMutableLiveData = MutableLiveData<MutableList<Localized>>()
 
     private val viewStateMediatorLiveData = MediatorLiveData<CheckListViewState>()
     val viewState: LiveData<CheckListViewState> = viewStateMediatorLiveData
@@ -29,18 +29,13 @@ class CheckListFilterViewModel @Inject constructor(
     init {
         // Init checklist's selected items
 
-        checkedItemsMutableLiveData.value = when (filterValue) {
-            is FilterValue.EstateType -> filterValue.selectedEstateTypes.map { it.labelId }
-            is FilterValue.Poi -> filterValue.selectedPois.map { it.labelId }
-            null -> emptyList()
-        }.toMutableList()
+        checkedItemsMutableLiveData.value = filterValue?.selectedItems?.toMutableList()
+            ?: mutableListOf()
 
         // Setup view state's data sources
 
-        val allItemsLiveData = when (filterType) {
-            is FilterType.EstateType -> getAvailableValuesUseCase.getTypeList().map { it.map { it.labelId } }
-            is FilterType.PointOfInterest -> getAvailableValuesUseCase.getPoiList().map { it.map { it.labelId } }
-        }.asLiveData(coroutineProvider.getIoDispatcher())
+        val allItemsLiveData = getAvailableValuesUseCase.getSelectedItems(filterType)
+            .asLiveData(coroutineProvider.getIoDispatcher())
 
         viewStateMediatorLiveData.addSource(checkedItemsMutableLiveData) { checkedItems ->
             combineViewState(checkedItems, allItemsLiveData.value)
@@ -50,7 +45,7 @@ class CheckListFilterViewModel @Inject constructor(
         }
     }
 
-    private fun combineViewState(checkedItems: List<Int>?, allItems: List<Int>?) {
+    private fun combineViewState(checkedItems: List<Localized>?, allItems: Set<Localized>?) {
         if (checkedItems == null || allItems == null) {
             return
         }
@@ -60,14 +55,14 @@ class CheckListFilterViewModel @Inject constructor(
                 is FilterType.EstateType -> R.string.filter_type_dialog_title
                 is FilterType.PointOfInterest -> R.string.filter_poi_dialog_title
             },
-            items = allItems.map { itemId ->
+            items = allItems.map { item ->
                 CheckListViewState.CheckItem(
-                    label = itemId,
-                    isChecked = checkedItems.contains(itemId),
+                    label = item.stringId,
+                    isChecked = checkedItems.contains(item),
                     onClicked = { isChecked ->
                         checkedItemsMutableLiveData.update { currentCheckedItems ->
                             currentCheckedItems?.apply {
-                                if (isChecked) add(itemId) else remove(itemId)
+                                if (isChecked) add(item) else remove(item)
                             } ?: mutableListOf()
                         }
                     }

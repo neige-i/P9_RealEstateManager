@@ -1,5 +1,6 @@
 package com.openclassrooms.realestatemanager.data.filter
 
+import com.openclassrooms.realestatemanager.data.Localized
 import com.openclassrooms.realestatemanager.data.PointOfInterest
 import com.openclassrooms.realestatemanager.data.RealEstateType
 import java.io.Serializable
@@ -8,11 +9,14 @@ import java.time.LocalDate
 // Make it serializable to allow passing it as a Bundle argument
 sealed class FilterValue : Serializable {
 
-    sealed class MinMax<T: Number> : FilterValue() {
+    sealed class MinMax<T : Number> : FilterValue() {
         abstract val min: T
         abstract val max: T
     }
-    sealed class Choices : FilterValue()
+
+    sealed class Choices : FilterValue() {
+        abstract val selectedItems: List<Localized>
+    }
 
     // ---------------------
 
@@ -38,10 +42,10 @@ sealed class FilterValue : Serializable {
     ) : FilterValue()
 
     data class EstateType(
-        val selectedEstateTypes: List<RealEstateType>,
+        override val selectedItems: List<RealEstateType>,
     ) : Choices()
 
     data class Poi(
-        val selectedPois: List<PointOfInterest>,
+        override val selectedItems: List<PointOfInterest>,
     ) : Choices()
 }

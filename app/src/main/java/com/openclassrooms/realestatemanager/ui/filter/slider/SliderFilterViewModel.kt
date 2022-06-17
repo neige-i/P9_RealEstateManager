@@ -28,7 +28,7 @@ class SliderFilterViewModel @Inject constructor(
 
     private val sliderSelectionMutableLiveData = MutableLiveData<Range<Float>?>()
 
-    private val sliderBoundsFlow: Flow<Range<Float>> = getAvailableValuesUseCase.getRangeBounds(filterType)
+    private val sliderBoundsFlow: Flow<Range<Float>> = getAvailableValuesUseCase.getSliderBounds(filterType)
 
     private val viewStateMediatorLiveData = MediatorLiveData<SliderViewState>()
     val viewState: LiveData<SliderViewState> = viewStateMediatorLiveData

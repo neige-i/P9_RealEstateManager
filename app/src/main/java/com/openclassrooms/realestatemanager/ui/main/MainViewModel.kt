@@ -129,10 +129,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun getChoicesFilterLabel(choicesFilter: FilterValue.Choices): String {
-        val selectedItems = when (choicesFilter) {
-            is FilterValue.EstateType -> choicesFilter.selectedEstateTypes.map { it.labelId }
-            is FilterValue.Poi -> choicesFilter.selectedPois.map { it.labelId }
-        }
+        val selectedItems = choicesFilter.selectedItems.map { it.stringId }
 
         val displayedItems = selectedItems
             .take(3) // Only display the first 3 items

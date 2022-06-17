@@ -1,6 +1,7 @@
 package com.openclassrooms.realestatemanager.domain.real_estate
 
 import android.util.Range
+import com.openclassrooms.realestatemanager.data.Localized
 import com.openclassrooms.realestatemanager.data.PointOfInterest
 import com.openclassrooms.realestatemanager.data.RealEstateType
 import com.openclassrooms.realestatemanager.data.filter.FilterRepository
@@ -17,7 +18,7 @@ class GetAvailableValuesUseCase @Inject constructor(
     private val realEstateRepository: RealEstateRepository,
 ) {
 
-    fun getRangeBounds(sliderFilter: FilterType.Slider): Flow<Range<Float>> = getEstateBound(Bound.MAX) { realEstate ->
+    fun getSliderBounds(sliderFilter: FilterType.Slider): Flow<Range<Float>> = getEstateBound(Bound.MAX) { realEstate ->
         when (sliderFilter) {
             FilterType.PhotoCount -> realEstate.photoList.size
             FilterType.Price -> realEstate.info.price
@@ -64,26 +65,19 @@ class GetAvailableValuesUseCase @Inject constructor(
         }
     }
 
-    fun getTypeList(): Flow<List<RealEstateType>> = transformEstatesTo {
-        map { realEstate ->
-            RealEstateType.valueOf(realEstate.info.type)
-        }
-    }
-
-    fun getPoiList(): Flow<List<PointOfInterest>> = transformEstatesTo {
-        flatMap { realEstate ->
-            realEstate.poiList.map { PointOfInterest.valueOf(it.poiValue) }
-        }
-    }
-
-    private fun <T> transformEstatesTo(transform: Sequence<RealEstateEntity>.() -> Sequence<T>): Flow<List<T>> {
-        return realEstateRepository.getAllRealEstates().map { allEstates ->
-            allEstates
-                .asSequence()
-                .transform()
-                .toSet() // To remove duplicates
-                .toList()
-        }
+    fun getSelectedItems(checkListFilter: FilterType.CheckList): Flow<Set<Localized>> = realEstateRepository.getAllRealEstates().map {
+        it.asSequence() // Use Sequence for better performance
+            .let { allEstates ->
+                when (checkListFilter) {
+                    FilterType.EstateType -> allEstates.map { realEstate ->
+                        RealEstateType.valueOf(realEstate.info.type)
+                    }
+                    FilterType.PointOfInterest -> allEstates.flatMap { realEstate ->
+                        realEstate.poiList.map { poi -> PointOfInterest.valueOf(poi.poiValue) }
+                    }
+                }
+            }
+            .toSet() // To remove duplicates
     }
 
     enum class Bound {
