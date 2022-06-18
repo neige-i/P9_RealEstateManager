@@ -13,7 +13,6 @@ import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.filter.FilterType.*
 import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import com.openclassrooms.realestatemanager.data.real_estate.CurrentEstateRepository
-import com.openclassrooms.realestatemanager.domain.filter.SetFilterUseCase
 import com.openclassrooms.realestatemanager.domain.form.FormType
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
@@ -29,13 +28,23 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     filterRepository: FilterRepository,
-    setFilterUseCase: SetFilterUseCase,
     private val currentEstateRepository: CurrentEstateRepository,
     private val setFormUseCase: SetFormUseCase,
     private val resourcesRepository: ResourcesRepository,
     private val coroutineProvider: CoroutineProvider,
     private val application: Application,
 ) : ViewModel() {
+
+    companion object {
+        private val ALL_FILTER_TYPES = listOf(
+            EstateType,
+            Price,
+            Surface,
+            PhotoCount,
+            PointOfInterest,
+            SaleStatus,
+        )
+    }
 
     private val backStackEntryCountMutableStateFlow = MutableStateFlow(0)
     private val isFilteringMutableStateFlow = MutableStateFlow(false)
@@ -45,8 +54,8 @@ class MainViewModel @Inject constructor(
         backStackEntryCountMutableStateFlow,
         isFilteringMutableStateFlow,
         resourcesRepository.isTabletFlow(),
-        filterRepository.getAllFiltersFlow(),
-    ) { currentEstateId, backStackEntryCount, isFiltering, isTablet, allFilters ->
+        filterRepository.getAppliedFiltersFlow(),
+    ) { currentEstateId, backStackEntryCount, isFiltering, isTablet, appliedFilters ->
 
         // Set when to open the estate details
         withContext(coroutineProvider.getMainDispatcher()) {
@@ -66,7 +75,8 @@ class MainViewModel @Inject constructor(
             navigationIconId = if (isDetailInPortrait) R.drawable.ic_arrow_back else null,
             isEditMenuItemVisible = currentEstateId != null,
             isFiltering = isFiltering && !isDetailInPortrait,
-            chips = allFilters.map { (filterType, filterValue) ->
+            chips = ALL_FILTER_TYPES.map { filterType ->
+                val filterValue = appliedFilters[filterType]
 
                 MainViewState.ChipViewState(
                     style = if (filterValue != null) {
@@ -89,7 +99,7 @@ class MainViewModel @Inject constructor(
                             is SaleStatus -> MainEvent.ShowDateFilterSettings(filterType, filterValue)
                         }
                     },
-                    onCloseIconClicked = { setFilterUseCase.reset(filterType) },
+                    onCloseIconClicked = { filterRepository.clear(filterType) },
                 )
             },
         )

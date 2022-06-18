@@ -17,10 +17,10 @@ class GetFilteredEstatesUseCase @Inject constructor(
 ) {
 
     operator fun invoke(): Flow<List<RealEstateEntity>> = combine(
-        filterRepository.getAllFiltersFlow(),
+        filterRepository.getAppliedFiltersFlow(),
         realEstateRepository.getAllRealEstates(),
-    ) { allFilters, allEstates ->
-        allEstates.filter { realEstate -> isCorrect(realEstate, allFilters.values.filterNotNull()) }
+    ) { appliedFilters, allEstates ->
+        allEstates.filter { realEstate -> isCorrect(realEstate, appliedFilters.values) }
     }
 
     private fun isCorrect(realEstate: RealEstateEntity, filterValues: Collection<FilterValue>): Boolean = filterValues.all { filterValue ->
