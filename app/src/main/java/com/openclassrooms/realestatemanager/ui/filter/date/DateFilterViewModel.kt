@@ -3,9 +3,9 @@ package com.openclassrooms.realestatemanager.ui.filter.date
 import androidx.lifecycle.*
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.UtilsRepository
+import com.openclassrooms.realestatemanager.data.filter.FilterRepository
 import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.filter.FilterValue
-import com.openclassrooms.realestatemanager.domain.filter.SetFilterUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.GetAvailableValuesUseCase
 import com.openclassrooms.realestatemanager.ui.filter.FilterViewModel
 import com.openclassrooms.realestatemanager.ui.filter.date.DateFilterViewModel.DatePickerType.END
@@ -23,18 +23,18 @@ import javax.inject.Inject
 @HiltViewModel
 class DateFilterViewModel @Inject constructor(
     getAvailableValuesUseCase: GetAvailableValuesUseCase,
-    private val setFilterUseCase: SetFilterUseCase,
     coroutineProvider: CoroutineProvider,
     private val defaultZoneId: ZoneId,
     savedStateHandle: SavedStateHandle,
-) : FilterViewModel<FilterType.SaleStatus, FilterValue.Date>(savedStateHandle) {
+    filterRepository: FilterRepository,
+) : FilterViewModel<FilterType.SaleStatus, FilterValue.Date>(savedStateHandle, filterRepository) {
 
-    private val dateMutableLiveData: MutableLiveData<FilterValue.Date?> = MutableLiveData(filterValue)
+    private val dateFilterMutableLiveData: MutableLiveData<FilterValue.Date?> = MutableLiveData(filterValue)
 
     // Use distinctUntilChanged() to avoid infinite loop due to RadioButton checking:
     // The RadioButton is checked while observing the view state but,
     // the view state is also updated when a RadioButton is checked
-    val viewState = Transformations.map(dateMutableLiveData.distinctUntilChanged()) { availableDates ->
+    val viewState = Transformations.map(dateFilterMutableLiveData.distinctUntilChanged()) { availableDates ->
 
         val startDateText = availableDates?.from?.format(UtilsRepository.DATE_FORMATTER).orEmpty()
         val endDateText = availableDates?.until?.format(UtilsRepository.DATE_FORMATTER).orEmpty()
@@ -69,26 +69,26 @@ class DateFilterViewModel @Inject constructor(
             )
         }.asLiveData(coroutineProvider.getIoDispatcher())
 
-        showDatePickerSingleLiveEvent.addSource(dateMutableLiveData) { availableDates ->
-            combineLiveEvent(availableDates, dateLimitLiveData.value, datePickerPingMutableLiveData.value)
+        showDatePickerSingleLiveEvent.addSource(dateFilterMutableLiveData) { dateFilter ->
+            combineLiveEvent(dateFilter, dateLimitLiveData.value, datePickerPingMutableLiveData.value)
         }
         showDatePickerSingleLiveEvent.addSource(dateLimitLiveData) { dateLimit ->
-            combineLiveEvent(dateMutableLiveData.value, dateLimit, datePickerPingMutableLiveData.value)
+            combineLiveEvent(dateFilterMutableLiveData.value, dateLimit, datePickerPingMutableLiveData.value)
         }
         showDatePickerSingleLiveEvent.addSource(datePickerPingMutableLiveData) { datePickerPing ->
-            combineLiveEvent(dateMutableLiveData.value, dateLimitLiveData.value, datePickerPing)
+            combineLiveEvent(dateFilterMutableLiveData.value, dateLimitLiveData.value, datePickerPing)
         }
     }
 
-    private fun combineLiveEvent(date: FilterValue.Date?, dateLimit: DateLimit?, datePickerPing: DatePickerType?) {
+    private fun combineLiveEvent(dateFilter: FilterValue.Date?, dateLimit: DateLimit?, datePickerPing: DatePickerType?) {
         if (dateLimit == null || datePickerPing == null) {
             return
         }
 
         datePickerPingMutableLiveData.value = null // Reset ping
 
-        val min = date?.from?.toMillis()
-        val max = date?.until?.toMillis()
+        val min = dateFilter?.from?.toMillis()
+        val max = dateFilter?.until?.toMillis()
         val minLimit = dateLimit.min?.toMillis()
         val maxLimit = dateLimit.max?.toMillis()
 
@@ -113,7 +113,7 @@ class DateFilterViewModel @Inject constructor(
     }
 
     fun onSaleStatusSelected(isAvailable: Boolean) {
-        dateMutableLiveData.update { availableDates ->
+        dateFilterMutableLiveData.update { availableDates ->
             availableDates?.copy(availableEstates = isAvailable)
                 ?: FilterValue.Date(
                     availableEstates = isAvailable,
@@ -132,7 +132,7 @@ class DateFilterViewModel @Inject constructor(
     }
 
     private fun updateDate(newDate: LocalDate?, datePickerType: DatePickerType) {
-        dateMutableLiveData.update { availableDates ->
+        dateFilterMutableLiveData.update { availableDates ->
             when (datePickerType) {
                 START -> availableDates?.copy(from = newDate)
                 END -> availableDates?.copy(until = newDate)
@@ -140,12 +140,10 @@ class DateFilterViewModel @Inject constructor(
         }
     }
 
-    override fun onPositiveButtonClicked() {
-        setFilterUseCase.applyFilter(dateMutableLiveData.value)
-    }
+    override fun getFilterToApply(): FilterValue.Date? = dateFilterMutableLiveData.value
 
     override fun onNeutralButtonClicked() {
-        dateMutableLiveData.value = null
+        dateFilterMutableLiveData.value = null
     }
 
     private fun LocalDate.toMillis(): Long = atStartOfDay(defaultZoneId).toInstant().toEpochMilli()

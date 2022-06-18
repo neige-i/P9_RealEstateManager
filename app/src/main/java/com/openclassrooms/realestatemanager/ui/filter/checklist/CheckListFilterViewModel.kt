@@ -3,9 +3,11 @@ package com.openclassrooms.realestatemanager.ui.filter.checklist
 import androidx.lifecycle.*
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.Localized
+import com.openclassrooms.realestatemanager.data.PointOfInterest
+import com.openclassrooms.realestatemanager.data.RealEstateType
+import com.openclassrooms.realestatemanager.data.filter.FilterRepository
 import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.filter.FilterValue
-import com.openclassrooms.realestatemanager.domain.filter.SetFilterUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.GetAvailableValuesUseCase
 import com.openclassrooms.realestatemanager.ui.filter.FilterViewModel
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
@@ -16,10 +18,10 @@ import javax.inject.Inject
 @HiltViewModel
 class CheckListFilterViewModel @Inject constructor(
     getAvailableValuesUseCase: GetAvailableValuesUseCase,
-    private val setFilterUseCase: SetFilterUseCase,
     coroutineProvider: CoroutineProvider,
     savedStateHandle: SavedStateHandle,
-) : FilterViewModel<FilterType.CheckList, FilterValue.Choices>(savedStateHandle) {
+    filterRepository: FilterRepository,
+) : FilterViewModel<FilterType.CheckList, FilterValue.Choices>(savedStateHandle, filterRepository) {
 
     private val checkedItemsMutableLiveData = MutableLiveData<MutableList<Localized>>()
 
@@ -71,8 +73,16 @@ class CheckListFilterViewModel @Inject constructor(
         )
     }
 
-    override fun onPositiveButtonClicked() {
-        setFilterUseCase.applyFilter(filterType, checkedItemsMutableLiveData.value)
+    override fun getFilterToApply(): FilterValue.Choices? {
+        val checkedItems = checkedItemsMutableLiveData.value
+
+        // The filter is not considered if the check list is empty
+        if (checkedItems.isNullOrEmpty()) return null
+
+        return when (filterType) {
+            FilterType.EstateType -> FilterValue.EstateType(checkedItems.map { it as RealEstateType })
+            FilterType.PointOfInterest -> FilterValue.Poi(checkedItems.map { it as PointOfInterest })
+        }
     }
 
     override fun onNeutralButtonClicked() {

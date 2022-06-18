@@ -7,28 +7,25 @@ import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.filter.FilterRepository
 import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.filter.FilterValue
-import com.openclassrooms.realestatemanager.domain.filter.SetFilterUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.GetAvailableValuesUseCase
 import com.openclassrooms.realestatemanager.ui.filter.FilterViewModel
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SliderFilterViewModel @Inject constructor(
     getAvailableValuesUseCase: GetAvailableValuesUseCase,
-    private val setFilterUseCase: SetFilterUseCase,
-    private val coroutineProvider: CoroutineProvider,
+    coroutineProvider: CoroutineProvider,
     private val application: Application,
     savedStateHandle: SavedStateHandle,
-) : FilterViewModel<FilterType.Slider, FilterValue.MinMax>(savedStateHandle) {
+    filterRepository: FilterRepository,
+) : FilterViewModel<FilterType.Slider, FilterValue.MinMax>(savedStateHandle, filterRepository) {
 
     private val sliderSelectionMutableLiveData = MutableLiveData<Range<Float>?>()
 
-    private val sliderBoundsFlow: Flow<Range<Float>> = getAvailableValuesUseCase.getSliderBounds(filterType)
+    private val sliderBoundsLiveData: LiveData<Range<Float>> = getAvailableValuesUseCase.getSliderBounds(filterType)
+        .asLiveData(coroutineProvider.getIoDispatcher())
 
     private val viewStateMediatorLiveData = MediatorLiveData<SliderViewState>()
     val viewState: LiveData<SliderViewState> = viewStateMediatorLiveData
@@ -40,12 +37,10 @@ class SliderFilterViewModel @Inject constructor(
 
         // Setup view state's data sources
 
-        val filterBoundsLiveData = sliderBoundsFlow.asLiveData(coroutineProvider.getIoDispatcher())
-
         viewStateMediatorLiveData.addSource(sliderSelectionMutableLiveData) { sliderSelection ->
-            combineViewState(sliderSelection, filterBoundsLiveData.value)
+            combineViewState(sliderSelection, sliderBoundsLiveData.value)
         }
-        viewStateMediatorLiveData.addSource(filterBoundsLiveData) { sliderBounds ->
+        viewStateMediatorLiveData.addSource(sliderBoundsLiveData) { sliderBounds ->
             combineViewState(sliderSelectionMutableLiveData.value, sliderBounds)
         }
     }
@@ -84,9 +79,21 @@ class SliderFilterViewModel @Inject constructor(
         sliderSelectionMutableLiveData.value = currentRange
     }
 
-    override fun onPositiveButtonClicked() {
-        viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            setFilterUseCase.applyFilter(filterType, sliderSelectionMutableLiveData.value, sliderBoundsFlow.first())
+    override fun getFilterToApply(): FilterValue.MinMax? {
+        val sliderSelection = sliderSelectionMutableLiveData.value
+        val sliderBounds = sliderBoundsLiveData.value
+
+        if (sliderSelection == null ||
+            sliderBounds == null ||
+            sliderSelection == sliderBounds
+        ) {
+            return null
+        }
+
+        return when (filterType) {
+            is FilterType.PhotoCount -> FilterValue.PhotoCount(min = sliderSelection.lower.toInt(), max = sliderSelection.upper.toInt())
+            is FilterType.Price -> FilterValue.Price(min = sliderSelection.lower.toDouble(), max = sliderSelection.upper.toDouble())
+            is FilterType.Surface -> FilterValue.Surface(min = sliderSelection.lower.toInt(), max = sliderSelection.upper.toInt())
         }
     }
 
