@@ -5,6 +5,7 @@
     <string name="menu_item_close">Close</string>
     <string name="menu_item_save">Save</string>
     <string name="menu_item_edit">Edit</string>
+    <string name="menu_item_filter">Filter</string>
 
     <string name="undefined_price">Undefined price</string>
     <string name="price_in_dollars">$%s</string>
@@ -104,4 +105,35 @@
     <string name="location_description">Location logo</string>
     <string name="agent_description">Agent logo</string>
     <string name="map_description">Real estate location map</string>
+
+    <string name="filter_photo">Photo</string>
+    <string name="filter_sale_status">Sale status</string>
+
+    <string name="filter_type_dialog_title">Filter by type</string>
+    <string name="filter_price_dialog_title">Filter by price</string>
+    <string name="filter_surface_dialog_title">Filter by surface</string>
+    <string name="filter_photo_dialog_title">Filter by photo count</string>
+    <string name="filter_poi_dialog_title">Filter by point of interest</string>
+    <string name="filter_sale_dialog_title">Filter by sale status</string>
+    <string name="filter_price_range">From %d to %d Dollars</string>
+    <string name="filter_price_range_short">%d - %d $</string>
+    <string name="filter_surface_range">From %d to %d square meters</string>
+    <string name="filter_surface_range_short">%d - %d m²</string>
+    <string name="filter_photo_count_range">From %d to %d photos</string>
+    <string name="filter_photo_count_range_short">%d - %d photos</string>
+    <string name="filter_available_all">All available</string>
+    <string name="filter_available_from">Available from %s</string>
+    <string name="filter_available_until">Available until %s</string>
+    <string name="filter_available_between">Available %s - %s</string>
+    <string name="filter_sold_all">All sold</string>
+    <string name="filter_sold_from">Sold from %s</string>
+    <string name="filter_sold_until">Sold until %s</string>
+    <string name="filter_sold_between">Sold %s - %s</string>
+    <string name="available_estates_only">Available estates only</string>
+    <string name="sold_estates_only">Sold estates only</string>
+    <string name="from">From</string>
+    <string name="until">Until</string>
+    <string name="apply_filter">Apply</string>
+    <string name="reset_filter">Reset</string>
+    <string name="cancel_filter">Cancel</string>
 </resources>

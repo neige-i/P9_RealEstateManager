@@ -9,6 +9,7 @@ import com.openclassrooms.realestatemanager.data.RealEstateType
 import com.openclassrooms.realestatemanager.data.ResourcesRepository
 import com.openclassrooms.realestatemanager.data.real_estate.CurrentEstateRepository
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateRepository
+import com.openclassrooms.realestatemanager.domain.filter.GetFilteredEstatesUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EstatesViewModel @Inject constructor(
-    realEstateRepository: RealEstateRepository,
+//    realEstateRepository: RealEstateRepository,
+    getFilteredEstatesUseCase: GetFilteredEstatesUseCase,
     private val currentEstateRepository: CurrentEstateRepository,
     resourcesRepository: ResourcesRepository,
     coroutineProvider: CoroutineProvider,
@@ -26,12 +28,12 @@ class EstatesViewModel @Inject constructor(
 ) : ViewModel() {
 
     val viewStateLiveData: LiveData<List<EstateViewState>> = combine(
-        realEstateRepository.getAllRealEstates(),
+        getFilteredEstatesUseCase(),
         currentEstateRepository.getIdOrNull(),
         resourcesRepository.isTabletFlow(),
-    ) { allEstates, currentEstateId, isTablet ->
+    ) { filteredEstates, currentEstateId, isTablet ->
 
-        allEstates.map { realEstate ->
+        filteredEstates.map { realEstate ->
             EstateViewState(
                 id = realEstate.info.realEstateId,
                 photoUrl = realEstate.photoList.first().uri,

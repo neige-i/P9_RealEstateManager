@@ -33,6 +33,7 @@ class UtilsRepository @Inject constructor(
         )
 
         val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        val SHORT_DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yy")
 
         // Currency rate on January, 19th 2022
         private const val USD_EUR = .8815
