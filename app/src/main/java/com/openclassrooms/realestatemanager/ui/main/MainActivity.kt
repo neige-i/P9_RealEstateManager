@@ -31,29 +31,36 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
-        // Do not set support Actionbar when inflate menu from the Toolbar
-        // Otherwise MenuItems won't be displayed
+        /*
+            This activity contains a MenuItem which visibility is modified.
+            The modification occurs while observing the ViewModel's view state.
+            To better access the MenuItem instance, the menu is not inflated by the activity as usual but by the toolbar.
+            In this scenario, Activity.setSupportActionBar() should not be called, otherwise MenuItems won't be displayed.
+         */
 
-        filterBinding.filterToolbar.setNavigationOnClickListener { onBackPressed() }
-        filterBinding.filterToolbar.inflateMenu(R.menu.menu_main)
-        filterBinding.filterToolbar.menu
-            .findItem(R.id.main_menu_add_estate)
-            .setOnMenuItemClickListener {
-                viewModel.onAddMenuItemClicked()
-                true
+        filterBinding.filterToolbar.apply {
+            setNavigationOnClickListener { onBackPressed() }
+            inflateMenu(R.menu.menu_main)
+            setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.main_menu_add_estate -> {
+                        viewModel.onAddMenuItemClicked()
+                        true
+                    }
+                    R.id.main_menu_edit_estate -> {
+                        viewModel.onEditMenuItemClicked()
+                        true
+                    }
+                    R.id.main_menu_filter_estate -> {
+                        viewModel.onFilterMenuItemClicked()
+                        true
+                    }
+                    else -> false
+                }
             }
-        val editMenuItem = filterBinding.filterToolbar.menu
-            .findItem(R.id.main_menu_edit_estate)
-            .setOnMenuItemClickListener {
-                viewModel.onEditMenuItemClicked()
-                true
-            }
-        filterBinding.filterToolbar.menu
-            .findItem(R.id.main_menu_filter_estate)
-            .setOnMenuItemClickListener {
-                viewModel.onFilterMenuItemClicked()
-                true
-            }
+        }
+
+        val editMenuItem = filterBinding.filterToolbar.menu.findItem(R.id.main_menu_edit_estate)
 
         val filterAdapter = FilterAdapter()
         filterBinding.filterList.adapter = filterAdapter
@@ -72,7 +79,7 @@ class MainActivity : AppCompatActivity() {
 
             editMenuItem?.isVisible = mainViewState.isEditMenuItemVisible
 
-            filterBinding.filterList.isVisible = viewStateToolbar.isFiltering
+            filterBinding.filterList.isVisible = viewStateToolbar.isFilterLayoutVisible
             filterAdapter.submitList(mainViewState.chips)
         }
 

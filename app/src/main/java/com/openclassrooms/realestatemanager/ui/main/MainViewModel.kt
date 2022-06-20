@@ -60,8 +60,8 @@ class MainViewModel @Inject constructor(
         val isDetailInPortrait = !isTablet && backStackEntryCount == 1
 
         // Set when to open the estate details
-        withContext(coroutineProvider.getMainDispatcher()) {
-            if (isEstateSelected && !isTablet && backStackEntryCount == 0) {
+        if (isEstateSelected && !isTablet && backStackEntryCount == 0) {
+            withContext(coroutineProvider.getMainDispatcher()) {
                 mainSingleLiveEvent.value = MainEvent.OpenEstateDetail
             }
         }
@@ -71,13 +71,13 @@ class MainViewModel @Inject constructor(
                 MainViewState.Toolbar(
                     title = R.string.toolbar_title_detail,
                     navIcon = R.drawable.ic_arrow_back,
-                    isFiltering = false,
+                    isFilterLayoutVisible = false,
                 )
             } else {
                 MainViewState.Toolbar(
                     title = R.string.app_name,
                     navIcon = null,
-                    isFiltering = isFiltering,
+                    isFilterLayoutVisible = isFiltering,
                 )
             },
             isEditMenuItemVisible = isEstateSelected,
@@ -206,18 +206,15 @@ class MainViewModel @Inject constructor(
         initAndOpenForm(FormType.EDIT_ESTATE)
     }
 
-    fun onFilterMenuItemClicked() {
-        isFilteringMutableStateFlow.update { isVisible -> !isVisible }
-    }
-
     private fun initAndOpenForm(formType: FormType) {
         viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
             setFormUseCase.initForm(formType)
-
-            withContext(coroutineProvider.getMainDispatcher()) {
-                mainSingleLiveEvent.value = MainEvent.OpenEstateForm
-            }
         }
+        mainSingleLiveEvent.value = MainEvent.OpenEstateForm
+    }
+
+    fun onFilterMenuItemClicked() {
+        isFilteringMutableStateFlow.update { isVisible -> !isVisible }
     }
 
     fun onBackStackChanged(backStackEntryCount: Int) {

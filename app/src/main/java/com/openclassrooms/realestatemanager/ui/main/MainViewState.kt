@@ -11,6 +11,6 @@ data class MainViewState(
     data class Toolbar(
         @StringRes val title: Int,
         @DrawableRes val navIcon: Int?,
-        val isFiltering: Boolean,
+        val isFilterLayoutVisible: Boolean,
     )
 }
