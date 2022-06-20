@@ -38,10 +38,7 @@ class ListViewModel @Inject constructor(
                 type = realEstate.info.type.labelId,
                 city = realEstate.info.city,
                 price = if (realEstate.info.price != null) {
-                    LocalText.ResWithArgs(
-                        stringId = R.string.price_in_dollars,
-                        args = listOf(numberFormat.format(realEstate.info.price))
-                    )
+                    LocalText.ResWithArgs(stringId = R.string.price_in_dollars, args = listOf(numberFormat.format(realEstate.info.price)))
                 } else {
                     LocalText.Res(stringId = R.string.undefined_price)
                 },

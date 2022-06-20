@@ -4,9 +4,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import com.openclassrooms.realestatemanager.ui.util.LocalText
 
-sealed class DetailViewState(
-    val isNoSelectionLabelVisible: Boolean,
-) {
+sealed class DetailViewState(val isNoSelectionLabelVisible: Boolean) {
 
     data class Empty(
         val noSelectionLabelText: LocalText,
@@ -18,7 +16,7 @@ sealed class DetailViewState(
         val areTypeAndPriceVisible: Boolean,
         @StringRes val saleText: Int,
         @ColorRes val saleBackgroundColor: Int,
-        val photoList: List<Photo>,
+        val photoList: List<PhotoViewState>,
         val description: LocalText,
         val surface: LocalText,
         val roomCount: String,
@@ -29,12 +27,5 @@ sealed class DetailViewState(
         val mapUrl: String,
         val marketDates: LocalText,
         val agentName: LocalText,
-    ) : DetailViewState(isNoSelectionLabelVisible = false) {
-
-        data class Photo(
-            val url: String,
-            val description: String,
-            val onClicked: () -> Unit,
-        )
-    }
+    ) : DetailViewState(isNoSelectionLabelVisible = false)
 }

@@ -54,8 +54,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                             detail.saleBackgroundColor
                         )
 
-                    binding.detailDescriptionTxt.text =
-                        detail.description.toCharSequence(requireContext())
+                    binding.detailDescriptionTxt.text = detail.description.toCharSequence(requireContext())
 
                     photoAdapter.submitList(detail.photoList)
 
@@ -70,8 +69,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                         .load(detail.mapUrl)
                         .into(binding.detailMapImg)
 
-                    binding.detailMarketTxt.text =
-                        detail.marketDates.toCharSequence(requireContext())
+                    binding.detailMarketTxt.text = detail.marketDates.toCharSequence(requireContext())
 
                     binding.detailAgentTxt.text = detail.agentName.toCharSequence(requireContext())
                 }

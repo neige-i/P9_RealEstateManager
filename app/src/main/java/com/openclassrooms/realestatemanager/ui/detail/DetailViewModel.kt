@@ -38,16 +38,13 @@ class DetailViewModel @Inject constructor(
                     args = listOf(realEstateResult.estateId),
                 )
             )
-            Idle -> DetailViewState.Empty(
+            is Idle -> DetailViewState.Empty(
                 noSelectionLabelText = LocalText.Res(stringId = R.string.no_real_estate_selected)
             )
         }
     }.asLiveData(coroutineProvider.getIoDispatcher())
 
-    private fun getInfoViewState(
-        realEstate: RealEstateEntity,
-        isTablet: Boolean
-    ): DetailViewState.Info {
+    private fun getInfoViewState(realEstate: RealEstateEntity, isTablet: Boolean): DetailViewState.Info {
         val availableForSale = realEstate.info.saleDate == null
 
         val additionalAddressText = if (realEstate.info.additionalAddressInfo.isNotEmpty()) {
@@ -78,10 +75,9 @@ class DetailViewModel @Inject constructor(
                 android.R.color.holo_red_dark
             },
             photoList = realEstate.photoList.map {
-                DetailViewState.Info.Photo(
+                PhotoViewState(
                     url = it.uri,
                     description = it.description,
-                    onClicked = {}
                 )
             },
             description = realEstate.info.description.let { estateDescription ->
@@ -92,7 +88,7 @@ class DetailViewModel @Inject constructor(
                 }
             },
             surface = if (realEstate.info.area != null) {
-                LocalText.Simple(content = realEstate.info.area.toString())
+                LocalText.ResWithArgs(stringId = R.string.square_meters, args = listOf(realEstate.info.area))
             } else {
                 LocalText.Res(stringId = R.string.not_available)
             },

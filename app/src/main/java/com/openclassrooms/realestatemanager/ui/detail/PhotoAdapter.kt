@@ -9,8 +9,7 @@ import com.bumptech.glide.Glide
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ItemPhotoBinding
 
-class PhotoAdapter :
-    ListAdapter<DetailViewState.Info.Photo, PhotoAdapter.PhotoViewHolder>(PhotoDiffCallback()) {
+class PhotoAdapter : ListAdapter<PhotoViewState, PhotoAdapter.PhotoViewHolder>(PhotoDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = PhotoViewHolder(
         ItemPhotoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -20,31 +19,26 @@ class PhotoAdapter :
         holder.bind(getItem(position))
     }
 
-    class PhotoViewHolder(private val binding: ItemPhotoBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class PhotoViewHolder(private val binding: ItemPhotoBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(photo: DetailViewState.Info.Photo) {
+        fun bind(photo: PhotoViewState) {
             Glide.with(binding.root)
                 .load(photo.url)
                 .error(R.drawable.ic_photo)
                 .into(binding.mediaImg)
 
             binding.mediaDescriptionTxt.text = photo.description
-
-            binding.root.setOnClickListener { photo.onClicked() }
         }
     }
 
-    class PhotoDiffCallback : DiffUtil.ItemCallback<DetailViewState.Info.Photo>() {
+    class PhotoDiffCallback : DiffUtil.ItemCallback<PhotoViewState>() {
 
-        override fun areItemsTheSame(
-            oldItem: DetailViewState.Info.Photo,
-            newItem: DetailViewState.Info.Photo
-        ): Boolean = oldItem == newItem
+        override fun areItemsTheSame(oldItem: PhotoViewState, newItem: PhotoViewState): Boolean {
+            return oldItem == newItem
+        }
 
-        override fun areContentsTheSame(
-            oldItem: DetailViewState.Info.Photo,
-            newItem: DetailViewState.Info.Photo
-        ): Boolean = oldItem == newItem
+        override fun areContentsTheSame(oldItem: PhotoViewState, newItem: PhotoViewState): Boolean {
+            return oldItem == newItem
+        }
     }
 }

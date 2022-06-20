@@ -89,7 +89,7 @@
     <string name="sold">Sold</string>
     <string name="media">Media</string>
     <string name="not_available">N/A</string>
-    <string name="square_meters">%s sq m</string>
+    <string name="square_meters">%d sq m</string>
     <string name="location">Location</string>
     <string name="on_market">On the market</string>
     <string name="since_date">Since %s</string>

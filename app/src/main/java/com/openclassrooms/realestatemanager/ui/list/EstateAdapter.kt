@@ -12,8 +12,7 @@ import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ItemEstateBinding
 import com.openclassrooms.realestatemanager.ui.util.toCharSequence
 
-class EstateAdapter :
-    ListAdapter<EstateViewState, EstateAdapter.EstateViewHolder>(EstateDiffUtil()) {
+class EstateAdapter : ListAdapter<EstateViewState, EstateAdapter.EstateViewHolder>(EstateDiffUtil()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = EstateViewHolder(
         ItemEstateBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -23,8 +22,7 @@ class EstateAdapter :
         holder.bind(getItem(position))
     }
 
-    class EstateViewHolder(private val binding: ItemEstateBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class EstateViewHolder(private val binding: ItemEstateBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(estate: EstateViewState) {
             Glide.with(binding.root)
@@ -45,19 +43,17 @@ class EstateAdapter :
             binding.root.setOnClickListener { estate.onClicked() }
         }
 
-        private fun getColor(@ColorRes colorId: Int): Int =
-            ContextCompat.getColor(binding.root.context, colorId)
+        private fun getColor(@ColorRes colorId: Int): Int = ContextCompat.getColor(binding.root.context, colorId)
     }
 
     class EstateDiffUtil : DiffUtil.ItemCallback<EstateViewState>() {
-        override fun areItemsTheSame(
-            oldItem: EstateViewState,
-            newItem: EstateViewState
-        ): Boolean = oldItem.id == newItem.id
 
-        override fun areContentsTheSame(
-            oldItem: EstateViewState,
-            newItem: EstateViewState
-        ): Boolean = oldItem == newItem
+        override fun areItemsTheSame(oldItem: EstateViewState, newItem: EstateViewState): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: EstateViewState, newItem: EstateViewState): Boolean {
+            return oldItem == newItem
+        }
     }
 }
