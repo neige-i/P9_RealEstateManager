@@ -6,6 +6,7 @@ import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import com.openclassrooms.realestatemanager.databinding.DialogSliderBinding
 import com.openclassrooms.realestatemanager.ui.filter.FilterDialog
+import com.openclassrooms.realestatemanager.ui.util.toCharSequence
 import com.openclassrooms.realestatemanager.ui.util.viewBinding
 
 class SliderFilterDialog private constructor() : FilterDialog() {
@@ -29,20 +30,16 @@ class SliderFilterDialog private constructor() : FilterDialog() {
 
             dialog?.setTitle(sliderStyle.dialogTitle)
 
-            binding.dialogRangeTxt.text = sliderStyle.label
+            binding.dialogRangeTxt.text = sliderStyle.label.toCharSequence(requireContext())
 
             binding.dialogRangeSlider.valueFrom = slider.bounds.lower
             binding.dialogRangeSlider.valueTo = slider.bounds.upper
 
-            binding.dialogRangeSlider.values = listOf(
-                slider.selection.lower,
-                slider.selection.upper
-            )
+            binding.dialogRangeSlider.values = listOf(slider.selection.lower, slider.selection.upper)
 
             binding.dialogRangeSlider.stepSize = sliderStyle.step
         }
     }
 
-    override fun triggerViewEvents() {
-    }
+    override fun triggerViewEvents() {}
 }

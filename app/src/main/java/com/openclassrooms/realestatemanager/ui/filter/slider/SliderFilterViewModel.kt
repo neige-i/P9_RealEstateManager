@@ -1,6 +1,5 @@
 package com.openclassrooms.realestatemanager.ui.filter.slider
 
-import android.app.Application
 import android.util.Range
 import androidx.lifecycle.*
 import com.openclassrooms.realestatemanager.R
@@ -10,6 +9,7 @@ import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import com.openclassrooms.realestatemanager.domain.real_estate.GetAvailableValuesUseCase
 import com.openclassrooms.realestatemanager.ui.filter.FilterViewModel
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
+import com.openclassrooms.realestatemanager.ui.util.LocalText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -17,7 +17,6 @@ import javax.inject.Inject
 class SliderFilterViewModel @Inject constructor(
     getAvailableValuesUseCase: GetAvailableValuesUseCase,
     coroutineProvider: CoroutineProvider,
-    private val application: Application,
     savedStateHandle: SavedStateHandle,
     filterRepository: FilterRepository,
 ) : FilterViewModel<FilterType.Slider, FilterValue.MinMax>(savedStateHandle, filterRepository) {
@@ -51,22 +50,23 @@ class SliderFilterViewModel @Inject constructor(
         }
 
         val selectionRange: Range<Float> = sliderSelection ?: sliderBounds
+        val stringArgs = listOf(selectionRange.lower.toInt(), selectionRange.upper.toInt())
 
         viewStateMediatorLiveData.value = SliderViewState(
             style = when (filterType) {
                 is FilterType.PhotoCount -> SliderViewState.Style(
                     dialogTitle = R.string.filter_photo_dialog_title,
-                    label = application.getString(R.string.filter_photo_count_range, selectionRange.lower.toInt(), selectionRange.upper.toInt()),
+                    label = LocalText.ResWithArgs(stringId = R.string.filter_photo_count_range, args = stringArgs),
                     step = FilterRepository.PHOTO_COUNT_RANGE_STEP,
                 )
                 is FilterType.Price -> SliderViewState.Style(
                     dialogTitle = R.string.filter_price_dialog_title,
-                    label = application.getString(R.string.filter_price_range, selectionRange.lower.toInt(), selectionRange.upper.toInt()),
+                    label = LocalText.ResWithArgs(stringId = R.string.filter_price_range, args = stringArgs),
                     step = FilterRepository.PRICE_RANGE_STEP,
                 )
                 is FilterType.Surface -> SliderViewState.Style(
                     dialogTitle = R.string.filter_surface_dialog_title,
-                    label = application.getString(R.string.filter_surface_range, selectionRange.lower.toInt(), selectionRange.upper.toInt()),
+                    label = LocalText.ResWithArgs(stringId = R.string.filter_surface_range, args = stringArgs),
                     step = FilterRepository.SURFACE_RANGE_STEP,
                 )
             },
