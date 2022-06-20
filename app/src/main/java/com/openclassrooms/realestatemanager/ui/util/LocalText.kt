@@ -14,10 +14,10 @@ sealed class LocalText {
 
 fun LocalText.toCharSequence(context: Context): CharSequence = when (this) {
     is LocalText.Res -> context.getString(stringId)
-    is LocalText.ResWithArgs -> context.getString(stringId, args)
+    is LocalText.ResWithArgs -> context.getString(stringId, *args.toTypedArray())
     is LocalText.ResWithRes -> context.getString(stringId, resArgs.map { context.getString(it) })
     is LocalText.Simple -> content
-    is LocalText.Join -> { stringIds.joinToString { stringId -> context.getString(stringId) } }
+    is LocalText.Join -> stringIds.joinToString { stringId -> context.getString(stringId) }
     is LocalText.Multi -> {
         val stringBuilder = StringBuilder()
         texts.forEach { localText -> stringBuilder.append(localText.toCharSequence(context)) }
