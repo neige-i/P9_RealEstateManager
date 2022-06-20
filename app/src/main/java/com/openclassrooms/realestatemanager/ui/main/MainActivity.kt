@@ -10,6 +10,7 @@ import androidx.fragment.app.replace
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding
 import com.openclassrooms.realestatemanager.ui.detail.DetailFragment
+import com.openclassrooms.realestatemanager.ui.filter.FilterDialog
 import com.openclassrooms.realestatemanager.ui.filter.checklist.CheckListFilterDialog
 import com.openclassrooms.realestatemanager.ui.filter.date.DateFilterDialog
 import com.openclassrooms.realestatemanager.ui.filter.slider.SliderFilterDialog
@@ -91,17 +92,17 @@ class MainActivity : AppCompatActivity() {
                     addToBackStack(null)
                 }
                 is OpenEstateForm -> startActivity(Intent(this, FormActivity::class.java))
-                is ShowSliderFilterSettings -> {
-                    SliderFilterDialog.newInstance(mainEvent.filterType, mainEvent.filterValue).show(supportFragmentManager, null)
-                }
-                is ShowCheckListFilterSettings -> {
-                    CheckListFilterDialog.newInstance(mainEvent.filterType, mainEvent.filterValue).show(supportFragmentManager, null)
-                }
-                is ShowDateFilterSettings -> {
-                    DateFilterDialog.newInstance(mainEvent.filterType, mainEvent.filterValue).show(supportFragmentManager, null)
-                }
+                is OpenSliderFilterForm -> showFilterDialog<SliderFilterDialog>(mainEvent)
+                is OpenCheckListFilterForm -> showFilterDialog<CheckListFilterDialog>(mainEvent)
+                is OpenDateFilterForm -> showFilterDialog<DateFilterDialog>(mainEvent)
             }
         }
+    }
+
+    private inline fun <reified FD : FilterDialog> showFilterDialog(openFilterFormEvent: OpenFilterForm) {
+        FilterDialog
+            .newInstance(FD::class, openFilterFormEvent.filterType, openFilterFormEvent.filterValue)
+            .show(supportFragmentManager, null)
     }
 
     override fun onResume() {

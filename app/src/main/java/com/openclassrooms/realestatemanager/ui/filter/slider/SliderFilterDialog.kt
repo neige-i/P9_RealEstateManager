@@ -2,18 +2,12 @@ package com.openclassrooms.realestatemanager.ui.filter.slider
 
 import android.util.Range
 import androidx.fragment.app.viewModels
-import com.openclassrooms.realestatemanager.data.filter.FilterType
-import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import com.openclassrooms.realestatemanager.databinding.DialogSliderBinding
 import com.openclassrooms.realestatemanager.ui.filter.FilterDialog
 import com.openclassrooms.realestatemanager.ui.util.toCharSequence
 import com.openclassrooms.realestatemanager.ui.util.viewBinding
 
 class SliderFilterDialog private constructor() : FilterDialog() {
-
-    companion object {
-        fun newInstance(filterType: FilterType, filterValue: FilterValue?) = SliderFilterDialog().createInstance(filterType, filterValue)
-    }
 
     override val binding by viewBinding(DialogSliderBinding::inflate)
     override val viewModel by viewModels<SliderFilterViewModel>()

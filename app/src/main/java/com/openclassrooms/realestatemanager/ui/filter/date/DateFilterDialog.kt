@@ -4,18 +4,12 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.openclassrooms.realestatemanager.data.filter.FilterType
-import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import com.openclassrooms.realestatemanager.databinding.DialogSaleStatusFilterBinding
 import com.openclassrooms.realestatemanager.ui.filter.FilterDialog
 import com.openclassrooms.realestatemanager.ui.filter.date.DateFilterViewModel.DatePickerType
 import com.openclassrooms.realestatemanager.ui.util.viewBinding
 
 class DateFilterDialog private constructor() : FilterDialog() {
-
-    companion object {
-        fun newInstance(filterType: FilterType, filterValue: FilterValue?) = DateFilterDialog().createInstance(filterType, filterValue)
-    }
 
     override val binding by viewBinding(DialogSaleStatusFilterBinding::inflate)
     override val viewModel by viewModels<DateFilterViewModel>()

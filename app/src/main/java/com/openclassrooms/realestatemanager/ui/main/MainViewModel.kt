@@ -100,9 +100,9 @@ class MainViewModel @Inject constructor(
                     },
                     onClicked = {
                         mainSingleLiveEvent.value = when (filterType) {
-                            is Slider -> MainEvent.ShowSliderFilterSettings(filterType, filterValue)
-                            is CheckList -> MainEvent.ShowCheckListFilterSettings(filterType, filterValue)
-                            is SaleStatus -> MainEvent.ShowDateFilterSettings(filterType, filterValue)
+                            is Slider -> MainEvent.OpenSliderFilterForm(filterType, filterValue)
+                            is CheckList -> MainEvent.OpenCheckListFilterForm(filterType, filterValue)
+                            is SaleStatus -> MainEvent.OpenDateFilterForm(filterType, filterValue)
                         }
                     },
                     onCloseIconClicked = { filterRepository.clear(filterType) },

@@ -9,6 +9,8 @@ import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.filter.FilterValue
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.reflect.KClass
+import kotlin.reflect.full.createInstance
 
 @AndroidEntryPoint
 abstract class FilterDialog : DialogFragment() {
@@ -16,6 +18,14 @@ abstract class FilterDialog : DialogFragment() {
     companion object {
         const val KEY_FILTER_TYPE = "KEY_FILTER_TYPE"
         const val KEY_FILTER_VALUE = "KEY_FILTER_VALUE"
+
+        fun <FD : FilterDialog> newInstance(filterKlass: KClass<FD>, filterType: FilterType, filterValue: FilterValue?): FD =
+            filterKlass.createInstance().apply {
+                arguments = Bundle().apply {
+                    putSerializable(KEY_FILTER_TYPE, filterType)
+                    putSerializable(KEY_FILTER_VALUE, filterValue)
+                }
+            }
     }
 
     protected abstract val binding: ViewBinding
@@ -47,13 +57,6 @@ abstract class FilterDialog : DialogFragment() {
         triggerViewEvents()
 
         return dialog
-    }
-
-    protected fun createInstance(filterType: FilterType, filterValue: FilterValue?): FilterDialog = apply {
-        arguments = Bundle().apply {
-            putSerializable(KEY_FILTER_TYPE, filterType)
-            putSerializable(KEY_FILTER_VALUE, filterValue)
-        }
     }
 
     abstract fun initUi()
