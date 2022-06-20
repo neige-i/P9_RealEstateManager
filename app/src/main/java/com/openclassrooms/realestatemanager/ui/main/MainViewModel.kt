@@ -164,34 +164,26 @@ class MainViewModel @Inject constructor(
         val min = dateFilter.from?.format(UtilsRepository.SHORT_DATE_FORMATTER)
         val max = dateFilter.until?.format(UtilsRepository.SHORT_DATE_FORMATTER)
 
-        return if (dateFilter.availableEstates) {
+        val stringArgs = listOfNotNull(min, max)
+
+        val stringRes = if (dateFilter.availableEstates) {
             if (min != null) {
-                if (max != null) {
-                    LocalText.ResWithArgs(stringId = R.string.filter_available_between, args = listOf(min, max))
-                } else {
-                    LocalText.ResWithArgs(stringId = R.string.filter_available_from, args = listOf(min))
-                }
+                if (max != null) R.string.filter_available_between else R.string.filter_available_from
             } else {
-                if (max != null) {
-                    LocalText.ResWithArgs(stringId = R.string.filter_available_until, args = listOf(max))
-                } else {
-                    LocalText.Res(stringId = R.string.filter_available_all)
-                }
+                if (max != null) R.string.filter_available_until else R.string.filter_available_all
             }
         } else {
             if (min != null) {
-                if (max != null) {
-                    LocalText.ResWithArgs(stringId = R.string.filter_sold_between, args = listOf(min, max))
-                } else {
-                    LocalText.ResWithArgs(stringId = R.string.filter_sold_from, args = listOf(min))
-                }
+                if (max != null) R.string.filter_sold_between else R.string.filter_sold_from
             } else {
-                if (max != null) {
-                    LocalText.ResWithArgs(stringId = R.string.filter_sold_until, args = listOf(max))
-                } else {
-                    LocalText.Res(stringId = R.string.filter_sold_all)
-                }
+                if (max != null) R.string.filter_sold_until else R.string.filter_sold_all
             }
+        }
+
+        return if (stringArgs.isEmpty()) {
+            LocalText.Res(stringId = stringRes)
+        } else {
+            LocalText.ResWithArgs(stringId = stringRes, args = stringArgs)
         }
     }
 
