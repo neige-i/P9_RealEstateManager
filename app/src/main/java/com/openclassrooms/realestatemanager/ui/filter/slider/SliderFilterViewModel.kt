@@ -6,24 +6,38 @@ import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.filter.FilterRepository
 import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.filter.FilterValue
-import com.openclassrooms.realestatemanager.domain.real_estate.GetAvailableValuesUseCase
+import com.openclassrooms.realestatemanager.data.real_estate.RealEstateRepository
 import com.openclassrooms.realestatemanager.ui.filter.FilterViewModel
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.util.LocalText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
 class SliderFilterViewModel @Inject constructor(
-    getAvailableValuesUseCase: GetAvailableValuesUseCase,
-    coroutineProvider: CoroutineProvider,
     savedStateHandle: SavedStateHandle,
     filterRepository: FilterRepository,
-) : FilterViewModel<FilterType.Slider, FilterValue.MinMax>(savedStateHandle, filterRepository) {
+    realEstateRepository: RealEstateRepository,
+    coroutineProvider: CoroutineProvider,
+) : FilterViewModel<FilterType.Slider, FilterValue.MinMax>(savedStateHandle, filterRepository, realEstateRepository) {
+
+    companion object {
+        const val PRICE_RANGE_STEP = 50f
+        const val SURFACE_RANGE_STEP = 5f
+        const val PHOTO_COUNT_RANGE_STEP = 1f
+    }
 
     private val sliderSelectionMutableLiveData = MutableLiveData<Range<Float>?>()
 
-    private val sliderBoundsLiveData: LiveData<Range<Float>> = getAvailableValuesUseCase.getSliderBounds(filterType)
+    private val sliderBoundsLiveData: LiveData<Range<Float>> = getEstateBound(Bound.MAX) { realEstate ->
+        when (filterType) {
+            FilterType.PhotoCount -> realEstate.photoList.size
+            FilterType.Price -> realEstate.info.price
+            FilterType.Surface -> realEstate.info.area
+        }?.toFloat()
+    }
+        .map { maxValue -> Range(0f, adjustMaxValueWithSliderStep(maxValue)) }
         .asLiveData(coroutineProvider.getIoDispatcher())
 
     private val viewStateMediatorLiveData = MediatorLiveData<SliderViewState>()
@@ -44,6 +58,27 @@ class SliderFilterViewModel @Inject constructor(
         }
     }
 
+    /**
+     * The slider's max value must be a multiple of the slider's step.
+     */
+    private fun adjustMaxValueWithSliderStep(maxValue: Float?): Float {
+        val step = when (filterType) {
+            FilterType.PhotoCount -> PHOTO_COUNT_RANGE_STEP
+            FilterType.Price -> PRICE_RANGE_STEP
+            FilterType.Surface -> SURFACE_RANGE_STEP
+        }
+
+        if (maxValue == null) {
+            return step
+        }
+
+        val quotient = (maxValue / step).toInt()
+        val remainder = maxValue % step
+
+        // Return maxValue if it is already a multiple of step, otherwise, return the next step
+        return if (remainder == 0f) maxValue else step * quotient.inc()
+    }
+
     private fun combineViewState(sliderSelection: Range<Float>?, sliderBounds: Range<Float>?) {
         if (sliderBounds == null) {
             return
@@ -57,17 +92,17 @@ class SliderFilterViewModel @Inject constructor(
                 is FilterType.PhotoCount -> SliderViewState.Style(
                     dialogTitle = R.string.filter_photo_dialog_title,
                     label = LocalText.ResWithArgs(stringId = R.string.filter_photo_count_range, args = stringArgs),
-                    step = FilterRepository.PHOTO_COUNT_RANGE_STEP,
+                    step = PHOTO_COUNT_RANGE_STEP,
                 )
                 is FilterType.Price -> SliderViewState.Style(
                     dialogTitle = R.string.filter_price_dialog_title,
                     label = LocalText.ResWithArgs(stringId = R.string.filter_price_range, args = stringArgs),
-                    step = FilterRepository.PRICE_RANGE_STEP,
+                    step = PRICE_RANGE_STEP,
                 )
                 is FilterType.Surface -> SliderViewState.Style(
                     dialogTitle = R.string.filter_surface_dialog_title,
                     label = LocalText.ResWithArgs(stringId = R.string.filter_surface_range, args = stringArgs),
-                    step = FilterRepository.SURFACE_RANGE_STEP,
+                    step = SURFACE_RANGE_STEP,
                 )
             },
             selection = selectionRange,

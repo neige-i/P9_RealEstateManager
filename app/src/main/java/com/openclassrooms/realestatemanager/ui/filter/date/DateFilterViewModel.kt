@@ -6,7 +6,7 @@ import com.openclassrooms.realestatemanager.data.UtilsRepository
 import com.openclassrooms.realestatemanager.data.filter.FilterRepository
 import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.filter.FilterValue
-import com.openclassrooms.realestatemanager.domain.real_estate.GetAvailableValuesUseCase
+import com.openclassrooms.realestatemanager.data.real_estate.RealEstateRepository
 import com.openclassrooms.realestatemanager.ui.filter.FilterViewModel
 import com.openclassrooms.realestatemanager.ui.filter.date.DateFilterViewModel.DatePickerType.END
 import com.openclassrooms.realestatemanager.ui.filter.date.DateFilterViewModel.DatePickerType.START
@@ -14,7 +14,6 @@ import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
 import com.openclassrooms.realestatemanager.ui.util.update
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.combine
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -22,12 +21,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DateFilterViewModel @Inject constructor(
-    getAvailableValuesUseCase: GetAvailableValuesUseCase,
-    coroutineProvider: CoroutineProvider,
-    private val defaultZoneId: ZoneId,
     savedStateHandle: SavedStateHandle,
     filterRepository: FilterRepository,
-) : FilterViewModel<FilterType.SaleStatus, FilterValue.Date>(savedStateHandle, filterRepository) {
+    realEstateRepository: RealEstateRepository,
+    coroutineProvider: CoroutineProvider,
+    private val defaultZoneId: ZoneId,
+) : FilterViewModel<FilterType.SaleStatus, FilterValue.Date>(savedStateHandle, filterRepository, realEstateRepository) {
 
     private val dateFilterMutableLiveData: MutableLiveData<FilterValue.Date?> = MutableLiveData(filterValue)
 
@@ -59,29 +58,32 @@ class DateFilterViewModel @Inject constructor(
     val viewEvent: LiveData<ShowDatePickerEvent> = showDatePickerSingleLiveEvent
 
     init {
-        val dateLimitLiveData = combine(
-            getAvailableValuesUseCase.getMinEntryDate(),
-            getAvailableValuesUseCase.getMaxSaleDate(),
-        ) { minEntryDate, maxSaleDate ->
-            DateLimit(
-                min = minEntryDate,
-                max = maxSaleDate,
-            )
-        }.asLiveData(coroutineProvider.getIoDispatcher())
+        val minEntryDateLiveData = getEstateBound(Bound.MIN) { realEstate -> realEstate.info.marketEntryDate }
+            .asLiveData(coroutineProvider.getIoDispatcher())
+        val maxSaleDateLiveData = getEstateBound(Bound.MAX) { realEstate -> realEstate.info.saleDate }
+            .asLiveData(coroutineProvider.getIoDispatcher())
 
         showDatePickerSingleLiveEvent.addSource(dateFilterMutableLiveData) { dateFilter ->
-            combineLiveEvent(dateFilter, dateLimitLiveData.value, datePickerPingMutableLiveData.value)
+            combineLiveEvent(dateFilter, minEntryDateLiveData.value, maxSaleDateLiveData.value, datePickerPingMutableLiveData.value)
         }
-        showDatePickerSingleLiveEvent.addSource(dateLimitLiveData) { dateLimit ->
-            combineLiveEvent(dateFilterMutableLiveData.value, dateLimit, datePickerPingMutableLiveData.value)
+        showDatePickerSingleLiveEvent.addSource(minEntryDateLiveData) { minEntryDate ->
+            combineLiveEvent(dateFilterMutableLiveData.value, minEntryDate, maxSaleDateLiveData.value, datePickerPingMutableLiveData.value)
+        }
+        showDatePickerSingleLiveEvent.addSource(maxSaleDateLiveData) { maxSaleDate ->
+            combineLiveEvent(dateFilterMutableLiveData.value, maxSaleDate, maxSaleDateLiveData.value, datePickerPingMutableLiveData.value)
         }
         showDatePickerSingleLiveEvent.addSource(datePickerPingMutableLiveData) { datePickerPing ->
-            combineLiveEvent(dateFilterMutableLiveData.value, dateLimitLiveData.value, datePickerPing)
+            combineLiveEvent(dateFilterMutableLiveData.value, minEntryDateLiveData.value, maxSaleDateLiveData.value, datePickerPing)
         }
     }
 
-    private fun combineLiveEvent(dateFilter: FilterValue.Date?, dateLimit: DateLimit?, datePickerPing: DatePickerType?) {
-        if (dateLimit == null || datePickerPing == null) {
+    private fun combineLiveEvent(
+        dateFilter: FilterValue.Date?,
+        minEntryDate: LocalDate?,
+        maxSaleDate: LocalDate?,
+        datePickerPing: DatePickerType?
+    ) {
+        if (datePickerPing == null) {
             return
         }
 
@@ -89,8 +91,8 @@ class DateFilterViewModel @Inject constructor(
 
         val min = dateFilter?.from?.toMillis()
         val max = dateFilter?.until?.toMillis()
-        val minLimit = dateLimit.min?.toMillis()
-        val maxLimit = dateLimit.max?.toMillis()
+        val minLimit = minEntryDate?.toMillis()
+        val maxLimit = maxSaleDate?.toMillis()
 
         val onDateValidated = { millis: Long? ->
             updateDate(newDate = millis?.toDate(), datePickerType = datePickerPing)
@@ -149,11 +151,6 @@ class DateFilterViewModel @Inject constructor(
     private fun LocalDate.toMillis(): Long = atStartOfDay(defaultZoneId).toInstant().toEpochMilli()
 
     private fun Long.toDate() = Instant.ofEpochMilli(this).atZone(defaultZoneId).toLocalDate()
-
-    data class DateLimit(
-        val min: LocalDate?,
-        val max: LocalDate?,
-    )
 
     enum class DatePickerType {
         START,

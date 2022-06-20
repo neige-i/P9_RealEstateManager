@@ -9,12 +9,6 @@ import javax.inject.Singleton
 @Singleton
 class FilterRepository @Inject constructor() {
 
-    companion object {
-        const val PRICE_RANGE_STEP = 50f
-        const val SURFACE_RANGE_STEP = 5f
-        const val PHOTO_COUNT_RANGE_STEP = 1f
-    }
-
     // CAUTION: do NOT use MUTABLE collections with StateFlow
     // By default, no filter is applied
     private val appliedFiltersMutableStateFlow = MutableStateFlow<Map<FilterType, FilterValue>>(emptyMap())
