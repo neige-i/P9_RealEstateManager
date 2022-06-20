@@ -84,21 +84,21 @@ class MainViewModel @Inject constructor(
             chips = ALL_FILTER_TYPES.map { filterType ->
                 val filterValue = appliedFilters[filterType]
 
-                MainViewState.ChipViewState(
+                FilterChipViewState(
                     style = if (filterValue != null) {
-                        MainViewState.ChipViewState.Style(
+                        FilterChipViewState.Style(
                             text = getSelectedChipLabel(filterValue),
                             backgroundColor = R.color.colorAccent,
                             isCloseIconVisible = true,
                         )
                     } else {
-                        MainViewState.ChipViewState.Style(
+                        FilterChipViewState.Style(
                             text = getDefaultChipLabel(filterType),
                             backgroundColor = R.color.lightGray,
                             isCloseIconVisible = false,
                         )
                     },
-                    onFilterClicked = {
+                    onClicked = {
                         mainSingleLiveEvent.value = when (filterType) {
                             is Slider -> MainEvent.ShowSliderFilterSettings(filterType, filterValue)
                             is CheckList -> MainEvent.ShowCheckListFilterSettings(filterType, filterValue)

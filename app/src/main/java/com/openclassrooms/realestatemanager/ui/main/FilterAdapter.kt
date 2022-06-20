@@ -6,11 +6,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.openclassrooms.realestatemanager.databinding.ItemChipBinding
-import com.openclassrooms.realestatemanager.ui.main.MainViewState.ChipViewState
 import com.openclassrooms.realestatemanager.ui.util.toCharSequence
 
-class FilterAdapter :
-    ListAdapter<ChipViewState, FilterAdapter.FilterViewHolder>(FilterDiffUtil()) {
+class FilterAdapter : ListAdapter<FilterChipViewState, FilterAdapter.FilterViewHolder>(FilterDiffUtil()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = FilterViewHolder(
         ItemChipBinding.inflate(
@@ -25,34 +23,31 @@ class FilterAdapter :
     }
 
 
-    class FilterViewHolder(private val binding: ItemChipBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class FilterViewHolder(private val binding: ItemChipBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(chip: ChipViewState) {
-            binding.root.isCheckable = false
+        fun bind(filterChip: FilterChipViewState) {
+            binding.root.apply {
+                isCheckable = false
 
-            val chipStyle = chip.style
+                val filterChipStyle = filterChip.style
 
-            binding.root.text = chipStyle.text.toCharSequence(binding.root.context)
+                text = filterChipStyle.text.toCharSequence(context)
+                setChipBackgroundColorResource(filterChipStyle.backgroundColor)
+                isCloseIconVisible = filterChipStyle.isCloseIconVisible
 
-            binding.root.setChipBackgroundColorResource(chipStyle.backgroundColor)
-            binding.root.isCloseIconVisible = chipStyle.isCloseIconVisible
-
-            binding.root.setOnClickListener { chip.onFilterClicked() }
-            binding.root.setOnCloseIconClickListener { chip.onCloseIconClicked() }
+                setOnClickListener { filterChip.onClicked() }
+                setOnCloseIconClickListener { filterChip.onCloseIconClicked() }
+            }
         }
     }
 
-    class FilterDiffUtil : DiffUtil.ItemCallback<ChipViewState>() {
+    class FilterDiffUtil : DiffUtil.ItemCallback<FilterChipViewState>() {
 
-        override fun areItemsTheSame(oldItem: ChipViewState, newItem: ChipViewState): Boolean {
+        override fun areItemsTheSame(oldItem: FilterChipViewState, newItem: FilterChipViewState): Boolean {
             return oldItem.style.text == newItem.style.text
         }
 
-        override fun areContentsTheSame(
-            oldItem: ChipViewState,
-            newItem: ChipViewState
-        ): Boolean {
+        override fun areContentsTheSame(oldItem: FilterChipViewState, newItem: FilterChipViewState): Boolean {
             return oldItem == newItem
         }
     }
