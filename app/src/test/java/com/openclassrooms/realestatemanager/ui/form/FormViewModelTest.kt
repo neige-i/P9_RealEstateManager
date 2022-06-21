@@ -126,7 +126,7 @@ class FormViewModelTest {
         // THEN
         assertEquals(
             FormEvent.ShowDialog(
-                type = FormViewModel.DialogType.SAVE_DRAFT,
+                dialogType = FormViewModel.DialogType.SAVE_DRAFT,
                 title = "Draft",
                 message = "Started: Manor",
                 positiveButtonText = "Resume draft",
@@ -287,7 +287,7 @@ class FormViewModelTest {
         // THEN
         assertEquals(
             FormEvent.ShowDialog(
-                type = FormViewModel.DialogType.EXIT_FORM,
+                dialogType = FormViewModel.DialogType.EXIT_FORM,
                 title = "Exit",
                 message = "Keep?",
                 positiveButtonText = "Yes",
@@ -312,7 +312,7 @@ class FormViewModelTest {
         // THEN
         assertEquals(
             FormEvent.ShowDialog(
-                type = FormViewModel.DialogType.EXIT_FORM,
+                dialogType = FormViewModel.DialogType.EXIT_FORM,
                 title = "Exit",
                 message = "Save?",
                 positiveButtonText = "Yes",
@@ -347,7 +347,7 @@ class FormViewModelTest {
         // THEN
         assertEquals(
             FormEvent.ShowDialog(
-                type = FormViewModel.DialogType.EXIT_FORM,
+                dialogType = FormViewModel.DialogType.EXIT_FORM,
                 title = "Exit",
                 message = "Keep?",
                 positiveButtonText = "Yes",
@@ -371,7 +371,7 @@ class FormViewModelTest {
         // THEN
         assertEquals(
             FormEvent.ShowDialog(
-                type = FormViewModel.DialogType.EXIT_FORM,
+                dialogType = FormViewModel.DialogType.EXIT_FORM,
                 title = "Exit",
                 message = "Save?",
                 positiveButtonText = "Yes",

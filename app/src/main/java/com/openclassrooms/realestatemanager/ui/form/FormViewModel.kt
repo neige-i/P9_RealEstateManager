@@ -1,6 +1,5 @@
 package com.openclassrooms.realestatemanager.ui.form
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -28,7 +27,6 @@ class FormViewModel @Inject constructor(
     private val setFormUseCase: SetFormUseCase,
     private val saveRealEstateUseCase: SaveRealEstateUseCase,
     private val coroutineProvider: CoroutineProvider,
-    private val application: Application,
 ) : ViewModel() {
 
     private val viewStateMutableLiveData = MutableLiveData<FormViewState>()
@@ -57,14 +55,14 @@ class FormViewModel @Inject constructor(
             getFormUseCase.getFormInfo().isModified
         ) {
             formSingleLiveEvent.value = FormEvent.ShowDialog(
-                type = DialogType.SAVE_DRAFT,
+                dialogType = DialogType.SAVE_DRAFT,
                 title = R.string.draft_form_dialog_title,
                 message = LocalText.ResWithRes(
                     stringId = R.string.draft_form_dialog_message,
                     resArgs = listOf(getFormUseCase.getFormInfo().estateType!!.labelId),
                 ),
-                positiveButtonText = application.getString(R.string.draft_form_dialog_positive_button),
-                negativeButtonText = application.getString(R.string.draft_form_dialog_negative_button)
+                positiveButtonText = R.string.draft_form_dialog_positive_button,
+                negativeButtonText = R.string.draft_form_dialog_negative_button,
             )
         }
     }
@@ -76,20 +74,17 @@ class FormViewModel @Inject constructor(
     fun onPageChanged(position: Int) {
         currentPage = position
 
-        val addOrEdit = application.getString(
-            when (getFormUseCase.getFormInfo().formType) {
+        val firstTitlePart = LocalText.Res(
+            stringId = when (getFormUseCase.getFormInfo().formType) {
                 FormType.ADD_ESTATE -> R.string.toolbar_title_add
                 FormType.EDIT_ESTATE -> R.string.toolbar_title_edit
             }
         )
+        val secondTitlePart = LocalText.Simple(content = " (${currentPage + 1}/$pageCount)")
 
         viewStateMutableLiveData.value = FormViewState(
-            toolbarTitle = "$addOrEdit (${currentPage + 1}/$pageCount)",
-            submitButtonText = if (isLastPageDisplayed()) {
-                application.getString(R.string.button_text_save)
-            } else {
-                application.getString(R.string.button_text_next)
-            }
+            toolbarTitle = LocalText.Multi(texts = listOf(firstTitlePart, secondTitlePart)),
+            submitButtonText = if (isLastPageDisplayed()) R.string.button_text_save else R.string.button_text_next,
         )
     }
 
@@ -129,7 +124,7 @@ class FormViewModel @Inject constructor(
     private fun confirmExit() {
         if (getFormUseCase.getFormInfo().isModified) {
             formSingleLiveEvent.value = FormEvent.ShowDialog(
-                type = DialogType.EXIT_FORM,
+                dialogType = DialogType.EXIT_FORM,
                 title = R.string.exit_form_dialog_title,
                 message = LocalText.Res(
                     stringId = when (getFormUseCase.getFormInfo().formType) {
@@ -137,8 +132,8 @@ class FormViewModel @Inject constructor(
                         FormType.EDIT_ESTATE -> R.string.exit_edit_form_dialog_message
                     }
                 ),
-                positiveButtonText = application.getString(R.string.exit_form_dialog_positive_button),
-                negativeButtonText = application.getString(R.string.exit_form_dialog_negative_button)
+                positiveButtonText = R.string.exit_form_dialog_positive_button,
+                negativeButtonText = R.string.exit_form_dialog_negative_button,
             )
         } else {
             setFormUseCase.reset()

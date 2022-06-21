@@ -44,36 +44,38 @@ class FormActivity : ImageLauncherActivity() {
         )
         viewModel.onInitPagerAdapter(formPagerAdapter.itemCount)
 
-        binding.formPager.isUserInputEnabled = false
-        binding.formPager.adapter = formPagerAdapter
-        binding.formPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                viewModel.onPageChanged(position)
-            }
-        })
+        binding.formPager.apply {
+            isUserInputEnabled = false
+            adapter = formPagerAdapter
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    viewModel.onPageChanged(position)
+                }
+            })
+        }
 
         binding.formSubmitButton.setOnClickListener { viewModel.onSubmitButtonClicked() }
 
         viewModel.viewStateLiveData.observe(this) { formViewState ->
-            binding.formToolbar.title = formViewState.toolbarTitle
-            binding.formSubmitButton.text = formViewState.submitButtonText
+            binding.formToolbar.title = formViewState.toolbarTitle.toCharSequence(this)
+            binding.formSubmitButton.setText(formViewState.submitButtonText)
         }
 
         viewModel.formEventLiveData.observe(this) { formEvent ->
             when (formEvent) {
-                ExitActivity -> finish()
+                is ExitActivity -> finish()
                 is GoToPage -> binding.formPager.currentItem = formEvent.pageToGo
                 is ShowDialog -> MaterialAlertDialogBuilder(this)
                     .setTitle(formEvent.title)
                     .setMessage(formEvent.message.toCharSequence(this))
                     .setPositiveButton(formEvent.positiveButtonText) { _, _ ->
-                        viewModel.onDialogPositiveButtonClicked(formEvent.type)
+                        viewModel.onDialogPositiveButtonClicked(formEvent.dialogType)
                     }
                     .setNegativeButton(formEvent.negativeButtonText) { _, _ ->
-                        viewModel.onDialogNegativeButtonClicked(formEvent.type)
+                        viewModel.onDialogNegativeButtonClicked(formEvent.dialogType)
                     }
                     .show()
-                ShowPicture -> startActivity(Intent(this, PictureActivity::class.java))
+                is ShowPicture -> startActivity(Intent(this, PictureActivity::class.java))
             }
         }
     }

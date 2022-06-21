@@ -7,16 +7,14 @@ sealed class FormEvent {
 
     object ExitActivity : FormEvent()
 
-    data class GoToPage(
-        val pageToGo: Int,
-    ) : FormEvent()
+    data class GoToPage(val pageToGo: Int) : FormEvent()
 
     data class ShowDialog(
-        val type: FormViewModel.DialogType,
+        val dialogType: FormViewModel.DialogType,
         @StringRes val title: Int,
         val message: LocalText,
-        val positiveButtonText: String,
-        val negativeButtonText: String,
+        @StringRes val positiveButtonText: Int,
+        @StringRes val negativeButtonText: Int,
     ) : FormEvent()
 
     object ShowPicture : FormEvent()
