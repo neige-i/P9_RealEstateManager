@@ -30,10 +30,7 @@ class DateFilterViewModel @Inject constructor(
 
     private val dateFilterMutableLiveData: MutableLiveData<FilterValue.Date?> = MutableLiveData(filterValue)
 
-    // Use distinctUntilChanged() to avoid infinite loop due to RadioButton checking:
-    // The RadioButton is checked while observing the view state but,
-    // the view state is also updated when a RadioButton is checked
-    val viewState = Transformations.map(dateFilterMutableLiveData.distinctUntilChanged()) { availableDates ->
+    val viewState = Transformations.map(dateFilterMutableLiveData) { availableDates ->
 
         val startDateText = availableDates?.from?.format(UtilsRepository.DATE_FORMATTER).orEmpty()
         val endDateText = availableDates?.until?.format(UtilsRepository.DATE_FORMATTER).orEmpty()
