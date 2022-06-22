@@ -4,13 +4,13 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.FragmentEditDetailInfoBinding
 import com.openclassrooms.realestatemanager.ui.form.picker_dialog.PicturePickerDialog
-import com.openclassrooms.realestatemanager.ui.util.onAfterTextChanged
 import com.openclassrooms.realestatemanager.ui.util.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,9 +25,7 @@ class EditDetailInfoFragment : Fragment(R.layout.fragment_edit_detail_info) {
         val viewModel = ViewModelProvider(this).get(EditDetailInfoViewModel::class.java)
 
         enableEditTextScrolling()
-        binding.detailInfoDescriptionInput.onAfterTextChanged { text, cursorPosition ->
-            viewModel.onDescriptionChanged(text?.toString(), cursorPosition)
-        }
+        binding.detailInfoDescriptionInput.doAfterTextChanged { viewModel.onDescriptionChanged(it?.toString()) }
 
         val addPhotoAdapter = AddPhotoAdapter(object : AddPhotoAdapter.PhotoListener {
             override fun add(position: Int) {
@@ -47,8 +45,7 @@ class EditDetailInfoFragment : Fragment(R.layout.fragment_edit_detail_info) {
         binding.detailInfoPhotoList.adapter = addPhotoAdapter
 
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
-            binding.detailInfoDescriptionInput.setText(it.description)
-            binding.detailInfoDescriptionInput.setSelection(it.descriptionSelection)
+            binding.detailInfoDescriptionInput.setTextKeepState(it.description)
             addPhotoAdapter.submitList(it.photoList)
         }
 
@@ -62,8 +59,8 @@ class EditDetailInfoFragment : Fragment(R.layout.fragment_edit_detail_info) {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun enableEditTextScrolling() {
-        binding.detailInfoDescriptionInput.setOnTouchListener { v, _ ->
-            v.parent.requestDisallowInterceptTouchEvent(true)
+        binding.detailInfoDescriptionInput.setOnTouchListener { view, _ ->
+            view.parent.requestDisallowInterceptTouchEvent(true)
             false
         }
     }

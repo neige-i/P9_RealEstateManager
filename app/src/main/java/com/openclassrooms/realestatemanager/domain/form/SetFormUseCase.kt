@@ -61,35 +61,26 @@ class SetFormUseCase @Inject constructor(
             estateType = realEstate.info.type,
             typeError = null,
             price = price,
-            priceCursor = price.length,
             area = area,
-            areaCursor = area.length,
             totalRoomCount = realEstate.info.totalRoomCount,
             bathroomCount = realEstate.info.bathroomCount,
             bedroomCount = realEstate.info.bedroomCount,
             description = realEstate.info.description,
-            descriptionCursor = realEstate.info.description.length,
             pictureList = realEstate.photoList.map {
                 FormEntity.PictureEntity(uri = Uri.parse(it.uri), description = it.description)
             },
             pictureListError = null,
             streetName = realEstate.info.streetName,
             streetNameError = null,
-            streetNameCursor = realEstate.info.streetName.length,
             additionalAddressInfo = realEstate.info.additionalAddressInfo,
-            additionalAddressInfoCursor = realEstate.info.additionalAddressInfo.length,
             city = realEstate.info.city,
             cityError = null,
-            cityCursor = realEstate.info.city.length,
             state = realEstate.info.state,
             stateError = null,
-            stateCursor = realEstate.info.state.length,
             zipcode = realEstate.info.zipcode,
             zipcodeError = null,
-            zipcodeCursor = realEstate.info.zipcode.length,
             country = realEstate.info.country,
             countryError = null,
-            countryCursor = realEstate.info.country.length,
             pointsOfInterests = realEstate.poiList.map { it.poiValue },
             agentName = realEstate.agent?.username.orEmpty(),
             marketEntryDate = realEstate.info.marketEntryDate,
@@ -110,15 +101,15 @@ class SetFormUseCase @Inject constructor(
         formRepository.setForm(formRepository.getForm().copy(estateType = estateType))
     }
 
-    fun updatePrice(price: String, cursorPosition: Int) {
+    fun updatePrice(price: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(price = price, priceCursor = cursorPosition)
+            formRepository.getForm().copy(price = price)
         )
     }
 
-    fun updateArea(area: String, cursorPosition: Int) {
+    fun updateArea(area: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(area = area, areaCursor = cursorPosition)
+            formRepository.getForm().copy(area = area)
         )
     }
 
@@ -178,12 +169,9 @@ class SetFormUseCase @Inject constructor(
 
     // DETAIL INFO
 
-    fun updateDescription(description: String, cursorPosition: Int) {
+    fun updateDescription(description: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(
-                description = description,
-                descriptionCursor = cursorPosition
-            )
+            formRepository.getForm().copy(description = description)
         )
     }
 
@@ -209,17 +197,13 @@ class SetFormUseCase @Inject constructor(
                 uri = uri,
                 description = description,
                 descriptionError = null,
-                descriptionCursor = description.length
             )
         )
     }
 
-    fun updatePictureDescription(description: String, cursorPosition: Int) {
+    fun updatePictureDescription(description: String) {
         currentPictureRepository.setPicture(
-            currentPictureRepository.getCurrentPicture()?.copy(
-                description = description,
-                descriptionCursor = cursorPosition
-            )
+            currentPictureRepository.getCurrentPicture()?.copy(description = description)
         )
     }
 
@@ -247,57 +231,39 @@ class SetFormUseCase @Inject constructor(
 
     // ADDRESS
 
-    fun updateStreetName(streetName: String, cursorPosition: Int) {
+    fun updateStreetName(streetName: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(
-                streetName = streetName,
-                streetNameCursor = cursorPosition
-            )
+            formRepository.getForm().copy(streetName = streetName)
         )
     }
 
-    fun updateAdditionalAddressInfo(additionalAddressInfo: String, cursorPosition: Int) {
+    fun updateAdditionalAddressInfo(additionalAddressInfo: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(
-                additionalAddressInfo = additionalAddressInfo,
-                additionalAddressInfoCursor = cursorPosition
-            )
+            formRepository.getForm().copy(additionalAddressInfo = additionalAddressInfo)
         )
     }
 
-    fun updateCity(city: String, cursorPosition: Int) {
+    fun updateCity(city: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(
-                city = city,
-                cityCursor = cursorPosition
-            )
+            formRepository.getForm().copy(city = city)
         )
     }
 
-    fun updateState(state: String, cursorPosition: Int) {
+    fun updateState(state: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(
-                state = state,
-                stateCursor = cursorPosition
-            )
+            formRepository.getForm().copy(state = state)
         )
     }
 
-    fun updateZipcode(zipcode: String, cursorPosition: Int) {
+    fun updateZipcode(zipcode: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(
-                zipcode = zipcode,
-                zipcodeCursor = cursorPosition
-            )
+            formRepository.getForm().copy(zipcode = zipcode)
         )
     }
 
-    fun updateCountry(country: String, cursorPosition: Int) {
+    fun updateCountry(country: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(
-                country = country,
-                countryCursor = cursorPosition
-            )
+            formRepository.getForm().copy(country = country)
         )
     }
 

@@ -1,8 +1,8 @@
 package com.openclassrooms.realestatemanager.data.form
 
 import android.net.Uri
-import com.openclassrooms.realestatemanager.data.RealEstateType
 import com.openclassrooms.realestatemanager.data.PointOfInterest
+import com.openclassrooms.realestatemanager.data.RealEstateType
 import java.time.LocalDate
 
 data class FormEntity(
@@ -10,33 +10,24 @@ data class FormEntity(
     val estateType: RealEstateType?,
     val typeError: String?,
     val price: String,
-    val priceCursor: Int,
     val area: String,
-    val areaCursor: Int,
     val totalRoomCount: Int,
     val bathroomCount: Int,
     val bedroomCount: Int,
     val description: String,
-    val descriptionCursor: Int,
     val pictureList: List<PictureEntity>,
     val pictureListError: String?,
     val streetName: String,
     val streetNameError: String?,
-    val streetNameCursor: Int,
     val additionalAddressInfo: String,
-    val additionalAddressInfoCursor: Int,
     val city: String,
     val cityError: String?,
-    val cityCursor: Int,
     val state: String,
     val stateError: String?,
-    val stateCursor: Int,
     val zipcode: String,
     val zipcodeError: String?,
-    val zipcodeCursor: Int,
     val country: String,
     val countryError: String?,
-    val countryCursor: Int,
     val pointsOfInterests: List<PointOfInterest>,
     val agentName: String,
     val marketEntryDate: LocalDate?,

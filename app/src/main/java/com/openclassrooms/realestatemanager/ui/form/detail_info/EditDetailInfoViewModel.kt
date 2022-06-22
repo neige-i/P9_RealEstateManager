@@ -25,7 +25,6 @@ class EditDetailInfoViewModel @Inject constructor(
     val viewStateLiveData = getFormUseCase.getFormFlow().map { form ->
         DetailInfoViewState(
             description = form.description,
-            descriptionSelection = form.descriptionCursor,
             photoList = form.pictureList
                 .map { picture ->
                     DetailInfoViewState.PhotoViewState.Photo(
@@ -56,8 +55,8 @@ class EditDetailInfoViewModel @Inject constructor(
         }
     }
 
-    fun onDescriptionChanged(description: String?, cursorPosition: Int) {
-        setFormUseCase.updateDescription(description ?: "", cursorPosition)
+    fun onDescriptionChanged(description: String?) {
+        setFormUseCase.updateDescription(description ?: "")
     }
 
     fun onPhotoAdded(position: Int) {

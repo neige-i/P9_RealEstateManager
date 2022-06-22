@@ -3,12 +3,12 @@ package com.openclassrooms.realestatemanager.ui.form.main_info
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.RealEstateType
 import com.openclassrooms.realestatemanager.databinding.FragmentEditMainInfoBinding
-import com.openclassrooms.realestatemanager.ui.util.onAfterTextChanged
 import com.openclassrooms.realestatemanager.ui.util.toCharSequence
 import com.openclassrooms.realestatemanager.ui.util.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,12 +32,8 @@ class EditMainInfoFragment : Fragment(R.layout.fragment_edit_main_info) {
             viewModel.onTypeSelected(parent.getItemAtPosition(position).toString())
         }
 
-        binding.mainInfoPriceInput.onAfterTextChanged { text, cursorPosition ->
-            viewModel.onPriceChanged(text?.toString(), cursorPosition)
-        }
-        binding.mainInfoAreaInput.onAfterTextChanged { text, cursorPosition ->
-            viewModel.onAreaChanged(text?.toString(), cursorPosition)
-        }
+        binding.mainInfoPriceInput.doAfterTextChanged { viewModel.onPriceChanged(it?.toString()) }
+        binding.mainInfoAreaInput.doAfterTextChanged { viewModel.onAreaChanged(it?.toString()) }
 
         binding.mainInfoAddTotalRoomButton.setOnClickListener { viewModel.onTotalRoomAdded() }
         binding.mainInfoRemoveTotalRoomButton.setOnClickListener { viewModel.onTotalRoomRemoved() }
@@ -46,24 +42,22 @@ class EditMainInfoFragment : Fragment(R.layout.fragment_edit_main_info) {
         binding.mainInfoAddBedroomButton.setOnClickListener { viewModel.onBedRoomAdded() }
         binding.mainInfoRemoveBedroomButton.setOnClickListener { viewModel.onBedRoomRemoved() }
 
-        viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
+        viewModel.viewStateLiveData.observe(viewLifecycleOwner) { mainInfo ->
             binding.mainInfoTypeInput.setAdapter(estateTypeArrayAdapter)
             binding.mainInfoTypeInput.setText(
-                it.selectedType.toCharSequence(requireContext()),
+                mainInfo.selectedType.toCharSequence(requireContext()),
                 false
             )
 
-            binding.mainInfoPriceInput.setText(it.price)
-            binding.mainInfoPriceInput.setSelection(it.priceSelection)
+            binding.mainInfoPriceInput.setTextKeepState(mainInfo.price)
 
-            binding.mainInfoAreaInput.setText(it.area)
-            binding.mainInfoAreaInput.setSelection(it.areaSelection)
+            binding.mainInfoAreaInput.setTextKeepState(mainInfo.area)
 
-            binding.mainInfoTotalRoomCount.text = it.totalRoomCount
-            binding.mainInfoBathroomCount.text = it.bathroomCount
-            binding.mainInfoBedroomCount.text = it.bedroomCount
+            binding.mainInfoTotalRoomCount.text = mainInfo.totalRoomCount
+            binding.mainInfoBathroomCount.text = mainInfo.bathroomCount
+            binding.mainInfoBedroomCount.text = mainInfo.bedroomCount
 
-            binding.mainInfoTypeInputLayout.error = it.typeError
+            binding.mainInfoTypeInputLayout.error = mainInfo.typeError
         }
     }
 }

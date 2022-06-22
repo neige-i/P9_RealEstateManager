@@ -27,7 +27,6 @@ class PictureViewModel @Inject constructor(
                 uri = it.uri,
                 description = it.description,
                 descriptionError = it.descriptionError,
-                descriptionSelection = it.descriptionCursor
             )
         }
         .asLiveData(coroutineProvider.getIoDispatcher())
@@ -35,8 +34,8 @@ class PictureViewModel @Inject constructor(
     private val exitSingleLiveEvent = SingleLiveEvent<Unit>()
     val exitEventLiveData: LiveData<Unit> = exitSingleLiveEvent
 
-    fun onDescriptionChanged(description: String?, cursorPosition: Int) {
-        setFormUseCase.updatePictureDescription(description ?: "", cursorPosition)
+    fun onDescriptionChanged(description: String?) {
+        setFormUseCase.updatePictureDescription(description ?: "")
     }
 
     fun onSaveMenuItemClicked() {

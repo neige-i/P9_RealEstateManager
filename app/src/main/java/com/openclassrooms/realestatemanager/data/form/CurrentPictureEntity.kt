@@ -6,5 +6,4 @@ data class CurrentPictureEntity(
     val uri: Uri,
     val description: String,
     val descriptionError: String?,
-    val descriptionCursor: Int,
 )

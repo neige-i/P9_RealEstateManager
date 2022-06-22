@@ -29,9 +29,7 @@ class EditMainInfoViewModel @Inject constructor(
             },
             typeError = form.typeError,
             price = form.price,
-            priceSelection = form.priceCursor,
             area = form.area,
-            areaSelection = form.areaCursor,
             totalRoomCount = form.totalRoomCount.toString(),
             bathroomCount = form.bathroomCount.toString(),
             bedroomCount = form.bedroomCount.toString()
@@ -46,12 +44,12 @@ class EditMainInfoViewModel @Inject constructor(
         )
     }
 
-    fun onPriceChanged(price: String?, cursorPosition: Int) {
-        setFormUseCase.updatePrice(price ?: "", cursorPosition)
+    fun onPriceChanged(price: String?) {
+        setFormUseCase.updatePrice(price ?: "")
     }
 
-    fun onAreaChanged(area: String?, cursorPosition: Int) {
-        setFormUseCase.updateArea(area ?: "", cursorPosition)
+    fun onAreaChanged(area: String?) {
+        setFormUseCase.updateArea(area ?: "")
     }
 
     fun onTotalRoomAdded() {

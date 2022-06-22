@@ -4,12 +4,12 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.core.widget.doAfterTextChanged
 import com.bumptech.glide.Glide
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ActivityPictureBinding
 import com.openclassrooms.realestatemanager.ui.form.image_launcher.ImageLauncherActivity
 import com.openclassrooms.realestatemanager.ui.form.picker_dialog.PicturePickerDialog
-import com.openclassrooms.realestatemanager.ui.util.onAfterTextChanged
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -26,17 +26,14 @@ class PictureActivity : ImageLauncherActivity() {
         setSupportActionBar(binding.pictureToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        binding.pictureDescriptionInput.onAfterTextChanged { text, cursorPosition ->
-            viewModel.onDescriptionChanged(text?.toString(), cursorPosition)
-        }
+        binding.pictureDescriptionInput.doAfterTextChanged { viewModel.onDescriptionChanged(it?.toString()) }
 
         viewModel.viewStateLiveData.observe(this) { pictureViewState ->
             Glide.with(this)
                 .load(pictureViewState.uri)
                 .into(binding.pictureImage)
 
-            binding.pictureDescriptionInput.setText(pictureViewState.description)
-            binding.pictureDescriptionInput.setSelection(pictureViewState.descriptionSelection)
+            binding.pictureDescriptionInput.setTextKeepState(pictureViewState.description)
             binding.pictureDescriptionInputLayout.error = pictureViewState.descriptionError
         }
 

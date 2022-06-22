@@ -6,5 +6,4 @@ data class PictureViewState(
     val uri: Uri,
     val description: String,
     val descriptionError: String?,
-    val descriptionSelection: Int,
 )
