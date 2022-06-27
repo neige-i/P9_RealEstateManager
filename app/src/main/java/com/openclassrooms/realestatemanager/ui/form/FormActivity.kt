@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.openclassrooms.realestatemanager.R
@@ -12,15 +13,14 @@ import com.openclassrooms.realestatemanager.databinding.ActivityFormBinding
 import com.openclassrooms.realestatemanager.ui.form.FormEvent.*
 import com.openclassrooms.realestatemanager.ui.form.address.EditAddressFragment
 import com.openclassrooms.realestatemanager.ui.form.detail_info.EditDetailInfoFragment
-import com.openclassrooms.realestatemanager.ui.form.image_launcher.ImageLauncherActivity
 import com.openclassrooms.realestatemanager.ui.form.main_info.EditMainInfoFragment
-import com.openclassrooms.realestatemanager.ui.form.picture.PictureActivity
+import com.openclassrooms.realestatemanager.ui.form.picture.PhotoActivity
 import com.openclassrooms.realestatemanager.ui.form.sale.EditSaleFragment
 import com.openclassrooms.realestatemanager.ui.util.toCharSequence
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class FormActivity : ImageLauncherActivity() {
+class FormActivity : AppCompatActivity() {
 
     private val viewModel: FormViewModel by viewModels()
 
@@ -75,7 +75,7 @@ class FormActivity : ImageLauncherActivity() {
                         viewModel.onDialogNegativeButtonClicked(formEvent.dialogType)
                     }
                     .show()
-                is ShowPicture -> startActivity(Intent(this, PictureActivity::class.java))
+                is ShowPhoto -> startActivity(Intent(this, PhotoActivity::class.java))
             }
         }
     }

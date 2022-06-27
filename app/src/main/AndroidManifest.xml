@@ -26,7 +26,7 @@
         </activity>
         <activity android:name=".ui.form.FormActivity" />
         <activity
-            android:name=".ui.form.picture.PictureActivity"
+            android:name=".ui.form.picture.PhotoActivity"
             android:label="@string/toolbar_title_edit_picture"
             android:windowSoftInputMode="adjustResize"
             />

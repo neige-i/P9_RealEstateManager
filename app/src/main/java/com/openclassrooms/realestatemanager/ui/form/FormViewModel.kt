@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openclassrooms.realestatemanager.R
-import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
+import com.openclassrooms.realestatemanager.data.current_photo.CurrentPhotoRepository
 import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
 import com.openclassrooms.realestatemanager.domain.form.FormType
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
@@ -22,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FormViewModel @Inject constructor(
     private val getFormUseCase: GetFormUseCase,
-    currentPictureRepository: CurrentPictureRepository,
+    currentPhotoRepository: CurrentPhotoRepository,
     private val checkFormErrorUseCase: CheckFormErrorUseCase,
     private val setFormUseCase: SetFormUseCase,
     private val saveRealEstateUseCase: SaveRealEstateUseCase,
@@ -41,10 +41,10 @@ class FormViewModel @Inject constructor(
         checkExistingDraft()
 
         viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            currentPictureRepository.getPictureFlow().collect {
+            currentPhotoRepository.getPhotoIndexFlow().collect {
 
                 withContext(coroutineProvider.getMainDispatcher()) {
-                    formSingleLiveEvent.value = FormEvent.ShowPicture
+                    formSingleLiveEvent.value = FormEvent.ShowPhoto
                 }
             }
         }
@@ -89,23 +89,25 @@ class FormViewModel @Inject constructor(
     }
 
     fun onSubmitButtonClicked() {
-        if (checkFormErrorUseCase.containsNoError(pageToCheck = currentPage)) {
-            if (isLastPageDisplayed()) {
-                onFormCompleted()
-            } else {
-                formSingleLiveEvent.value = FormEvent.GoToPage(currentPage + 1)
+        viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
+            if (checkFormErrorUseCase.containsNoError(pageToCheck = currentPage)) {
+                if (isLastPageDisplayed()) {
+                    onFormCompleted()
+                } else {
+                    withContext(coroutineProvider.getMainDispatcher()) {
+                        formSingleLiveEvent.value = FormEvent.GoToPage(currentPage + 1)
+                    }
+                }
             }
         }
     }
 
-    private fun onFormCompleted() {
-        viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            saveRealEstateUseCase.invoke()
-            setFormUseCase.reset()
+    private suspend fun onFormCompleted() {
+        saveRealEstateUseCase()
+        setFormUseCase.reset()
 
-            withContext(coroutineProvider.getMainDispatcher()) {
-                formSingleLiveEvent.value = FormEvent.ExitActivity
-            }
+        withContext(coroutineProvider.getMainDispatcher()) {
+            formSingleLiveEvent.value = FormEvent.ExitActivity
         }
     }
 
@@ -143,10 +145,15 @@ class FormViewModel @Inject constructor(
 
     fun onDialogPositiveButtonClicked(type: DialogType) {
         when (type) {
-            DialogType.EXIT_FORM -> if (checkFormErrorUseCase.containsNoError(pageToCheck = 0)) {
-                formSingleLiveEvent.value = FormEvent.ExitActivity
+            DialogType.EXIT_FORM -> viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
+                if (checkFormErrorUseCase.containsNoError(pageToCheck = 0)) {
+                    withContext(coroutineProvider.getMainDispatcher()) {
+                        formSingleLiveEvent.value = FormEvent.ExitActivity
+                    }
+                }
             }
             DialogType.SAVE_DRAFT -> {}
+
         }
     }
 

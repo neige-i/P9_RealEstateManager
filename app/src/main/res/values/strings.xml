@@ -79,6 +79,8 @@
     <string name="description_picture">Picture</string>
     <string name="real_estate_photo">Real estate photo</string>
 
+    <string name="error_no_image">Please select an image</string>
+
     <string name="error_mandatory_field">Mandatory field</string>
     <string name="error_empty_photo_list">Please select at least one photo</string>
     <string name="error_unknown_state">Unknown state</string>

@@ -17,5 +17,5 @@ sealed class FormEvent {
         @StringRes val negativeButtonText: Int,
     ) : FormEvent()
 
-    object ShowPicture : FormEvent()
+    object ShowPhoto : FormEvent()
 }

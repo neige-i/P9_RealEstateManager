@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.FragmentEditDetailInfoBinding
-import com.openclassrooms.realestatemanager.ui.form.picker_dialog.PicturePickerDialog
 import com.openclassrooms.realestatemanager.ui.util.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -27,21 +26,7 @@ class EditDetailInfoFragment : Fragment(R.layout.fragment_edit_detail_info) {
         enableEditTextScrolling()
         binding.detailInfoDescriptionInput.doAfterTextChanged { viewModel.onDescriptionChanged(it?.toString()) }
 
-        val addPhotoAdapter = AddPhotoAdapter(object : AddPhotoAdapter.PhotoListener {
-            override fun add(position: Int) {
-                viewModel.onPhotoAdded(position)
-                PicturePickerDialog().show(parentFragmentManager, null)
-            }
-
-            override fun open(position: Int, photo: DetailInfoViewState.PhotoViewState.Photo) {
-                viewModel.onPhotoOpened(position, photo)
-            }
-
-            override fun remove(position: Int) {
-                viewModel.onPhotoRemoved(position)
-            }
-
-        })
+        val addPhotoAdapter = AddPhotoAdapter()
         binding.detailInfoPhotoList.adapter = addPhotoAdapter
 
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
@@ -50,9 +35,9 @@ class EditDetailInfoFragment : Fragment(R.layout.fragment_edit_detail_info) {
         }
 
         viewModel.showErrorEventLiveData.observe(viewLifecycleOwner) { errorMessageId ->
-            val redColor = ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark)
-            Snackbar.make(binding.root, errorMessageId, Snackbar.LENGTH_SHORT)
-                .setBackgroundTint(redColor)
+            Snackbar
+                .make(binding.root, errorMessageId, Snackbar.LENGTH_SHORT)
+                .setBackgroundTint(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark))
                 .show()
         }
     }

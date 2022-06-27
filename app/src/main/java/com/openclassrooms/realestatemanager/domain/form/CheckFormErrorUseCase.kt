@@ -3,21 +3,22 @@ package com.openclassrooms.realestatemanager.domain.form
 import android.content.Context
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.UtilsRepository
-import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
+import com.openclassrooms.realestatemanager.data.current_photo.CurrentPhotoRepository
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class CheckFormErrorUseCase @Inject constructor(
     private val formRepository: FormRepository,
-    private val currentPictureRepository: CurrentPictureRepository,
+    private val currentPhotoRepository: CurrentPhotoRepository,
     @ApplicationContext private val appContext: Context,
 ) {
 
-    fun containsNoError(pageToCheck: PageToCheck): Boolean = containsNoError(pageToCheck.ordinal)
+    suspend fun containsNoError(pageToCheck: PageToCheck): Boolean = containsNoError(pageToCheck.ordinal)
 
-    fun containsNoError(pageToCheck: Int): Boolean {
+    suspend fun containsNoError(pageToCheck: Int): Boolean {
         val form = formRepository.getForm()
 
         return when (PageToCheck.values()[pageToCheck]) {
@@ -53,19 +54,20 @@ class CheckFormErrorUseCase @Inject constructor(
         return pictureListError == null
     }
 
-    private fun containsNoPictureError(): Boolean {
-        val picture = currentPictureRepository.getCurrentPicture()
-            ?: throw IllegalStateException("Picture shouldn't be null when checking for errors")
+    private suspend fun containsNoPictureError(): Boolean {
+        val currentPhoto = currentPhotoRepository.getCurrentPhotoFlow().first()
 
-        val descriptionError = if (picture.description.isBlank()) {
+        val descriptionError = if (currentPhoto.description.isBlank()) {
             appContext.getString(R.string.error_mandatory_field)
         } else {
             null
         }
 
-        currentPictureRepository.setPicture(picture.copy(descriptionError = descriptionError))
+        val isUriSelected = currentPhoto.uri != null
 
-        return descriptionError == null
+        currentPhotoRepository.setErrors(descriptionError, isUriSelected)
+
+        return descriptionError == null && isUriSelected
     }
 
     private fun containsNoAddressError(form: FormEntity): Boolean {

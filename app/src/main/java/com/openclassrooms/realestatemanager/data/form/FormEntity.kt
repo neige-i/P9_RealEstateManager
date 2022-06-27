@@ -15,7 +15,7 @@ data class FormEntity(
     val bathroomCount: Int,
     val bedroomCount: Int,
     val description: String,
-    val pictureList: List<PictureEntity>,
+    val pictureList: List<PhotoEntity>,
     val pictureListError: String?,
     val streetName: String,
     val streetNameError: String?,
@@ -37,7 +37,7 @@ data class FormEntity(
     val isAvailableForSale: Boolean,
 ) {
 
-    data class PictureEntity(
+    data class PhotoEntity(
         val uri: Uri,
         val description: String,
     )

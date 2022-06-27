@@ -3,8 +3,8 @@ package com.openclassrooms.realestatemanager.domain.form
 import android.net.Uri
 import com.openclassrooms.realestatemanager.data.PointOfInterest
 import com.openclassrooms.realestatemanager.data.RealEstateType
-import com.openclassrooms.realestatemanager.data.form.CurrentPictureEntity
-import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
+import com.openclassrooms.realestatemanager.data.current_photo.CurrentPhotoEntity
+import com.openclassrooms.realestatemanager.data.current_photo.CurrentPhotoRepository
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateEntity
@@ -19,7 +19,7 @@ import javax.inject.Inject
 class SetFormUseCase @Inject constructor(
     private val formRepository: FormRepository,
     private val getCurrentEstateUseCase: GetCurrentEstateUseCase,
-    private val currentPictureRepository: CurrentPictureRepository,
+    private val currentPhotoRepository: CurrentPhotoRepository,
 ) {
 
     suspend fun initForm(formType: FormType) {
@@ -67,7 +67,7 @@ class SetFormUseCase @Inject constructor(
             bedroomCount = realEstate.info.bedroomCount,
             description = realEstate.info.description,
             pictureList = realEstate.photoList.map {
-                FormEntity.PictureEntity(uri = Uri.parse(it.uri), description = it.description)
+                FormEntity.PhotoEntity(uri = Uri.parse(it.uri), description = it.description)
             },
             pictureListError = null,
             streetName = realEstate.info.streetName,
@@ -175,10 +175,6 @@ class SetFormUseCase @Inject constructor(
         )
     }
 
-    fun updatePicturePosition(position: Int) {
-        formRepository.setCurrentPicturePosition(position)
-    }
-
     fun removePictureAt(position: Int) {
         modifyPictureList {
             removeAt(position)
@@ -191,40 +187,37 @@ class SetFormUseCase @Inject constructor(
 
     // CURRENT PICTURE
 
-    fun initPicture(uri: Uri, description: String = "") {
-        currentPictureRepository.setPicture(
-            CurrentPictureEntity(
-                uri = uri,
-                description = description,
+    fun initPhotoToEdit(index: Int, photo: FormEntity.PhotoEntity) {
+        currentPhotoRepository.setPhotoIndex(index)
+        currentPhotoRepository.initPhoto(
+            CurrentPhotoEntity(
+                uri = photo.uri,
+                isUriErrorVisible = false,
+                description = photo.description,
                 descriptionError = null,
             )
         )
     }
 
-    fun updatePictureDescription(description: String) {
-        currentPictureRepository.setPicture(
-            currentPictureRepository.getCurrentPicture()?.copy(description = description)
-        )
+    fun initPhotoToAdd() {
+        currentPhotoRepository.setPhotoIndex(CurrentPhotoRepository.ADD_PHOTO)
+        currentPhotoRepository.initPhoto(CurrentPhotoRepository.DEFAULT_PHOTO)
     }
 
-    fun resetPicture() {
-        currentPictureRepository.setPicture(null)
-    }
+    suspend fun savePicture() {
+        val currentPhoto = currentPhotoRepository.getCurrentPhotoFlow().first()
+        val photoIndex = currentPhotoRepository.getPhotoIndexFlow().first()
 
-    fun savePicture() {
-        val currentPicture = currentPictureRepository.getCurrentPicture() ?: return
-        val picturePosition = formRepository.getCurrentPicturePosition()
-
-        val picture = FormEntity.PictureEntity(
-            uri = currentPicture.uri,
-            description = currentPicture.description,
+        val photoToSave = FormEntity.PhotoEntity(
+            uri = currentPhoto.uri!!,
+            description = currentPhoto.description,
         )
 
         modifyPictureList {
-            if (formRepository.getForm().pictureList.size == picturePosition) {
-                add(picture)
+            if (photoIndex == CurrentPhotoRepository.ADD_PHOTO) {
+                add(photoToSave)
             } else {
-                set(picturePosition, picture)
+                set(photoIndex, photoToSave)
             }
         }
     }
@@ -314,7 +307,7 @@ class SetFormUseCase @Inject constructor(
         )
     }
 
-    private fun modifyPictureList(modification: MutableList<FormEntity.PictureEntity>.() -> Unit) {
+    private fun modifyPictureList(modification: MutableList<FormEntity.PhotoEntity>.() -> Unit) {
         val currentForm = formRepository.getForm()
 
         formRepository.setForm(
