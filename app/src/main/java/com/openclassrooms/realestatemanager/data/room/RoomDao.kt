@@ -47,15 +47,6 @@ interface RoomDao {
     @Query("SELECT * FROM AgentEntity")
     fun getAllAgents(): Flow<List<AgentEntity>>
 
-    @Query("SELECT EXISTS(SELECT * FROM EstateAgentCrossRef WHERE estateId = :estateId)")
-    fun estateWithAgent(estateId: Long): Boolean
-
     @Insert
     suspend fun insertAgent(agent: AgentEntity)
-
-    @Insert
-    suspend fun insertEstateAgentCrossRef(estateAgentCrossRef: EstateAgentCrossRef)
-
-    @Update
-    suspend fun updateEstateAgentCrossRef(estateAgentCrossRef: EstateAgentCrossRef)
 }

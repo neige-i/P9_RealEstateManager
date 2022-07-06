@@ -9,6 +9,7 @@ import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.data.UtilsRepository
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateRepository
+import com.openclassrooms.realestatemanager.data.room.AgentEntity
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
@@ -39,13 +40,10 @@ class EditSaleViewModel @Inject constructor(
 
         currentForm = form
 
-        val agentNames = agentList.map { it.username }
-
         SaleViewState(
-            agentEntries = agentNames,
-            selectedAgentName = agentNames.firstOrNull { it == form.agentName } ?: "",
-            marketEntryDate = form.marketEntryDate?.format(UtilsRepository.DATE_FORMATTER)
-                .orEmpty(),
+            allAgents = agentList,
+            selectedAgentName = form.agent?.username.orEmpty(),
+            marketEntryDate = form.marketEntryDate?.format(UtilsRepository.DATE_FORMATTER).orEmpty(),
             marketEntryDateError = form.marketEntryDateError,
             saleDate = form.saleDate?.format(UtilsRepository.DATE_FORMATTER).orEmpty(),
             saleDateError = form.saleDateError,
@@ -58,8 +56,8 @@ class EditSaleViewModel @Inject constructor(
 
     private lateinit var currentForm: FormEntity
 
-    fun onAgentSelected(agentName: String) {
-        setFormUseCase.updateAgent(agentName)
+    fun onAgentSelected(selectedAgent: AgentEntity) {
+        setFormUseCase.updateAgent(selectedAgent)
     }
 
     fun onMarketEntryDateClicked() {

@@ -8,6 +8,7 @@ import com.openclassrooms.realestatemanager.data.current_photo.CurrentPhotoRepos
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateEntity
+import com.openclassrooms.realestatemanager.data.room.AgentEntity
 import com.openclassrooms.realestatemanager.domain.form.FormType.ADD_ESTATE
 import com.openclassrooms.realestatemanager.domain.form.FormType.EDIT_ESTATE
 import com.openclassrooms.realestatemanager.domain.real_estate.GetCurrentEstateUseCase
@@ -82,7 +83,7 @@ class SetFormUseCase @Inject constructor(
             country = realEstate.info.country,
             countryError = null,
             pointsOfInterests = realEstate.poiList.map { it.poiValue },
-            agentName = realEstate.agent?.username.orEmpty(),
+            agent = realEstate.agent,
             marketEntryDate = realEstate.info.marketEntryDate,
             marketEntryDateError = null,
             saleDate = realEstate.info.saleDate,
@@ -278,9 +279,9 @@ class SetFormUseCase @Inject constructor(
 
     // SALE STATUS
 
-    fun updateAgent(agentName: String) {
+    fun updateAgent(agent: AgentEntity) {
         formRepository.setForm(
-            formRepository.getForm().copy(agentName = agentName)
+            formRepository.getForm().copy(agent = agent)
         )
     }
 

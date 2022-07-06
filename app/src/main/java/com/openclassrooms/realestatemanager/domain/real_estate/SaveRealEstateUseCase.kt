@@ -3,7 +3,6 @@ package com.openclassrooms.realestatemanager.domain.real_estate
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateRepository
-import com.openclassrooms.realestatemanager.data.room.EstateAgentCrossRef
 import com.openclassrooms.realestatemanager.data.room.EstateEntity
 import com.openclassrooms.realestatemanager.data.room.EstatePoiCrossRef
 import com.openclassrooms.realestatemanager.data.room.PhotoEntity
@@ -32,6 +31,7 @@ class SaveRealEstateUseCase @Inject constructor(
             state = form.state,
             zipcode = form.zipcode,
             country = form.country,
+            agentInChargeId = form.agent?.agentId,
             marketEntryDate = form.marketEntryDate!!,
             saleDate = form.saleDate,
         )
@@ -63,30 +63,9 @@ class SaveRealEstateUseCase @Inject constructor(
                 )
             )
         }
-        if (form.agentName.isNotEmpty()) {
-            realEstateRepository.addEstateAgentRef(
-                EstateAgentCrossRef(
-                    estateId = newlyCreatedEstateId,
-                    username = form.agentName
-                )
-            )
-        }
     }
 
     private suspend fun editData(editedEstate: EstateEntity, form: FormEntity) {
         realEstateRepository.setEstate(editedEstate)
-
-        val estateAgentCrossRef = EstateAgentCrossRef(
-            estateId = editedEstate.estateId,
-            username = form.agentName
-        )
-
-        if (form.agentName.isNotEmpty()) {
-            if (realEstateRepository.isEstateTakenCareByAgent(editedEstate.estateId)) {
-                realEstateRepository.setEstateAgentRef(estateAgentCrossRef)
-            } else {
-                realEstateRepository.addEstateAgentRef(estateAgentCrossRef)
-            }
-        }
     }
 }

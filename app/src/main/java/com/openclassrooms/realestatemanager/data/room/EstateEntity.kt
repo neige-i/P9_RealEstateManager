@@ -22,6 +22,7 @@ data class EstateEntity(
     val state: String,
     val zipcode: String,
     val country: String,
+    val agentInChargeId: Long?,
     @ColumnInfo(name = "market_entry_date") val marketEntryDate: LocalDate,
     @ColumnInfo(name = "sale_date") val saleDate: LocalDate?,
 )

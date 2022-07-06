@@ -33,7 +33,7 @@ class FormRepository @Inject constructor() {
             country = "",
             countryError = null,
             pointsOfInterests = emptyList(),
-            agentName = "",
+            agent = null,
             marketEntryDate = null,
             marketEntryDateError = null,
             saleDate = null,

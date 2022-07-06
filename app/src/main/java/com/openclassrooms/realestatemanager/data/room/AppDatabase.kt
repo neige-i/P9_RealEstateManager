@@ -11,7 +11,6 @@ import androidx.room.TypeConverters
         PoiEntity::class,
         EstatePoiCrossRef::class,
         AgentEntity::class,
-        EstateAgentCrossRef::class,
     ],
     version = 1,
     exportSchema = false

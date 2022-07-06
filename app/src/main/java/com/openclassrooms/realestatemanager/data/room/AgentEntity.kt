@@ -7,4 +7,6 @@ import androidx.room.PrimaryKey
 data class AgentEntity(
     @PrimaryKey(autoGenerate = true) val agentId: Long = 0,
     val username: String,
-)
+) {
+    override fun toString(): String = username
+}

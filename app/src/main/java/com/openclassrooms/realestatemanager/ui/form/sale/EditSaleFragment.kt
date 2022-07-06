@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.openclassrooms.realestatemanager.R
+import com.openclassrooms.realestatemanager.data.room.AgentEntity
 import com.openclassrooms.realestatemanager.databinding.FragmentEditSaleBinding
 import com.openclassrooms.realestatemanager.ui.util.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,7 +24,7 @@ class EditSaleFragment : Fragment(R.layout.fragment_edit_sale) {
         val viewModel = ViewModelProvider(this).get(EditSaleViewModel::class.java)
 
         binding.saleAgentInput.setOnItemClickListener { parent, _, position, _ ->
-            viewModel.onAgentSelected(parent.getItemAtPosition(position).toString())
+            viewModel.onAgentSelected(parent.getItemAtPosition(position) as AgentEntity)
         }
         binding.saleSwitch.setOnCheckedChangeListener { _, isChecked ->
             viewModel.onAvailabilitySwitched(isChecked)
@@ -37,7 +38,7 @@ class EditSaleFragment : Fragment(R.layout.fragment_edit_sale) {
                 ArrayAdapter(
                     requireContext(),
                     android.R.layout.simple_list_item_1,
-                    it.agentEntries
+                    it.allAgents
                 )
             )
 

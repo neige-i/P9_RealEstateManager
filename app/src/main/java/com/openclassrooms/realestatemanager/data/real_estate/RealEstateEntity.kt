@@ -19,9 +19,8 @@ data class RealEstateEntity(
     )
     val poiList: List<PoiEntity>,
     @Relation(
-        parentColumn = "estateId",
-        entityColumn = "username",
-        associateBy = Junction(EstateAgentCrossRef::class)
+        parentColumn = "agentInChargeId",
+        entityColumn = "agentId",
     )
     val agent: AgentEntity?,
 )

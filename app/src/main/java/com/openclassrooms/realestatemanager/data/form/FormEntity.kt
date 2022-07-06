@@ -3,6 +3,7 @@ package com.openclassrooms.realestatemanager.data.form
 import android.net.Uri
 import com.openclassrooms.realestatemanager.data.PointOfInterest
 import com.openclassrooms.realestatemanager.data.RealEstateType
+import com.openclassrooms.realestatemanager.data.room.AgentEntity
 import java.time.LocalDate
 
 data class FormEntity(
@@ -29,7 +30,7 @@ data class FormEntity(
     val country: String,
     val countryError: String?,
     val pointsOfInterests: List<PointOfInterest>,
-    val agentName: String,
+    val agent: AgentEntity?,
     val marketEntryDate: LocalDate?,
     val marketEntryDateError: String?,
     val saleDate: LocalDate?,
