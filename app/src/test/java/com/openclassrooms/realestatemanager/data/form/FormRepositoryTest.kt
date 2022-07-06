@@ -17,7 +17,7 @@ class FormRepositoryTest {
         private val DEFAULT_URI = mockk<Uri>()
         private val DEFAULT_PICTURE = FormEntity.PictureEntity(DEFAULT_URI, "Lounge")
         private val TEST_FORM = FormEntity(
-            type = "MANSION",
+            estateType = "MANSION",
             typeError = "Wrong type",
             price = "345200",
             priceCursor = 4,
@@ -144,7 +144,7 @@ class FormRepositoryTest {
 
         // THEN
         assertEquals(
-            TEST_FORM.copy(type = "BIG HOUSE"),
+            TEST_FORM.copy(estateType = "BIG HOUSE"),
             currentForm
         )
     }

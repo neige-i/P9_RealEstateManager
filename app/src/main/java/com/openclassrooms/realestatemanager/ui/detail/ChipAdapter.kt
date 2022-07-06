@@ -16,8 +16,7 @@ class ChipAdapter : ListAdapter<Int, ChipAdapter.ChipViewHolder>(ChipDiffUtil())
         holder.bind(getItem(position))
     }
 
-    class ChipViewHolder(private val binding: ItemChipBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class ChipViewHolder(private val binding: ItemChipBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(labelId: Int) {
             binding.root.setText(labelId)
@@ -26,8 +25,12 @@ class ChipAdapter : ListAdapter<Int, ChipAdapter.ChipViewHolder>(ChipDiffUtil())
 
     class ChipDiffUtil : DiffUtil.ItemCallback<Int>() {
 
-        override fun areItemsTheSame(oldItem: Int, newItem: Int): Boolean = oldItem == newItem
+        override fun areItemsTheSame(oldItem: Int, newItem: Int): Boolean {
+            return oldItem == newItem
+        }
 
-        override fun areContentsTheSame(oldItem: Int, newItem: Int): Boolean = oldItem == newItem
+        override fun areContentsTheSame(oldItem: Int, newItem: Int): Boolean {
+            return oldItem == newItem
+        }
     }
 }

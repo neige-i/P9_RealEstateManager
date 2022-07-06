@@ -1,61 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:foreground="?selectableItemBackground"
     >
 
-    <ImageView
-        android:id="@+id/estate_photo_img"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:contentDescription="@string/real_estate_photo"
-        android:scaleType="centerCrop"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent=".3"
-        tools:src="@drawable/ic_photo"
-        />
-
-    <TextView
-        android:id="@+id/estate_type_txt"
-        android:layout_width="wrap_content"
+    <!--
+        The ConstraintLayout's background is set programmatically.
+        It is possible to add a ripple effect on the foreground but this property is only available
+        for API 23+, unless used with a FrameLayout.
+    -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:textColor="@android:color/black"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/estate_city_txt"
-        app:layout_constraintStart_toEndOf="@id/estate_photo_img"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Flat"
-        />
+        >
 
-    <TextView
-        android:id="@+id/estate_city_txt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        app:layout_constraintBottom_toTopOf="@id/estate_price_txt"
-        app:layout_constraintStart_toEndOf="@id/estate_photo_img"
-        app:layout_constraintTop_toBottomOf="@id/estate_type_txt"
-        tools:text="Manhattan"
-        />
+        <ImageView
+            android:id="@+id/estate_photo_img"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/real_estate_photo"
+            android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent=".3"
+            tools:src="@drawable/ic_photo"
+            />
 
-    <TextView
-        android:id="@+id/estate_price_txt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:textColor="@color/colorAccent"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/estate_photo_img"
-        app:layout_constraintTop_toBottomOf="@id/estate_city_txt"
-        tools:text="$17,870,000"
-        />
+        <TextView
+            android:id="@+id/estate_type_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/estate_city_txt"
+            app:layout_constraintStart_toEndOf="@id/estate_photo_img"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Flat"
+            />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/estate_city_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            app:layout_constraintBottom_toTopOf="@id/estate_price_txt"
+            app:layout_constraintStart_toEndOf="@id/estate_photo_img"
+            app:layout_constraintTop_toBottomOf="@id/estate_type_txt"
+            tools:text="Manhattan"
+            />
+
+        <TextView
+            android:id="@+id/estate_price_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/colorAccent"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/estate_photo_img"
+            app:layout_constraintTop_toBottomOf="@id/estate_city_txt"
+            tools:text="$17,870,000"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

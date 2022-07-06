@@ -2,6 +2,7 @@ package com.openclassrooms.realestatemanager.ui.filter.slider
 
 import android.util.Range
 import androidx.annotation.StringRes
+import com.openclassrooms.realestatemanager.ui.util.LocalText
 
 data class SliderViewState(
     val style: Style,
@@ -11,7 +12,7 @@ data class SliderViewState(
 
     data class Style(
         @StringRes val dialogTitle: Int,
-        val label: String,
+        val label: LocalText,
         val step: Float,
     )
 }

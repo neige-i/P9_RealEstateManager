@@ -1,18 +1,18 @@
 package com.openclassrooms.realestatemanager.ui.form
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openclassrooms.realestatemanager.R
-import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
+import com.openclassrooms.realestatemanager.data.current_photo.CurrentPhotoRepository
 import com.openclassrooms.realestatemanager.domain.form.CheckFormErrorUseCase
 import com.openclassrooms.realestatemanager.domain.form.FormType
 import com.openclassrooms.realestatemanager.domain.form.GetFormUseCase
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.SaveRealEstateUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
+import com.openclassrooms.realestatemanager.ui.util.LocalText
 import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -22,12 +22,11 @@ import javax.inject.Inject
 @HiltViewModel
 class FormViewModel @Inject constructor(
     private val getFormUseCase: GetFormUseCase,
-    currentPictureRepository: CurrentPictureRepository,
+    currentPhotoRepository: CurrentPhotoRepository,
     private val checkFormErrorUseCase: CheckFormErrorUseCase,
     private val setFormUseCase: SetFormUseCase,
     private val saveRealEstateUseCase: SaveRealEstateUseCase,
     private val coroutineProvider: CoroutineProvider,
-    private val application: Application,
 ) : ViewModel() {
 
     private val viewStateMutableLiveData = MutableLiveData<FormViewState>()
@@ -42,10 +41,10 @@ class FormViewModel @Inject constructor(
         checkExistingDraft()
 
         viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            currentPictureRepository.getPictureFlow().collect {
+            currentPhotoRepository.getPhotoIndexFlow().collect {
 
                 withContext(coroutineProvider.getMainDispatcher()) {
-                    formSingleLiveEvent.value = FormEvent.ShowPicture
+                    formSingleLiveEvent.value = FormEvent.ShowPhoto
                 }
             }
         }
@@ -56,14 +55,14 @@ class FormViewModel @Inject constructor(
             getFormUseCase.getFormInfo().isModified
         ) {
             formSingleLiveEvent.value = FormEvent.ShowDialog(
-                type = DialogType.SAVE_DRAFT,
-                title = application.getString(R.string.draft_form_dialog_title),
-                message = application.getString(
-                    R.string.draft_form_dialog_message,
-                    getFormUseCase.getFormInfo().estateType
+                dialogType = DialogType.SAVE_DRAFT,
+                title = R.string.draft_form_dialog_title,
+                message = LocalText.ResWithRes(
+                    stringId = R.string.draft_form_dialog_message,
+                    resArgs = listOf(getFormUseCase.getFormInfo().estateType!!.labelId),
                 ),
-                positiveButtonText = application.getString(R.string.draft_form_dialog_positive_button),
-                negativeButtonText = application.getString(R.string.draft_form_dialog_negative_button)
+                positiveButtonText = R.string.draft_form_dialog_positive_button,
+                negativeButtonText = R.string.draft_form_dialog_negative_button,
             )
         }
     }
@@ -75,41 +74,40 @@ class FormViewModel @Inject constructor(
     fun onPageChanged(position: Int) {
         currentPage = position
 
-        val addOrEdit = application.getString(
-            when (getFormUseCase.getFormInfo().formType) {
+        val firstTitlePart = LocalText.Res(
+            stringId = when (getFormUseCase.getFormInfo().formType) {
                 FormType.ADD_ESTATE -> R.string.toolbar_title_add
                 FormType.EDIT_ESTATE -> R.string.toolbar_title_edit
             }
         )
+        val secondTitlePart = LocalText.Simple(content = " (${currentPage + 1}/$pageCount)")
 
         viewStateMutableLiveData.value = FormViewState(
-            toolbarTitle = "$addOrEdit (${currentPage + 1}/$pageCount)",
-            submitButtonText = if (isLastPageDisplayed()) {
-                application.getString(R.string.button_text_save)
-            } else {
-                application.getString(R.string.button_text_next)
-            }
+            toolbarTitle = LocalText.Multi(texts = listOf(firstTitlePart, secondTitlePart)),
+            submitButtonText = if (isLastPageDisplayed()) R.string.button_text_save else R.string.button_text_next,
         )
     }
 
     fun onSubmitButtonClicked() {
-        if (checkFormErrorUseCase.containsNoError(pageToCheck = currentPage)) {
-            if (isLastPageDisplayed()) {
-                onFormCompleted()
-            } else {
-                formSingleLiveEvent.value = FormEvent.GoToPage(currentPage + 1)
+        viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
+            if (checkFormErrorUseCase.containsNoError(pageToCheck = currentPage)) {
+                if (isLastPageDisplayed()) {
+                    onFormCompleted()
+                } else {
+                    withContext(coroutineProvider.getMainDispatcher()) {
+                        formSingleLiveEvent.value = FormEvent.GoToPage(currentPage + 1)
+                    }
+                }
             }
         }
     }
 
-    private fun onFormCompleted() {
-        viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
-            saveRealEstateUseCase.invoke()
-            setFormUseCase.reset()
+    private suspend fun onFormCompleted() {
+        saveRealEstateUseCase()
+        setFormUseCase.reset()
 
-            withContext(coroutineProvider.getMainDispatcher()) {
-                formSingleLiveEvent.value = FormEvent.ExitActivity
-            }
+        withContext(coroutineProvider.getMainDispatcher()) {
+            formSingleLiveEvent.value = FormEvent.ExitActivity
         }
     }
 
@@ -128,14 +126,16 @@ class FormViewModel @Inject constructor(
     private fun confirmExit() {
         if (getFormUseCase.getFormInfo().isModified) {
             formSingleLiveEvent.value = FormEvent.ShowDialog(
-                type = DialogType.EXIT_FORM,
-                title = application.getString(R.string.exit_form_dialog_title),
-                message = when (getFormUseCase.getFormInfo().formType) {
-                    FormType.ADD_ESTATE -> application.getString(R.string.exit_add_form_dialog_message)
-                    FormType.EDIT_ESTATE -> application.getString(R.string.exit_edit_form_dialog_message)
-                },
-                positiveButtonText = application.getString(R.string.exit_form_dialog_positive_button),
-                negativeButtonText = application.getString(R.string.exit_form_dialog_negative_button)
+                dialogType = DialogType.EXIT_FORM,
+                title = R.string.exit_form_dialog_title,
+                message = LocalText.Res(
+                    stringId = when (getFormUseCase.getFormInfo().formType) {
+                        FormType.ADD_ESTATE -> R.string.exit_add_form_dialog_message
+                        FormType.EDIT_ESTATE -> R.string.exit_edit_form_dialog_message
+                    }
+                ),
+                positiveButtonText = R.string.exit_form_dialog_positive_button,
+                negativeButtonText = R.string.exit_form_dialog_negative_button,
             )
         } else {
             setFormUseCase.reset()
@@ -145,10 +145,15 @@ class FormViewModel @Inject constructor(
 
     fun onDialogPositiveButtonClicked(type: DialogType) {
         when (type) {
-            DialogType.EXIT_FORM -> if (checkFormErrorUseCase.containsNoError(pageToCheck = 0)) {
-                formSingleLiveEvent.value = FormEvent.ExitActivity
+            DialogType.EXIT_FORM -> viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
+                if (checkFormErrorUseCase.containsNoError(pageToCheck = 0)) {
+                    withContext(coroutineProvider.getMainDispatcher()) {
+                        formSingleLiveEvent.value = FormEvent.ExitActivity
+                    }
+                }
             }
             DialogType.SAVE_DRAFT -> {}
+
         }
     }
 

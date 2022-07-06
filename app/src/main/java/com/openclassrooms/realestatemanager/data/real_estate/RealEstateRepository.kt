@@ -49,14 +49,4 @@ class RealEstateRepository @Inject constructor(
     // ----------
 
     fun getAllAgents(): Flow<List<AgentEntity>> = roomDao.getAllAgents()
-
-    fun isEstateTakenCareByAgent(estateId: Long): Boolean = roomDao.estateWithAgent(estateId)
-
-    suspend fun addEstateAgentRef(estateAgentRef: EstateAgentCrossRef) {
-        roomDao.insertEstateAgentCrossRef(estateAgentRef)
-    }
-
-    suspend fun setEstateAgentRef(estateAgentRef: EstateAgentCrossRef) {
-        roomDao.updateEstateAgentCrossRef(estateAgentRef)
-    }
 }

@@ -1,9 +1,10 @@
 package com.openclassrooms.realestatemanager.data.room
 
 import androidx.room.Entity
+import com.openclassrooms.realestatemanager.data.PointOfInterest
 
-@Entity(primaryKeys = ["realEstateId", "poiValue"])
+@Entity(primaryKeys = ["estateId", "poiValue"])
 data class EstatePoiCrossRef(
-    val realEstateId: Long,
-    val poiValue: String,
+    val estateId: Long,
+    val poiValue: PointOfInterest,
 )

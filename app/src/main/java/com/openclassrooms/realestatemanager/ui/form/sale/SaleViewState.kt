@@ -1,7 +1,9 @@
 package com.openclassrooms.realestatemanager.ui.form.sale
 
+import com.openclassrooms.realestatemanager.data.room.AgentEntity
+
 data class SaleViewState(
-    val agentEntries: List<String>,
+    val allAgents: List<AgentEntity>,
     val selectedAgentName: String,
     val marketEntryDate: String,
     val marketEntryDateError: String?,

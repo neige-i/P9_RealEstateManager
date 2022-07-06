@@ -4,18 +4,19 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
 import com.openclassrooms.realestatemanager.R
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding
 import com.openclassrooms.realestatemanager.ui.detail.DetailFragment
-import com.openclassrooms.realestatemanager.ui.filter.date.DateFilterDialog
+import com.openclassrooms.realestatemanager.ui.filter.FilterDialog
 import com.openclassrooms.realestatemanager.ui.filter.checklist.CheckListFilterDialog
+import com.openclassrooms.realestatemanager.ui.filter.date.DateFilterDialog
 import com.openclassrooms.realestatemanager.ui.filter.slider.SliderFilterDialog
 import com.openclassrooms.realestatemanager.ui.form.FormActivity
 import com.openclassrooms.realestatemanager.ui.main.MainEvent.*
+import com.openclassrooms.realestatemanager.ui.util.setNavigationIcon
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -31,29 +32,36 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
-        // Do not set support Actionbar when inflate menu from the Toolbar
-        // Otherwise MenuItems won't be displayed
+        /*
+            This activity contains a MenuItem which visibility is modified.
+            The modification occurs while observing the ViewModel's view state.
+            To better access the MenuItem instance, the menu is not inflated by the activity as usual but by the toolbar.
+            In this scenario, Activity.setSupportActionBar() should not be called, otherwise MenuItems won't be displayed.
+         */
 
-        filterBinding.filterToolbar.setNavigationOnClickListener { onBackPressed() }
-        filterBinding.filterToolbar.inflateMenu(R.menu.menu_main)
-        filterBinding.filterToolbar.menu
-            .findItem(R.id.main_menu_add_estate)
-            .setOnMenuItemClickListener {
-                viewModel.onAddMenuItemClicked()
-                true
+        filterBinding.filterToolbar.apply {
+            setNavigationOnClickListener { onBackPressed() }
+            inflateMenu(R.menu.menu_main)
+            setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.main_menu_add_estate -> {
+                        viewModel.onAddMenuItemClicked()
+                        true
+                    }
+                    R.id.main_menu_edit_estate -> {
+                        viewModel.onEditMenuItemClicked()
+                        true
+                    }
+                    R.id.main_menu_filter_estate -> {
+                        viewModel.onFilterMenuItemClicked()
+                        true
+                    }
+                    else -> false
+                }
             }
-        val editMenuItem = filterBinding.filterToolbar.menu
-            .findItem(R.id.main_menu_edit_estate)
-            .setOnMenuItemClickListener {
-                viewModel.onEditMenuItemClicked()
-                true
-            }
-        filterBinding.filterToolbar.menu
-            .findItem(R.id.main_menu_filter_estate)
-            .setOnMenuItemClickListener {
-                viewModel.onFilterMenuItemClicked()
-                true
-            }
+        }
+
+        val editMenuItem = filterBinding.filterToolbar.menu.findItem(R.id.main_menu_edit_estate)
 
         val filterAdapter = FilterAdapter()
         filterBinding.filterList.adapter = filterAdapter
@@ -63,16 +71,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         viewModel.viewStateLiveData.observe(this) { mainViewState ->
-            filterBinding.filterToolbar.title = mainViewState.toolbarTitle
-            filterBinding.filterToolbar.navigationIcon =
-                if (mainViewState.navigationIconId != null) {
-                    ContextCompat.getDrawable(this, mainViewState.navigationIconId)
-                } else {
-                    null
-                }
+            val viewStateToolbar = mainViewState.toolbar
+
+            filterBinding.filterToolbar.apply {
+                setTitle(viewStateToolbar.title)
+                setNavigationIcon(viewStateToolbar.navIcon)
+            }
+
             editMenuItem?.isVisible = mainViewState.isEditMenuItemVisible
 
-            filterBinding.filterList.isVisible = mainViewState.isFiltering
+            filterBinding.filterList.isVisible = viewStateToolbar.isFilterLayoutVisible
             filterAdapter.submitList(mainViewState.chips)
         }
 
@@ -80,21 +88,21 @@ class MainActivity : AppCompatActivity() {
             when (mainEvent) {
                 is OpenEstateDetail -> supportFragmentManager.commit {
                     setReorderingAllowed(true)
-                    replace<DetailFragment>(R.id.main_content)
+                    replace<DetailFragment>(R.id.unique_content)
                     addToBackStack(null)
                 }
                 is OpenEstateForm -> startActivity(Intent(this, FormActivity::class.java))
-                is ShowSliderFilterSettings -> {
-                    SliderFilterDialog.newInstance(mainEvent.filterType, mainEvent.filterValue).show(supportFragmentManager, null)
-                }
-                is ShowCheckListFilterSettings -> {
-                    CheckListFilterDialog.newInstance(mainEvent.filterType, mainEvent.filterValue).show(supportFragmentManager, null)
-                }
-                is ShowDateFilterSettings -> {
-                    DateFilterDialog.newInstance(mainEvent.filterType, mainEvent.filterValue).show(supportFragmentManager, null)
-                }
+                is OpenSliderFilterForm -> showFilterDialog<SliderFilterDialog>(mainEvent)
+                is OpenCheckListFilterForm -> showFilterDialog<CheckListFilterDialog>(mainEvent)
+                is OpenDateFilterForm -> showFilterDialog<DateFilterDialog>(mainEvent)
             }
         }
+    }
+
+    private inline fun <reified FD : FilterDialog> showFilterDialog(openFilterFormEvent: OpenFilterForm) {
+        FilterDialog
+            .newInstance(FD::class, openFilterFormEvent.filterType, openFilterFormEvent.filterValue)
+            .show(supportFragmentManager, null)
     }
 
     override fun onResume() {

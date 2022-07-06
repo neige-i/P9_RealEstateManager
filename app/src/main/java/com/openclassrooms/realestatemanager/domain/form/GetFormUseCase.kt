@@ -22,7 +22,7 @@ class GetFormUseCase @Inject constructor(
                 FormType.EDIT_ESTATE
             },
             isModified = currentState != initialState,
-            estateType = currentState.type
+            estateType = currentState.estateType
         )
     }
 }

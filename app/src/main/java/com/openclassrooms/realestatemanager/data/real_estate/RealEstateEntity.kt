@@ -8,20 +8,19 @@ import com.openclassrooms.realestatemanager.data.room.*
 data class RealEstateEntity(
     @Embedded val info: EstateEntity,
     @Relation(
-        parentColumn = "realEstateId",
+        parentColumn = "estateId",
         entityColumn = "estateId"
     )
     val photoList: List<PhotoEntity>,
     @Relation(
-        parentColumn = "realEstateId",
+        parentColumn = "estateId",
         entityColumn = "poiValue",
         associateBy = Junction(EstatePoiCrossRef::class)
     )
     val poiList: List<PoiEntity>,
     @Relation(
-        parentColumn = "realEstateId",
-        entityColumn = "username",
-        associateBy = Junction(EstateAgentCrossRef::class)
+        parentColumn = "agentInChargeId",
+        entityColumn = "agentId",
     )
     val agent: AgentEntity?,
 )

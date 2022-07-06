@@ -23,55 +23,52 @@ class EditAddressViewModel @Inject constructor(
         AddressViewState(
             streetNumber = form.streetName,
             streetNumberError = form.streetNameError,
-            streetNumberSelection = form.streetNameCursor,
             additionalInfo = form.additionalAddressInfo,
-            additionalInfoSelection = form.additionalAddressInfoCursor,
             city = form.city,
             cityError = form.cityError,
-            citySelection = form.cityCursor,
             state = form.state,
             stateError = form.stateError,
-            stateSelection = form.stateCursor,
             zipcode = form.zipcode,
             zipcodeError = form.zipcodeError,
-            zipcodeSelection = form.zipcodeCursor,
             country = form.country,
             countryError = form.countryError,
-            countrySelection = form.countryCursor,
             pointOfInterestList = PointOfInterest.values().map { poi ->
                 AddressViewState.ChipViewState(
                     labelId = poi.labelId,
-                    isSelected = form.pointsOfInterests.contains(poi.labelId)
+                    isSelected = form.pointsOfInterests.contains(poi)
                 )
             }
         )
     }.asLiveData(coroutineProvider.getIoDispatcher())
 
-    fun onStreetNameChanged(streetName: String?, cursorPosition: Int) {
-        setFormUseCase.updateStreetName(streetName ?: "", cursorPosition)
+    fun onStreetNameChanged(streetName: String?) {
+        setFormUseCase.updateStreetName(streetName ?: "")
     }
 
-    fun onAdditionalAddressInfoChanged(additionalAddressInfo: String?, cursorPosition: Int) {
-        setFormUseCase.updateAdditionalAddressInfo(additionalAddressInfo ?: "", cursorPosition)
+    fun onAdditionalAddressInfoChanged(additionalAddressInfo: String?) {
+        setFormUseCase.updateAdditionalAddressInfo(additionalAddressInfo ?: "")
     }
 
-    fun onCityChanged(city: String?, cursorPosition: Int) {
-        setFormUseCase.updateCity(city ?: "", cursorPosition)
+    fun onCityChanged(city: String?) {
+        setFormUseCase.updateCity(city ?: "")
     }
 
-    fun onStateNameChanged(state: String?, cursorPosition: Int) {
-        setFormUseCase.updateState(state ?: "", cursorPosition)
+    fun onStateNameChanged(state: String?) {
+        setFormUseCase.updateState(state ?: "")
     }
 
-    fun onZipcodeChanged(zipcode: String?, cursorPosition: Int) {
-        setFormUseCase.updateZipcode(zipcode ?: "", cursorPosition)
+    fun onZipcodeChanged(zipcode: String?) {
+        setFormUseCase.updateZipcode(zipcode ?: "")
     }
 
-    fun onCountryChanged(country: String?, cursorPosition: Int) {
-        setFormUseCase.updateCountry(country ?: "", cursorPosition)
+    fun onCountryChanged(country: String?) {
+        setFormUseCase.updateCountry(country ?: "")
     }
 
     fun onPoiChecked(@StringRes labelId: Int, isChecked: Boolean) {
-        setFormUseCase.updatePoi(labelId, isChecked)
+        val checkedPoi = PointOfInterest.values().first { poi ->
+            poi.labelId == labelId
+        }
+        setFormUseCase.updatePoi(checkedPoi, isChecked)
     }
 }

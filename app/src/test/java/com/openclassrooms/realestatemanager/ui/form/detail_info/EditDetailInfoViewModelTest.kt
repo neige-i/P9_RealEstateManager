@@ -127,7 +127,7 @@ class EditDetailInfoViewModelTest {
     @Test
     fun `update description when change input with non-null content`() {
         // WHEN
-        editDetailInfoViewModel.onDescriptionChanged("This is a big house", 3)
+        editDetailInfoViewModel.onDescriptionChanged("This is a big house")
 
         // THEN
         verify(exactly = 1) { mockSetFormUseCase.updateDescription("This is a big house", 3) }
@@ -136,7 +136,7 @@ class EditDetailInfoViewModelTest {
     @Test
     fun `update description when change input with null content`() {
         // WHEN
-        editDetailInfoViewModel.onDescriptionChanged(null, 3)
+        editDetailInfoViewModel.onDescriptionChanged(null)
 
         // THEN
         verify(exactly = 1) { mockSetFormUseCase.updateDescription("", 3) }

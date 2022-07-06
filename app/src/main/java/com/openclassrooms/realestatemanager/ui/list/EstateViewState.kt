@@ -1,14 +1,17 @@
 package com.openclassrooms.realestatemanager.ui.list
 
 import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
+import com.openclassrooms.realestatemanager.ui.util.LocalText
 
 data class EstateViewState(
     val id: Long,
     val photoUrl: String,
-    val type: String,
+    @StringRes val type: Int,
     val city: String,
-    val price: String,
+    val price: LocalText,
     val style: Style,
+    val onClicked: () -> Unit,
 ) {
 
     data class Style(

@@ -1,29 +1,25 @@
 package com.openclassrooms.realestatemanager.ui.list
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.openclassrooms.realestatemanager.R
-import com.openclassrooms.realestatemanager.data.RealEstateType
 import com.openclassrooms.realestatemanager.data.ResourcesRepository
 import com.openclassrooms.realestatemanager.data.real_estate.CurrentEstateRepository
-import com.openclassrooms.realestatemanager.data.real_estate.RealEstateRepository
 import com.openclassrooms.realestatemanager.domain.filter.GetFilteredEstatesUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
+import com.openclassrooms.realestatemanager.ui.util.LocalText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import java.text.NumberFormat
 import javax.inject.Inject
 
 @HiltViewModel
-class EstatesViewModel @Inject constructor(
-//    realEstateRepository: RealEstateRepository,
+class ListViewModel @Inject constructor(
     getFilteredEstatesUseCase: GetFilteredEstatesUseCase,
-    private val currentEstateRepository: CurrentEstateRepository,
+    currentEstateRepository: CurrentEstateRepository,
     resourcesRepository: ResourcesRepository,
     coroutineProvider: CoroutineProvider,
-    application: Application,
     numberFormat: NumberFormat,
 ) : ViewModel() {
 
@@ -34,15 +30,19 @@ class EstatesViewModel @Inject constructor(
     ) { filteredEstates, currentEstateId, isTablet ->
 
         filteredEstates.map { realEstate ->
+            val estateId = realEstate.info.estateId
+
             EstateViewState(
-                id = realEstate.info.realEstateId,
+                id = estateId,
                 photoUrl = realEstate.photoList.first().uri,
-                type = application.getString(RealEstateType.valueOf(realEstate.info.type).labelId),
+                type = realEstate.info.type.labelId,
                 city = realEstate.info.city,
-                price = realEstate.info.price?.let { price ->
-                    application.getString(R.string.price_in_dollars, numberFormat.format(price))
-                } ?: application.getString(R.string.undefined_price),
-                style = if (currentEstateId == realEstate.info.realEstateId && isTablet) {
+                price = if (realEstate.info.price != null) {
+                    LocalText.ResWithArgs(stringId = R.string.price_in_dollars, args = listOf(numberFormat.format(realEstate.info.price)))
+                } else {
+                    LocalText.Res(stringId = R.string.undefined_price)
+                },
+                style = if (currentEstateId == estateId && isTablet) {
                     EstateViewState.Style(
                         backgroundColor = R.color.colorAccent,
                         priceTextColor = android.R.color.white,
@@ -55,11 +55,8 @@ class EstatesViewModel @Inject constructor(
                         cityTextColor = android.R.color.tab_indicator_text,
                     )
                 },
+                onClicked = { currentEstateRepository.setId(estateId) }
             )
         }
     }.asLiveData(coroutineProvider.getIoDispatcher())
-
-    fun onEstateClicked(estateId: Long) {
-        currentEstateRepository.setId(estateId)
-    }
 }

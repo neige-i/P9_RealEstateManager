@@ -1,6 +1,5 @@
 package com.openclassrooms.realestatemanager.ui.main
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -16,6 +15,7 @@ import com.openclassrooms.realestatemanager.data.real_estate.CurrentEstateReposi
 import com.openclassrooms.realestatemanager.domain.form.FormType
 import com.openclassrooms.realestatemanager.domain.form.SetFormUseCase
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
+import com.openclassrooms.realestatemanager.ui.util.LocalText
 import com.openclassrooms.realestatemanager.ui.util.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +32,6 @@ class MainViewModel @Inject constructor(
     private val setFormUseCase: SetFormUseCase,
     private val resourcesRepository: ResourcesRepository,
     private val coroutineProvider: CoroutineProvider,
-    private val application: Application,
 ) : ViewModel() {
 
     companion object {
@@ -57,46 +56,53 @@ class MainViewModel @Inject constructor(
         filterRepository.getAppliedFiltersFlow(),
     ) { currentEstateId, backStackEntryCount, isFiltering, isTablet, appliedFilters ->
 
+        val isEstateSelected = currentEstateId != null
+        val isDetailInPortrait = !isTablet && backStackEntryCount == 1
+
         // Set when to open the estate details
-        withContext(coroutineProvider.getMainDispatcher()) {
-            if (currentEstateId != null && !isTablet && backStackEntryCount == 0) {
+        if (isEstateSelected && !isTablet && backStackEntryCount == 0) {
+            withContext(coroutineProvider.getMainDispatcher()) {
                 mainSingleLiveEvent.value = MainEvent.OpenEstateDetail
             }
         }
 
-        val isDetailInPortrait = !isTablet && backStackEntryCount == 1
-
         MainViewState(
-            toolbarTitle = if (isDetailInPortrait) {
-                application.getString(R.string.toolbar_title_detail)
+            toolbar = if (isDetailInPortrait) {
+                MainViewState.Toolbar(
+                    title = R.string.toolbar_title_detail,
+                    navIcon = R.drawable.ic_arrow_back,
+                    isFilterLayoutVisible = false,
+                )
             } else {
-                application.getString(R.string.app_name)
+                MainViewState.Toolbar(
+                    title = R.string.app_name,
+                    navIcon = null,
+                    isFilterLayoutVisible = isFiltering,
+                )
             },
-            navigationIconId = if (isDetailInPortrait) R.drawable.ic_arrow_back else null,
-            isEditMenuItemVisible = currentEstateId != null,
-            isFiltering = isFiltering && !isDetailInPortrait,
+            isEditMenuItemVisible = isEstateSelected,
             chips = ALL_FILTER_TYPES.map { filterType ->
                 val filterValue = appliedFilters[filterType]
 
-                MainViewState.ChipViewState(
+                FilterChipViewState(
                     style = if (filterValue != null) {
-                        MainViewState.ChipViewState.Style(
+                        FilterChipViewState.Style(
                             text = getSelectedChipLabel(filterValue),
                             backgroundColor = R.color.colorAccent,
                             isCloseIconVisible = true,
                         )
                     } else {
-                        MainViewState.ChipViewState.Style(
+                        FilterChipViewState.Style(
                             text = getDefaultChipLabel(filterType),
                             backgroundColor = R.color.lightGray,
                             isCloseIconVisible = false,
                         )
                     },
-                    onFilterClicked = {
+                    onClicked = {
                         mainSingleLiveEvent.value = when (filterType) {
-                            is Slider -> MainEvent.ShowSliderFilterSettings(filterType, filterValue)
-                            is CheckList -> MainEvent.ShowCheckListFilterSettings(filterType, filterValue)
-                            is SaleStatus -> MainEvent.ShowDateFilterSettings(filterType, filterValue)
+                            is Slider -> MainEvent.OpenSliderFilterForm(filterType, filterValue)
+                            is CheckList -> MainEvent.OpenCheckListFilterForm(filterType, filterValue)
+                            is SaleStatus -> MainEvent.OpenDateFilterForm(filterType, filterValue)
                         }
                     },
                     onCloseIconClicked = { filterRepository.clear(filterType) },
@@ -105,9 +111,9 @@ class MainViewModel @Inject constructor(
         )
     }.asLiveData(coroutineProvider.getIoDispatcher())
 
-    private fun getDefaultChipLabel(filterType: FilterType): String {
-        return application.getString(
-            when (filterType) {
+    private fun getDefaultChipLabel(filterType: FilterType): LocalText {
+        return LocalText.Res(
+            stringId = when (filterType) {
                 EstateType -> R.string.hint_type
                 PointOfInterest -> R.string.label_points_of_interest
                 SaleStatus -> R.string.filter_sale_status
@@ -118,7 +124,7 @@ class MainViewModel @Inject constructor(
         )
     }
 
-    private fun getSelectedChipLabel(filterValue: FilterValue): String {
+    private fun getSelectedChipLabel(filterValue: FilterValue): LocalText {
         return when (filterValue) {
             is FilterValue.MinMax -> getMinMaxFilterLabel(filterValue)
             is FilterValue.Choices -> getChoicesFilterLabel(filterValue)
@@ -126,69 +132,58 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun getMinMaxFilterLabel(minMaxFilter: FilterValue.MinMax): String {
-        return application.getString(
-            when (minMaxFilter) {
+    private fun getMinMaxFilterLabel(minMaxFilter: FilterValue.MinMax): LocalText {
+        return LocalText.ResWithArgs(
+            stringId = when (minMaxFilter) {
                 is FilterValue.PhotoCount -> R.string.filter_photo_count_range_short
                 is FilterValue.Price -> R.string.filter_price_range_short
                 is FilterValue.Surface -> R.string.filter_surface_range_short
             },
-            minMaxFilter.min.toInt(),
-            minMaxFilter.max.toInt(),
+            args = listOf(minMaxFilter.min.toInt(), minMaxFilter.max.toInt()),
         )
     }
 
-    private fun getChoicesFilterLabel(choicesFilter: FilterValue.Choices): String {
+    private fun getChoicesFilterLabel(choicesFilter: FilterValue.Choices): LocalText {
+        val overflowLimit = 3
         val selectedItems = choicesFilter.selectedItems.map { it.stringId }
 
-        val displayedItems = selectedItems
-            .take(3) // Only display the first 3 items
-            .map { stringRes -> application.getString(stringRes) }
+        val itemCountOverflow = selectedItems.size - overflowLimit
 
-        val itemCountOverflow = selectedItems.size - displayedItems.size
+        return LocalText.Multi(
+            mutableListOf<LocalText>().apply {
+                add(LocalText.Join(stringIds = selectedItems.take(overflowLimit))) // Only display the first 3 items)
 
-        val stringBuilder = StringBuilder(displayedItems.joinToString())
-
-        if (itemCountOverflow > 0) {
-            stringBuilder.append(" (+$itemCountOverflow)")
-        }
-
-        return stringBuilder.toString()
+                if (itemCountOverflow > 0) {
+                    add(LocalText.Simple(" (+$itemCountOverflow)"))
+                }
+            }
+        )
     }
 
-    private fun getSaleStatusFilterLabel(dateFilter: FilterValue.Date): String {
+    private fun getSaleStatusFilterLabel(dateFilter: FilterValue.Date): LocalText {
         val min = dateFilter.from?.format(UtilsRepository.SHORT_DATE_FORMATTER)
         val max = dateFilter.until?.format(UtilsRepository.SHORT_DATE_FORMATTER)
 
+        val stringArgs = listOfNotNull(min, max)
 
-        return if (dateFilter.availableEstates) {
+        val stringRes = if (dateFilter.availableEstates) {
             if (min != null) {
-                if (max != null) {
-                    application.getString(R.string.filter_available_between, min, max)
-                } else {
-                    application.getString(R.string.filter_available_from, min)
-                }
+                if (max != null) R.string.filter_available_between else R.string.filter_available_from
             } else {
-                if (max != null) {
-                    application.getString(R.string.filter_available_until, max)
-                } else {
-                    application.getString(R.string.filter_available_all)
-                }
+                if (max != null) R.string.filter_available_until else R.string.filter_available_all
             }
         } else {
             if (min != null) {
-                if (max != null) {
-                    application.getString(R.string.filter_sold_between, min, max)
-                } else {
-                    application.getString(R.string.filter_sold_from, min)
-                }
+                if (max != null) R.string.filter_sold_between else R.string.filter_sold_from
             } else {
-                if (max != null) {
-                    application.getString(R.string.filter_sold_until, max)
-                } else {
-                    application.getString(R.string.filter_sold_all)
-                }
+                if (max != null) R.string.filter_sold_until else R.string.filter_sold_all
             }
+        }
+
+        return if (stringArgs.isEmpty()) {
+            LocalText.Res(stringId = stringRes)
+        } else {
+            LocalText.ResWithArgs(stringId = stringRes, args = stringArgs)
         }
     }
 
@@ -203,18 +198,15 @@ class MainViewModel @Inject constructor(
         initAndOpenForm(FormType.EDIT_ESTATE)
     }
 
-    fun onFilterMenuItemClicked() {
-        isFilteringMutableStateFlow.update { isVisible -> !isVisible }
-    }
-
     private fun initAndOpenForm(formType: FormType) {
         viewModelScope.launch(coroutineProvider.getIoDispatcher()) {
             setFormUseCase.initForm(formType)
-
-            withContext(coroutineProvider.getMainDispatcher()) {
-                mainSingleLiveEvent.value = MainEvent.OpenEstateForm
-            }
         }
+        mainSingleLiveEvent.value = MainEvent.OpenEstateForm
+    }
+
+    fun onFilterMenuItemClicked() {
+        isFilteringMutableStateFlow.update { isVisible -> !isVisible }
     }
 
     fun onBackStackChanged(backStackEntryCount: Int) {

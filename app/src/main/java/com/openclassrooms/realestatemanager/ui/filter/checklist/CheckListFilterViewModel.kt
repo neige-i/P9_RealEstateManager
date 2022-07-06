@@ -8,20 +8,21 @@ import com.openclassrooms.realestatemanager.data.RealEstateType
 import com.openclassrooms.realestatemanager.data.filter.FilterRepository
 import com.openclassrooms.realestatemanager.data.filter.FilterType
 import com.openclassrooms.realestatemanager.data.filter.FilterValue
-import com.openclassrooms.realestatemanager.domain.real_estate.GetAvailableValuesUseCase
+import com.openclassrooms.realestatemanager.data.real_estate.RealEstateRepository
 import com.openclassrooms.realestatemanager.ui.filter.FilterViewModel
 import com.openclassrooms.realestatemanager.ui.util.CoroutineProvider
 import com.openclassrooms.realestatemanager.ui.util.update
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
 class CheckListFilterViewModel @Inject constructor(
-    getAvailableValuesUseCase: GetAvailableValuesUseCase,
-    coroutineProvider: CoroutineProvider,
     savedStateHandle: SavedStateHandle,
     filterRepository: FilterRepository,
-) : FilterViewModel<FilterType.CheckList, FilterValue.Choices>(savedStateHandle, filterRepository) {
+    realEstateRepository: RealEstateRepository,
+    coroutineProvider: CoroutineProvider,
+) : FilterViewModel<FilterType.CheckList, FilterValue.Choices>(savedStateHandle, filterRepository, realEstateRepository) {
 
     private val checkedItemsMutableLiveData = MutableLiveData<MutableList<Localized>>()
 
@@ -36,7 +37,22 @@ class CheckListFilterViewModel @Inject constructor(
 
         // Setup view state's data sources
 
-        val allItemsLiveData = getAvailableValuesUseCase.getSelectedItems(filterType)
+        val allItemsLiveData = realEstateRepository.getAllRealEstates()
+            .map { estateList ->
+                estateList
+                    .asSequence() // Use Sequence for better performance
+                    .let { allEstates ->
+                        when (filterType) {
+                            FilterType.EstateType -> allEstates.map { realEstate ->
+                                realEstate.info.type
+                            }
+                            FilterType.PointOfInterest -> allEstates.flatMap { realEstate ->
+                                realEstate.poiList.map { poi -> poi.poiValue }
+                            }
+                        }
+                    }
+                    .toSet() // To remove duplicates
+            }
             .asLiveData(coroutineProvider.getIoDispatcher())
 
         viewStateMediatorLiveData.addSource(checkedItemsMutableLiveData) { checkedItems ->

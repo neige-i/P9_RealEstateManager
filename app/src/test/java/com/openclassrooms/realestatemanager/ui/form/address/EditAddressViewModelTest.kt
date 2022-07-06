@@ -157,7 +157,7 @@ class EditAddressViewModelTest {
     @Test
     fun `update additional address when change input with non-null content`() {
         // WHEN
-        editAddressViewModel.onAdditionalAddressInfoChanged("2nd floor", 3)
+        editAddressViewModel.onAdditionalAddressInfoChanged("2nd floor")
 
         // THEN
         verify(exactly = 1) { mockSetFormUseCase.updateAdditionalAddressInfo("2nd floor", 3) }
@@ -166,7 +166,7 @@ class EditAddressViewModelTest {
     @Test
     fun `update additional address when change input with null content`() {
         // WHEN
-        editAddressViewModel.onAdditionalAddressInfoChanged(null, 2)
+        editAddressViewModel.onAdditionalAddressInfoChanged(null)
 
         // THEN
         verify(exactly = 1) { mockSetFormUseCase.updateAdditionalAddressInfo("", 2) }
@@ -175,7 +175,7 @@ class EditAddressViewModelTest {
     @Test
     fun `update city when change input with non-null content`() {
         // WHEN
-        editAddressViewModel.onCityChanged("New York", 1)
+        editAddressViewModel.onCityChanged("New York")
 
         // THEN
         verify(exactly = 1) { mockSetFormUseCase.updateCity("New York", 1) }
@@ -184,7 +184,7 @@ class EditAddressViewModelTest {
     @Test
     fun `update city when change input with null content`() {
         // WHEN
-        editAddressViewModel.onCityChanged(null, 1)
+        editAddressViewModel.onCityChanged(null)
 
         // THEN
         verify(exactly = 1) { mockSetFormUseCase.updateCity("", 1) }
@@ -193,7 +193,7 @@ class EditAddressViewModelTest {
     @Test
     fun `update state when change input with non-null content`() {
         // WHEN
-        editAddressViewModel.onStateNameChanged("NY", 0)
+        editAddressViewModel.onStateNameChanged("NY")
 
         // THEN
         verify(exactly = 1) { mockSetFormUseCase.updateState("NY", 0) }
@@ -202,7 +202,7 @@ class EditAddressViewModelTest {
     @Test
     fun `update state when change input with null content`() {
         // WHEN
-        editAddressViewModel.onStateNameChanged(null, 0)
+        editAddressViewModel.onStateNameChanged(null)
 
         // THEN
         verify(exactly = 1) { mockSetFormUseCase.updateState("", 0) }
@@ -211,7 +211,7 @@ class EditAddressViewModelTest {
     @Test
     fun `update zipcode when change input with non-null content`() {
         // WHEN
-        editAddressViewModel.onZipcodeChanged("50111", 5)
+        editAddressViewModel.onZipcodeChanged("50111")
 
         // THEN
         verify(exactly = 1) { mockSetFormUseCase.updateZipcode("50111", 5) }
@@ -220,7 +220,7 @@ class EditAddressViewModelTest {
     @Test
     fun `update zipcode when change input with null content`() {
         // WHEN
-        editAddressViewModel.onZipcodeChanged(null, 5)
+        editAddressViewModel.onZipcodeChanged(null)
 
         // THEN
         verify(exactly = 1) { mockSetFormUseCase.updateZipcode("", 5) }
@@ -229,7 +229,7 @@ class EditAddressViewModelTest {
     @Test
     fun `update country when change input with non-null content`() {
         // WHEN
-        editAddressViewModel.onCountryChanged("United States", 0)
+        editAddressViewModel.onCountryChanged("United States")
 
         // THEN
         verify(exactly = 1) { mockSetFormUseCase.updateCountry("United States", 0) }
@@ -238,7 +238,7 @@ class EditAddressViewModelTest {
     @Test
     fun `update country when change input with null content`() {
         // WHEN
-        editAddressViewModel.onCountryChanged(null, 0)
+        editAddressViewModel.onCountryChanged(null)
 
         // THEN
         verify(exactly = 1) { mockSetFormUseCase.updateCountry("", 0) }

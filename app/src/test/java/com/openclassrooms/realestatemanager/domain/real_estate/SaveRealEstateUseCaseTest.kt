@@ -43,7 +43,7 @@ class SaveRealEstateUseCaseTest {
         private const val DEFAULT_AGENT_NAME = "Agent K"
         private const val UNKNOWN_AGENT_NAME = "unknown"
         private val DEFAULT_FORM = FormEntity(
-            type = "Flat",
+            estateType = "Flat",
             typeError = null,
             price = "98324.67",
             priceCursor = 4,

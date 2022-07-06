@@ -1,27 +1,26 @@
 package com.openclassrooms.realestatemanager.domain.form
 
-import android.app.Application
 import android.net.Uri
-import androidx.annotation.StringRes
 import com.openclassrooms.realestatemanager.data.PointOfInterest
 import com.openclassrooms.realestatemanager.data.RealEstateType
-import com.openclassrooms.realestatemanager.data.form.CurrentPictureEntity
-import com.openclassrooms.realestatemanager.data.form.CurrentPictureRepository
+import com.openclassrooms.realestatemanager.data.current_photo.CurrentPhotoEntity
+import com.openclassrooms.realestatemanager.data.current_photo.CurrentPhotoRepository
 import com.openclassrooms.realestatemanager.data.form.FormEntity
 import com.openclassrooms.realestatemanager.data.form.FormRepository
 import com.openclassrooms.realestatemanager.data.real_estate.RealEstateEntity
+import com.openclassrooms.realestatemanager.data.room.AgentEntity
 import com.openclassrooms.realestatemanager.domain.form.FormType.ADD_ESTATE
 import com.openclassrooms.realestatemanager.domain.form.FormType.EDIT_ESTATE
 import com.openclassrooms.realestatemanager.domain.real_estate.GetCurrentEstateUseCase
 import com.openclassrooms.realestatemanager.domain.real_estate.RealEstateResult
 import kotlinx.coroutines.flow.first
+import java.time.LocalDate
 import javax.inject.Inject
 
 class SetFormUseCase @Inject constructor(
     private val formRepository: FormRepository,
     private val getCurrentEstateUseCase: GetCurrentEstateUseCase,
-    private val currentPictureRepository: CurrentPictureRepository,
-    private val application: Application,
+    private val currentPhotoRepository: CurrentPhotoRepository,
 ) {
 
     suspend fun initForm(formType: FormType) {
@@ -59,46 +58,35 @@ class SetFormUseCase @Inject constructor(
         val area = realEstate.info.area?.toString() ?: ""
 
         return FormEntity(
-            id = realEstate.info.realEstateId,
-            type = application.getString(RealEstateType.valueOf(realEstate.info.type).labelId),
+            id = realEstate.info.estateId,
+            estateType = realEstate.info.type,
             typeError = null,
             price = price,
-            priceCursor = price.length,
             area = area,
-            areaCursor = area.length,
             totalRoomCount = realEstate.info.totalRoomCount,
             bathroomCount = realEstate.info.bathroomCount,
             bedroomCount = realEstate.info.bedroomCount,
             description = realEstate.info.description,
-            descriptionCursor = realEstate.info.description.length,
             pictureList = realEstate.photoList.map {
-                FormEntity.PictureEntity(uri = Uri.parse(it.uri), description = it.description)
+                FormEntity.PhotoEntity(uri = Uri.parse(it.uri), description = it.description)
             },
             pictureListError = null,
             streetName = realEstate.info.streetName,
             streetNameError = null,
-            streetNameCursor = realEstate.info.streetName.length,
             additionalAddressInfo = realEstate.info.additionalAddressInfo,
-            additionalAddressInfoCursor = realEstate.info.additionalAddressInfo.length,
             city = realEstate.info.city,
             cityError = null,
-            cityCursor = realEstate.info.city.length,
             state = realEstate.info.state,
             stateError = null,
-            stateCursor = realEstate.info.state.length,
             zipcode = realEstate.info.zipcode,
             zipcodeError = null,
-            zipcodeCursor = realEstate.info.zipcode.length,
             country = realEstate.info.country,
             countryError = null,
-            countryCursor = realEstate.info.country.length,
-            pointsOfInterests = realEstate.poiList.map {
-                PointOfInterest.valueOf(it.poiValue).labelId
-            },
-            agentName = realEstate.agent?.username.orEmpty(),
+            pointsOfInterests = realEstate.poiList.map { it.poiValue },
+            agent = realEstate.agent,
             marketEntryDate = realEstate.info.marketEntryDate,
             marketEntryDateError = null,
-            saleDate = realEstate.info.saleDate ?: "",
+            saleDate = realEstate.info.saleDate,
             saleDateError = null,
             isAvailableForSale = realEstate.info.saleDate == null,
         )
@@ -110,19 +98,19 @@ class SetFormUseCase @Inject constructor(
 
     // MAIN INFO
 
-    fun updateType(type: String) {
-        formRepository.setForm(formRepository.getForm().copy(type = type))
+    fun updateType(estateType: RealEstateType) {
+        formRepository.setForm(formRepository.getForm().copy(estateType = estateType))
     }
 
-    fun updatePrice(price: String, cursorPosition: Int) {
+    fun updatePrice(price: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(price = price, priceCursor = cursorPosition)
+            formRepository.getForm().copy(price = price)
         )
     }
 
-    fun updateArea(area: String, cursorPosition: Int) {
+    fun updateArea(area: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(area = area, areaCursor = cursorPosition)
+            formRepository.getForm().copy(area = area)
         )
     }
 
@@ -182,17 +170,10 @@ class SetFormUseCase @Inject constructor(
 
     // DETAIL INFO
 
-    fun updateDescription(description: String, cursorPosition: Int) {
+    fun updateDescription(description: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(
-                description = description,
-                descriptionCursor = cursorPosition
-            )
+            formRepository.getForm().copy(description = description)
         )
-    }
-
-    fun updatePicturePosition(position: Int) {
-        formRepository.setCurrentPicturePosition(position)
     }
 
     fun removePictureAt(position: Int) {
@@ -207,112 +188,87 @@ class SetFormUseCase @Inject constructor(
 
     // CURRENT PICTURE
 
-    fun initPicture(uri: Uri, description: String = "") {
-        currentPictureRepository.setPicture(
-            CurrentPictureEntity(
-                uri = uri,
-                description = description,
+    fun initPhotoToEdit(index: Int, photo: FormEntity.PhotoEntity) {
+        currentPhotoRepository.setPhotoIndex(index)
+        currentPhotoRepository.initPhoto(
+            CurrentPhotoEntity(
+                uri = photo.uri,
+                isUriErrorVisible = false,
+                description = photo.description,
                 descriptionError = null,
-                descriptionCursor = description.length
             )
         )
     }
 
-    fun updatePictureDescription(description: String, cursorPosition: Int) {
-        currentPictureRepository.setPicture(
-            currentPictureRepository.getCurrentPicture()?.copy(
-                description = description,
-                descriptionCursor = cursorPosition
-            )
-        )
+    fun initPhotoToAdd() {
+        currentPhotoRepository.setPhotoIndex(CurrentPhotoRepository.ADD_PHOTO)
+        currentPhotoRepository.initPhoto(CurrentPhotoRepository.DEFAULT_PHOTO)
     }
 
-    fun resetPicture() {
-        currentPictureRepository.setPicture(null)
-    }
+    suspend fun savePicture() {
+        val currentPhoto = currentPhotoRepository.getCurrentPhotoFlow().first()
+        val photoIndex = currentPhotoRepository.getPhotoIndexFlow().first()
 
-    fun savePicture() {
-        val currentPicture = currentPictureRepository.getCurrentPicture() ?: return
-        val picturePosition = formRepository.getCurrentPicturePosition()
-
-        val picture = FormEntity.PictureEntity(
-            uri = currentPicture.uri,
-            description = currentPicture.description,
+        val photoToSave = FormEntity.PhotoEntity(
+            uri = currentPhoto.uri!!,
+            description = currentPhoto.description,
         )
 
         modifyPictureList {
-            if (formRepository.getForm().pictureList.size == picturePosition) {
-                add(picture)
+            if (photoIndex == CurrentPhotoRepository.ADD_PHOTO) {
+                add(photoToSave)
             } else {
-                set(picturePosition, picture)
+                set(photoIndex, photoToSave)
             }
         }
     }
 
     // ADDRESS
 
-    fun updateStreetName(streetName: String, cursorPosition: Int) {
+    fun updateStreetName(streetName: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(
-                streetName = streetName,
-                streetNameCursor = cursorPosition
-            )
+            formRepository.getForm().copy(streetName = streetName)
         )
     }
 
-    fun updateAdditionalAddressInfo(additionalAddressInfo: String, cursorPosition: Int) {
+    fun updateAdditionalAddressInfo(additionalAddressInfo: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(
-                additionalAddressInfo = additionalAddressInfo,
-                additionalAddressInfoCursor = cursorPosition
-            )
+            formRepository.getForm().copy(additionalAddressInfo = additionalAddressInfo)
         )
     }
 
-    fun updateCity(city: String, cursorPosition: Int) {
+    fun updateCity(city: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(
-                city = city,
-                cityCursor = cursorPosition
-            )
+            formRepository.getForm().copy(city = city)
         )
     }
 
-    fun updateState(state: String, cursorPosition: Int) {
+    fun updateState(state: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(
-                state = state,
-                stateCursor = cursorPosition
-            )
+            formRepository.getForm().copy(state = state)
         )
     }
 
-    fun updateZipcode(zipcode: String, cursorPosition: Int) {
+    fun updateZipcode(zipcode: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(
-                zipcode = zipcode,
-                zipcodeCursor = cursorPosition
-            )
+            formRepository.getForm().copy(zipcode = zipcode)
         )
     }
 
-    fun updateCountry(country: String, cursorPosition: Int) {
+    fun updateCountry(country: String) {
         formRepository.setForm(
-            formRepository.getForm().copy(
-                country = country,
-                countryCursor = cursorPosition
-            )
+            formRepository.getForm().copy(country = country)
         )
     }
 
-    fun updatePoi(@StringRes labelId: Int, isChecked: Boolean) {
+    fun updatePoi(poi: PointOfInterest, isChecked: Boolean) {
         val updatedForm = formRepository.getForm().let {
             it.copy(
                 pointsOfInterests = applyModificationOn(it.pointsOfInterests) {
                     if (isChecked) {
-                        add(labelId)
+                        add(poi)
                     } else {
-                        remove(labelId)
+                        remove(poi)
                     }
                 }
             )
@@ -323,19 +279,19 @@ class SetFormUseCase @Inject constructor(
 
     // SALE STATUS
 
-    fun updateAgent(agentName: String) {
+    fun updateAgent(agent: AgentEntity) {
         formRepository.setForm(
-            formRepository.getForm().copy(agentName = agentName)
+            formRepository.getForm().copy(agent = agent)
         )
     }
 
-    fun updateMarketEntryDate(marketEntryDate: String) {
+    fun updateMarketEntryDate(marketEntryDate: LocalDate) {
         formRepository.setForm(
             formRepository.getForm().copy(marketEntryDate = marketEntryDate)
         )
     }
 
-    fun updateSaleDate(saleDate: String) {
+    fun updateSaleDate(saleDate: LocalDate) {
         formRepository.setForm(
             formRepository.getForm().copy(saleDate = saleDate)
         )
@@ -347,12 +303,12 @@ class SetFormUseCase @Inject constructor(
         formRepository.setForm(
             currentForm.copy(
                 isAvailableForSale = isAvailable,
-                saleDate = if (!isAvailable) "" else currentForm.saleDate
+                saleDate = if (!isAvailable) null else currentForm.saleDate
             )
         )
     }
 
-    private fun modifyPictureList(modification: MutableList<FormEntity.PictureEntity>.() -> Unit) {
+    private fun modifyPictureList(modification: MutableList<FormEntity.PhotoEntity>.() -> Unit) {
         val currentForm = formRepository.getForm()
 
         formRepository.setForm(
